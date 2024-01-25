@@ -1,6 +1,6 @@
 {
   "name": "tour-extension",
-  "displayName": "Tour extension",
+  "displayName": "Tour Helper",
   "version": "0.0.1",
   "description": "A basic Plasmo extension.",
   "author": "Plasmo Corp. <foss@plasmo.com>",
@@ -10,6 +10,8 @@
     "test": "plasmo test"
   },
   "dependencies": {
+    "antd": "^5.13.2",
+    "copy-to-clipboard": "^3.3.3",
     "plasmo": "0.84.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"

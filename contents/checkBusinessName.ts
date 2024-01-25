@@ -1,4 +1,4 @@
-export {}
+import type { PlasmoCSConfig } from "plasmo"
 console.log("hello world")
 const name = "安思科"
 
@@ -20,3 +20,13 @@ function checkBusinessName() {
 }
 
 checkBusinessName()
+
+
+// 获取某一天的所有酒店 ID
+// Array.from(document.querySelectorAll('.ant-form')[0].querySelectorAll('.ant-select-selection-selected-value')).map(e=>e.innerText.split('/')[1])
+
+ 
+export const config: PlasmoCSConfig = {
+  matches: ["https://vbooking.ctrip.com/ivbk/vendor/baseInfoMerge*"],
+  world: "MAIN"
+}
