@@ -43,7 +43,7 @@ const copyPaySpots = () => {
   const event = (e) => {
     const spots = getAllSpots()
     const paySpots = spots
-      .filter((spot) => spot.type === "含首道门票")
+      .filter((spot) => spot.type === "含首道门票" || spot.type === "已含门票")
       .map((spot) => spot.name.split("/")[0])
     const spotStr = paySpots.join("、")
     console.log("当前行程所有的景点：", spotStr)
