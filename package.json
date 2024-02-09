@@ -27,7 +27,8 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://vacations.ctrip.com/*",
+      "https://vbooking.ctrip.com/*"
     ],
     "permissions": [
       "activeTab",
