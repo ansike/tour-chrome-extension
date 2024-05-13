@@ -26,6 +26,7 @@ function IndexPopup() {
         <a href="https://test-c2x1zzjx4rou.feishu.cn/docx/CHHVdMWPBorPDnxrLBDck6nanLd">
           Tour Helper 安装文档
         </a>
+        THIS is aa
       </div>
     </div>
   )
