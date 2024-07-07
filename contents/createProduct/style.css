@@ -1,0 +1,24 @@
+#plasmo-shadow-container{
+  position: absolute!important;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.plasmo-csui-container{
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+#plasmo-container {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  right: 20px;
+}
+
