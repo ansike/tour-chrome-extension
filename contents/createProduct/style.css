@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 #plasmo-shadow-container{
   position: absolute!important;
   width: 100%;
@@ -15,7 +19,7 @@
 }
 
 #plasmo-container {
-  position: absolute;
+  position: fixed;
   width: 50px;
   height: 50px;
   top: 50%;

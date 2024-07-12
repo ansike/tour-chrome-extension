@@ -1,33 +1,45 @@
 import { Button, message } from 'antd'
 import { type PlasmoCSConfig } from 'plasmo'
-import styleText from 'data-text:./style.css'
-import { saveSaleControlInfo } from './scripts/saveSaleControlInfo'
-import { saveProductBaseInfo } from './scripts/saveProductBaseInfo'
+import CreateModal from './CreateModal'
+import { useState } from 'react'
+import cssText from "data-text:./style.css"
+
+export const getStyle = () => {
+  const style = document.createElement("style")
+  style.textContent = cssText
+  return style
+}
 
 const CreateProduct = () => {
   const [messageApi, contextHolder] = message.useMessage()
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const event = async () => {
-    const controlInfo = await saveSaleControlInfo();
-    console.log(controlInfo.productId);
-    // saveProductBaseInfo({
+    setIsModalOpen(true);
+    // const controlInfo = await saveSaleControlInfo();
 
-    // });
-    messageApi.open({
-      type: 'success',
-      content: `start create project`
-    })
+    // 48165125
+    // console.log(controlInfo.productId);
+    // const productId = 48165125
+    // // saveProductBaseInfo({
+
+    // // });
+    
+    // messageApi.open({
+    //   type: 'success',
+    //   content: `start create project`
+    // })
   }
 
   return (
     <div id='plasmo-container'>
       {contextHolder}
       <div
+        className="p-8"
         style={{
           background: '#1677ff',
           color: 'white',
           fontSize: 12,
-          padding: '8px',
           cursor: 'pointer',
           borderRadius:'100%',
           width: '40px',
@@ -44,6 +56,7 @@ const CreateProduct = () => {
           Tour helper
         </span>
       </div>
+      <CreateModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </div>
   )
 }
@@ -54,12 +67,6 @@ export const config: PlasmoCSConfig = {
 
 export const getPortalRoot = () => {
   return document.body
-}
-
-export const getStyle = () => {
-  const style = document.createElement('style')
-  style.textContent = styleText
-  return style
 }
 
 export default CreateProduct

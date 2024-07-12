@@ -1,5 +1,7 @@
 // 无须过多的参数，可以固定
-export const saveSaleControlInfo = async (): Promise<{productId: number}> => {
+type saveSaleControlInfoProps = {}
+
+export const saveSaleControlInfo = async (props?: saveSaleControlInfoProps): Promise<{productId: number}> => {
   const data = {
     contentType: 'json',
     head: {
@@ -56,6 +58,7 @@ export const saveSaleControlInfo = async (): Promise<{productId: number}> => {
       desCityDto: {}
     }
   };
+  
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/saveSaleControlInfo?_fxpcqlniredt=09031111115146167449&_fxpcqlniredt=09031111115146167449',
     {
