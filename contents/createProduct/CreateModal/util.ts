@@ -1,6 +1,11 @@
 import * as XLSX from 'xlsx';
 
 
+export const splitProduct = () => {
+  // 
+}
+
+
 export function exportExcelToNestedJSON(excelData: any) {
   try {
     // 读取 Excel 数据

@@ -1,4 +1,3 @@
-import { Button, message } from 'antd'
 import { type PlasmoCSConfig } from 'plasmo'
 import CreateModal from './CreateModal'
 import { useState } from 'react'
@@ -11,29 +10,14 @@ export const getStyle = () => {
 }
 
 const CreateProduct = () => {
-  const [messageApi, contextHolder] = message.useMessage()
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const event = async () => {
     setIsModalOpen(true);
-    // const controlInfo = await saveSaleControlInfo();
-
-    // 48165125
-    // console.log(controlInfo.productId);
-    // const productId = 48165125
-    // // saveProductBaseInfo({
-
-    // // });
-    
-    // messageApi.open({
-    //   type: 'success',
-    //   content: `start create project`
-    // })
   }
 
   return (
     <div id='plasmo-container'>
-      {contextHolder}
       <div
         className="p-8"
         style={{
@@ -56,7 +40,7 @@ const CreateProduct = () => {
           Tour helper
         </span>
       </div>
-      <CreateModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      {isModalOpen && <CreateModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}
     </div>
   )
 }

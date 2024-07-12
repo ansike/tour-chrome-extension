@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Button, Input, Modal, message } from 'antd'
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail'
+import ProductSteps from './ProductSteps'
+// import { splitProduct } from './util'
 
 // import cssText from 'data-text:~/contents/createProduct/style.css'
 
@@ -37,15 +39,6 @@ const CreateModal = (props: CreateModalProps) => {
     setProductInfo(baseInfo)
   }
 
-  const splitProduct = async () => {
-    if (!productId) {
-      return messageApi.info('请输入产品ID')
-    }
-    // TODO 分裂产品
-    // const { baseInfo } = await getProductDetail(productId)
-    // setProductInfo(baseInfo)
-  }
-
   return (
     <div>
       {contextHolder}
@@ -73,16 +66,13 @@ const CreateModal = (props: CreateModalProps) => {
             <Button type='primary' onClick={getProduct}>
               获取产品信息
             </Button>
-            <Button type='primary' onClick={splitProduct}>
-              复制产品
-            </Button>
           </div>
-          <div style={{ display: 'flex', marginTop: '30px', minHeight: '300px' }}>
+          <div style={{ display: 'flex', marginTop: '30px', minHeight: '300px', flexDirection:'column' }}>
             <div>
               <span>产品信息：</span>
               <span>{productInfo?.name||'--'}</span>
             </div>
-            {/*  */}
+            <ProductSteps productId={productId} />
           </div>
         </div>
       </Modal>
