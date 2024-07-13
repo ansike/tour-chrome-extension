@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Steps, message, type StepProps } from 'antd';
+import React, { useState } from 'react'
+import { Button, Flex, Steps, message, type StepProps } from 'antd'
 
 import { getProductDetail } from '../scripts/getProductDetail';
 import { getTourDaily } from '../scripts/getProductBaseInfo';
@@ -67,18 +67,17 @@ const ProductSteps = (props: ProductStepsProps) => {
   console.log({productInfo});
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <Flex vertical>
       {contextHolder}
-      <Button type='primary' onClick={split}>
+      {/* <Button type='primary' onClick={split}>
         分裂产品
-      </Button>
+      </Button> */}
       <Steps
-        style={{marginTop: '20px'}}
         current={current}
         direction="vertical"
         items={stepItems}
       />
-    </div>
+    </Flex>
   )
 }
 

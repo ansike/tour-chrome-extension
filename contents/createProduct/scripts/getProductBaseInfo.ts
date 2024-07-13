@@ -1,3 +1,7 @@
+export interface TourDailyDescription {
+  [key: string]: any;
+}
+
 export const getTourDaily = async (productId: string) => {
   const tourInfoId = await getProductTourInfoList(productId);
   return await getTourDailyDetail(tourInfoId)
@@ -38,7 +42,11 @@ export const getProductTourInfoList = async (productId: string) => {
   return match[1]
 }
 
-export const getTourDailyDetail = async (tourInfoId: string) => {
+export const getTourDailyDetail = async (tourInfoId: string): Promise<{
+  tourInfo: {
+    tourDailyDescriptions: TourDailyDescription[]
+  }
+}> => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/20049/getTourDailyDetail.json',
     {
