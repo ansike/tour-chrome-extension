@@ -1,60 +1,71 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx'
 
-
-export const splitProduct = () => {
-  // 
+export const parseHtmlToObj = (html: string) => {
+  const match = html.match(/<script>([\s\S]*?)<\/script>/)
+  if (match) {
+    // TODO 换一个方法获取 product 基础数据
+    const str = match[1].split(' = ')[2].split('\n')[0]
+    const obj = JSON.parse(str)
+    return JSON.parse(str)
+  } else {
+    console.log('Unable to find __INITIAL_STATE__ object in the input string.')
+    return
+  }
 }
 
-
-export function exportExcelToNestedJSON(excelData: any) {
+export function exportExcelToNestedJSON (excelData: any) {
   try {
     // 读取 Excel 数据
-    const workbook = XLSX.read(excelData, { type: 'array' });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const workbook = XLSX.read(excelData, { type: 'array' })
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]]
 
     // 获取表头信息
-    const headers = XLSX.utils.sheet_to_json(worksheet, { header: 1, range: 0 });
+    const headers = XLSX.utils.sheet_to_json(worksheet, { header: 1, range: 0 })
 
     // 构建表头对象
-    const headerObj = {};
+    const headerObj = {}
     headers.forEach((row, rowIndex) => {
       row.forEach((cell, colIndex) => {
-        const mergedCell = getMergedCellValue(worksheet, rowIndex, colIndex);
+        const mergedCell = getMergedCellValue(worksheet, rowIndex, colIndex)
         if (!headerObj[colIndex]) {
-          headerObj[colIndex] = [];
+          headerObj[colIndex] = []
         }
-        headerObj[colIndex][rowIndex] = mergedCell || cell;
-      });
-    });
+        headerObj[colIndex][rowIndex] = mergedCell || cell
+      })
+    })
 
     // 将 Excel 数据转换为嵌套的 JSON 格式
     const jsonData = XLSX.utils.sheet_to_json(worksheet, {
       header: (row, index) => {
-        const keys = Object.keys(headerObj);
-        return keys.map(key => headerObj[key][index]).join('.');
+        const keys = Object.keys(headerObj)
+        return keys.map(key => headerObj[key][index]).join('.')
       },
       range: 1, // 从第二行开始
       blankrows: false // 忽略空行
-    });
+    })
 
     // 格式化 JSON 输出
-    const formattedJSON = JSON.stringify(jsonData, null, 2);
+    const formattedJSON = JSON.stringify(jsonData, null, 2)
 
-    return formattedJSON;
+    return formattedJSON
   } catch (error) {
-    console.error('Error exporting Excel to nested JSON:', error);
-    throw error;
+    console.error('Error exporting Excel to nested JSON:', error)
+    throw error
   }
 }
 
 // 获取合并单元格的值
-export function getMergedCellValue(worksheet, rowIndex, colIndex) {
-  const cell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: colIndex })];
+export function getMergedCellValue (worksheet, rowIndex, colIndex) {
+  const cell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: colIndex })]
   if (cell && cell.l && cell.l.target) {
-    const { r: mergedRowIndex, c: mergedColIndex } = XLSX.utils.decode_cell(cell.l.target);
+    const { r: mergedRowIndex, c: mergedColIndex } = XLSX.utils.decode_cell(
+      cell.l.target
+    )
     if (mergedRowIndex <= rowIndex && mergedColIndex <= colIndex) {
-      return worksheet[XLSX.utils.encode_cell({ r: mergedRowIndex, c: mergedColIndex })].v;
+      return worksheet[
+        XLSX.utils.encode_cell({ r: mergedRowIndex, c: mergedColIndex })
+      ].v
     }
   }
-  return null;
+  return null
 }
