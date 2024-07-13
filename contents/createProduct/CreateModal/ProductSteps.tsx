@@ -64,7 +64,7 @@ const ProductSteps = (props: ProductStepsProps) => {
     // setProductInfo(baseInfo)
   }
 
-  console.log({productInfo});
+  console.log({ productInfo });
 
   return (
     <Flex vertical>
@@ -73,6 +73,7 @@ const ProductSteps = (props: ProductStepsProps) => {
         分裂产品
       </Button> */}
       <Steps
+        style={{ display: 'none' }}
         current={current}
         direction="vertical"
         items={stepItems}

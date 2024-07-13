@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Card, Drawer, Flex, Input, Modal, message } from 'antd'
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail'
-import ProductSteps from './ProductSteps'
 import { getTourDaily, type TourDailyDescription } from '~/contents/createProduct/scripts/getProductBaseInfo'
 import type { TourDay } from './interface'
 import Tour from './Tour'
@@ -148,10 +147,10 @@ const CreateModal = (props: CreateModalProps) => {
           {tourDay.length > 0 && (
             <Card>
               {
-                tourDay.map(val => {
+                tourDay.slice(0, 1).map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
-                      <Tour data={val} updateTourDayStatus={updateTourDayStatus} />
+                      <Tour productId={productId} data={val} updateTourDayStatus={updateTourDayStatus} />
                     </Card.Grid>
                   )
                 })
