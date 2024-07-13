@@ -61,12 +61,6 @@ const ProductSteps = (props: ProductStepsProps) => {
     }
   }
 
-  useEffect(()=>{
-    if(productId){
-      split();
-    }
-  },[productId])
-
   const split = async () => {
     if (!productId) {
       return messageApi.info('请输入产品ID')
