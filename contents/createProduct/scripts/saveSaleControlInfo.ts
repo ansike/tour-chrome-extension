@@ -1,7 +1,6 @@
-// 无须过多的参数，可以固定
-type saveSaleControlInfoProps = {}
-
-export const saveSaleControlInfo = async (props?: saveSaleControlInfoProps): Promise<{productId: number}> => {
+export const saveSaleControlInfo = async (
+  productId: string
+): Promise<{ productId: number }> => {
   const data = {
     contentType: 'json',
     head: {
@@ -14,8 +13,8 @@ export const saveSaleControlInfo = async (props?: saveSaleControlInfoProps): Pro
       auth: '',
       extension: []
     },
-    id: '1431565', // 供应商ID
-    idType: 'providerId',
+    id: productId,
+    idType: 'productId',
     saleControlInfoDto: {
       contractId: 648526,
       saleMode: 'P',
@@ -57,8 +56,8 @@ export const saveSaleControlInfo = async (props?: saveSaleControlInfoProps): Pro
       ],
       desCityDto: {}
     }
-  };
-  
+  }
+
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/saveSaleControlInfo?_fxpcqlniredt=09031111115146167449&_fxpcqlniredt=09031111115146167449',
     {

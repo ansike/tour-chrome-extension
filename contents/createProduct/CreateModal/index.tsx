@@ -19,7 +19,9 @@ type CreateModalProps = {
 const CreateModal = (props: CreateModalProps) => {
   const { isModalOpen, setIsModalOpen } = props
   const queryParams = new URLSearchParams(window.location.search)
-  const [productId, setProductId] = useState(queryParams.get('productid'))
+  const [productId, setProductId] = useState(
+    queryParams.get('productid') || queryParams.get('productId')
+  )
   const [messageApi, contextHolder] = message.useMessage()
   const [productInfo, setProductInfo] = useState(false)
 

@@ -1,5 +1,5 @@
 
-export const productDuplicate = async (productId: string) => {
+export const productDuplicate = async (productId: string): Promise<{newProductId: string}> => {
   const res = await fetch("https://online.ctrip.com/restapi/soa2/15638/productDuplicate.json?_fxpcqlniredt=09031072216594047056&_fxpcqlniredt=09031072216594047056", {
     "headers": {
       "accept": "*/*",

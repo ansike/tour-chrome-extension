@@ -10,7 +10,7 @@ export const getStyle = () => {
 };
 
 const CreateProduct = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const event = async () => {
     setIsModalOpen(true);
