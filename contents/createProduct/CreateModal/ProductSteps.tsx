@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { Button, Steps, message, type StepProps } from 'antd'
+import React, { useState } from 'react';
+import { Button, Steps, message, type StepProps } from 'antd';
 
-import { getProductDetail } from '../scripts/getProductDetail'
-import { getTourDaily } from '../scripts/getProductBaseInfo'
+import { getProductDetail } from '../scripts/getProductDetail';
+import { getTourDaily } from '../scripts/getProductBaseInfo';
 
 type ProductStepsProps = {
   productId: string
@@ -11,7 +11,7 @@ type ProductStepsProps = {
 const ProductSteps = (props: ProductStepsProps) => {
   const { productId } = props
   const [current, setCurrent] = useState(1);
-  const [productInfo, setProductInfo] = useState(false)
+  const [productInfo, setProductInfo] = useState(false);
   const [messageApi, contextHolder] = message.useMessage()
   const [stepItems, setStepItems] = useState<StepProps[]>([
     {
@@ -56,7 +56,7 @@ const ProductSteps = (props: ProductStepsProps) => {
     setProductInfo(baseInfo)
 
     const tour = await getTourDaily(productId);
-    console.log(tour.tourInfo)
+    // console.log(tour.tourInfo)
 
     // await splitProduct();
     // TODO 分裂产品

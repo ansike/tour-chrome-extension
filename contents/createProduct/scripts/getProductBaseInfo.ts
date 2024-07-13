@@ -1,8 +1,5 @@
 export const getTourDaily = async (productId: string) => {
-  // const tourRes = await getProductTourInfoList(productId)
-  // console.log(tourRes.tourInfos[0].tourInfoId)
-  // window.__INITIAL_STATE__?.tourInfoList[0].tourInfoId
-  const tourInfoId = '270295598481358854';
+  const tourInfoId = await getProductTourInfoList(productId);
   return await getTourDailyDetail(tourInfoId)
 }
 
@@ -35,7 +32,10 @@ export const getProductTourInfoList = async (productId: string) => {
       credentials: 'include'
     }
   )
-  return await res.json()
+  const text = await res.text()
+  const tourInfoIdRegex = /"tourInfoId":(\d+)/
+  const match = tourInfoIdRegex.exec(text)
+  return match[1]
 }
 
 export const getTourDailyDetail = async (tourInfoId: string) => {

@@ -61,16 +61,23 @@ const CreateModal = (props: CreateModalProps) => {
             <Input
               style={{ marginRight: '40px' }}
               value={productId}
-              onChange={v => setProductId(v.target.value?.replace(/\s+/,''))}
+              onChange={v => setProductId(v.target.value?.replace(/\s+/, ''))}
             />
             <Button type='primary' onClick={getProduct}>
               获取产品信息
             </Button>
           </div>
-          <div style={{ display: 'flex', marginTop: '30px', minHeight: '300px', flexDirection:'column' }}>
+          <div
+            style={{
+              display: 'flex',
+              marginTop: '30px',
+              minHeight: '300px',
+              flexDirection: 'column'
+            }}
+          >
             <div>
               <span>产品信息：</span>
-              <span>{productInfo?.name||'--'}</span>
+              <span>{productInfo?.name || '--'}</span>
             </div>
             <ProductSteps productId={productId} />
           </div>

@@ -1,16 +1,16 @@
-import { type PlasmoCSConfig } from 'plasmo'
-import CreateModal from './CreateModal'
-import { useState } from 'react'
-import cssText from "data-text:./style.css"
+import { type PlasmoCSConfig } from 'plasmo';
+import CreateModal from './CreateModal';
+import { useState } from 'react';
+import cssText from "data-text:./style.css";
 
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
   return style
-}
+};
 
 const CreateProduct = () => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const event = async () => {
     setIsModalOpen(true);
@@ -53,4 +53,4 @@ export const getPortalRoot = () => {
   return document.body
 }
 
-export default CreateProduct
+export default CreateProduct;
