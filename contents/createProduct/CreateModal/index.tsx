@@ -143,7 +143,7 @@ const CreateModal = (props: CreateModalProps) => {
               onChange={v => setProductId(v.target.value?.replace(/\s+/, ''))}
             />
             <Button type='primary' onClick={getProduct}>
-              获取产品信息
+              分裂当前产品
             </Button>
           </Flex>
           <div>
