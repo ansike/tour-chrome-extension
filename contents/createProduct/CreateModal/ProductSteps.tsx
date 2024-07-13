@@ -8,6 +8,7 @@ import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/Creat
 import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
 import { saveProduct } from '~/contents/createProduct/scripts/saveProductBaseInfo';
 import { saveProductRichText } from '~/contents/createProduct/scripts/savedescriptioninfo';
+import { savePackage } from '~/contents/createProduct/scripts/savePackageItem';
 import type { TourDay } from "./interface";
 
 
@@ -83,13 +84,17 @@ const ProductSteps = (props: ProductStepsProps) => {
         return saveProduct(newProductId);
       },  CreateStepConstant.PRODUCT_INFO);
 
-    // const newProductId="48407172"
-
+    
     const richText = await doJob(()=>{
       return saveProductRichText(newProductId);
     },  CreateStepConstant.PRODUCT_RICHTEXT);
+    
+    // const newProductId="48407172"
+    const packageRes = await doJob(()=>{
+      return savePackage(newProductId);
+    },  CreateStepConstant.PACKAGE_MANAGE);
 
-    console.log(richText);
+    console.log(packageRes);
     
   }
   

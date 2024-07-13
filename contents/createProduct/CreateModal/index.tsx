@@ -103,7 +103,7 @@ const CreateModal = (props: CreateModalProps) => {
     }
     const [{ baseInfo }, { tourInfo }] = await Promise.all([getProductDetail(productId), getTourDaily(productId)])
     setProductInfo(baseInfo)
-    const routes = permuteWithDeletions([...tourInfo.tourDailyDescriptions])
+    const routes = permuteWithDeletions([...(tourInfo?.tourDailyDescriptions||[])])
     console.log('routes', routes);
     setTourDay(routes)
   }
