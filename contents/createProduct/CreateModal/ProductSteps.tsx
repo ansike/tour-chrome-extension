@@ -8,21 +8,27 @@ import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/Creat
 import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
 import { saveProduct } from '~/contents/createProduct/scripts/saveProductBaseInfo';
 import { saveProductRichText } from '~/contents/createProduct/scripts/savedescriptioninfo';
+import type { TourDay } from "./interface";
+
 
 type ProductStepsProps = {
+  data: TourDay;
   productId: string;
   tourDailyDescriptions: any[];
+  updateTourDayStatus: (id: string, status: string) => void;
 }
 
 const ProductSteps = (props: ProductStepsProps) => {
-  const { productId, tourDailyDescriptions } = props
+  const { data, productId, tourDailyDescriptions, updateTourDayStatus } = props
   const [current, setCurrent] = useState(0);
   const [messageApi, contextHolder] = message.useMessage()
   const [stepItems, setStepItems] = useState<StepProps[]>(StepsConfMap)
 
-  // useEffect(()=>{
-
-  // },[productId, ])
+  useEffect(()=>{
+    if(productId){
+      split();
+    }
+  },[productId])
 
   const doJob = async (fn: () => any, title: string) => {
     try {
@@ -35,7 +41,13 @@ const ProductSteps = (props: ProductStepsProps) => {
         step.description = `${title} success: ${JSON.stringify(info)}`;
         return prev;
       })
-      setCurrent(prev=>prev+1);
+
+      setCurrent(prev=>{
+        const next = prev+1;
+        updateTourDayStatus(data.id, `${next+1}/${stepItems.length} [${title}]`);
+        return next
+      });
+
       return info;
     } catch (error) {
       setStepItems((prev)=>{
@@ -44,19 +56,20 @@ const ProductSteps = (props: ProductStepsProps) => {
       })
 
       console.log(`${title} error`, error);
+      updateTourDayStatus(data.id, `${current+1}/${stepItems.length} ${title} error ${error}`);
       return;
     }
   }
 
   const split = async () => {
-    // if (!productId) {
-    //   return messageApi.info('请输入产品ID')
-    // }
+    if (!productId) {
+      return messageApi.info('请输入产品ID')
+    }
 
     const product = await doJob(()=>{
       return productDuplicate(productId);
     }, CreateStepConstant.DUPLICATE_PRODUCT);
-    console.log(product.newProductId);
+    console.log('newProductId', product.newProductId);
     const newProductId=product.newProductId
 
     // const newProductId="48406430"
@@ -68,7 +81,6 @@ const ProductSteps = (props: ProductStepsProps) => {
     const productInfo = await doJob(()=>{
         return saveProduct(newProductId);
       },  CreateStepConstant.PRODUCT_INFO);
-    console.log(productInfo);
 
     // const newProductId="48407172"
 
@@ -78,15 +90,11 @@ const ProductSteps = (props: ProductStepsProps) => {
 
     console.log(richText);
     
-    
   }
   
   return (
     <Flex vertical>
       {contextHolder}
-      {/* <Button type='primary' onClick={split}>
-        分裂产品
-      </Button> */}
       <Steps
         style={{ display: 'none' }}
         current={current}

@@ -108,7 +108,7 @@ const CreateModal = (props: CreateModalProps) => {
     setTourDay(routes)
   }
 
-  const updateTourDayStatus = (id: string, status: TourDay['status']) => {
+  const updateTourDayStatus = (id: string, status: string) => {
     setTourDay(val => val.map(v => ({
       ...v,
       status: v.id === id ? status : v.status
