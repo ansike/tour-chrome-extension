@@ -108,12 +108,16 @@ const CreateModal = (props: CreateModalProps) => {
     setTourDay(routes)
   }
 
-  const updateTourDayStatus = (id: string, status: string) => {
+  const updateTourDayStatus = (id: string, option: {status?: string, productId?: string}) => {
+    const {status='init', productId} = option;
     setTourDay(val => val.map(v => ({
       ...v,
-      status: v.id === id ? status : v.status
+      status: v.id === id ? status : v.status,
+      productId: v.productId ? v.productId : v.id === id ? (productId || '') : v.productId
     })))
   }
+
+  console.log({tourDay});
 
   return (
     <div>

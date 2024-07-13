@@ -2,6 +2,7 @@ import type { TourDailyDescription } from "~/contents/createProduct/scripts/getP
 
 export interface TourDay {
     id: string;
-    status: string;
     routes: TourDailyDescription[];
+    status?: string;
+    productId?: string;
 }

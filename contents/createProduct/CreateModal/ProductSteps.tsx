@@ -15,7 +15,7 @@ type ProductStepsProps = {
   data: TourDay;
   productId: string;
   tourDailyDescriptions: any[];
-  updateTourDayStatus: (id: string, status: string) => void;
+  updateTourDayStatus: (id: string, option: {status?: string, productId?: string}) => void;
 }
 
 const ProductSteps = (props: ProductStepsProps) => {
@@ -44,7 +44,7 @@ const ProductSteps = (props: ProductStepsProps) => {
 
       setCurrent(prev=>{
         const next = prev+1;
-        updateTourDayStatus(data.id, `${next+1}/${stepItems.length} [${title}]`);
+        updateTourDayStatus(data.id, {status: `${next+1}/${stepItems.length} [${title}]`});
         return next
       });
 
@@ -56,7 +56,7 @@ const ProductSteps = (props: ProductStepsProps) => {
       })
 
       console.log(`${title} error`, error);
-      updateTourDayStatus(data.id, `${current+1}/${stepItems.length} ${title} error ${error}`);
+      updateTourDayStatus(data.id, {status:`${current+1}/${stepItems.length} ${title} error ${error}`});
       return;
     }
   }
@@ -75,11 +75,12 @@ const ProductSteps = (props: ProductStepsProps) => {
     const product = await doJob(()=>{
       return productDuplicate(productId);
     }, CreateStepConstant.DUPLICATE_PRODUCT);
-    console.log('newProductId', product.newProductId);
     const newProductId=product.newProductId
 
-    // const newProductId="48406430"
-    
+    console.log('newProductId', newProductId);
+
+    updateTourDayStatus(data.id, {productId: newProductId});
+
     const sale = await doJob(()=>{
       return saveSaleControlInfo(newProductId);
     },  CreateStepConstant.SALE_CONTROL);
