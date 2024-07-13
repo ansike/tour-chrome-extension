@@ -1,71 +1,86 @@
 import React, { useState } from 'react'
 import { Button, Flex, Steps, message, type StepProps } from 'antd'
 
-import { getProductDetail } from '../scripts/getProductDetail';
-import { getTourDaily } from '../scripts/getProductBaseInfo';
+import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail';
+import { getTourDaily } from '~/contents/createProduct/scripts/getProductBaseInfo';
+import { productDuplicate } from '~/contents/createProduct/scripts/productDuplicate';
+import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/CreateModal/constant';
+import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
+import { saveProduct } from '~/contents/createProduct/scripts/saveProductBaseInfo';
+import { saveProductRichText } from '~/contents/createProduct/scripts/savedescriptioninfo';
 
 type ProductStepsProps = {
-  productId: string
+  productId: string;
+  tourDailyDescriptions: any[];
 }
 
 const ProductSteps = (props: ProductStepsProps) => {
-  const { productId } = props
-  const [current, setCurrent] = useState(1);
-  const [productInfo, setProductInfo] = useState(false);
+  const { productId, tourDailyDescriptions } = props
+  const [current, setCurrent] = useState(0);
   const [messageApi, contextHolder] = message.useMessage()
-  const [stepItems, setStepItems] = useState<StepProps[]>([
-    {
-      title: '销售控制',
-      status: 'wait'
-    },
-    {
-      title: '产品信息',
-      status: 'wait'
-    },
-    {
-      title: '产品图文',
-      status: 'wait'
-    },
-    {
-      title: '行程描述',
-      status: 'wait'
-    },
-    {
-      title: '套餐管理',
-      status: 'wait'
-    },
-    {
-      title: '价格库存班期',
-      status: 'wait'
-    },
-    {
-      title: '资源配置',
-      status: 'wait'
-    },
-    {
-      title: '条款维护',
-      status: 'wait'
+  const [stepItems, setStepItems] = useState<StepProps[]>(StepsConfMap)
+
+  // useEffect(()=>{
+
+  // },[productId, ])
+
+  const doJob = async (fn: () => any, title: string) => {
+    try {
+      const info = await fn();
+      console.log('==',title, info);
+
+      setStepItems((prev)=>{
+        const step = prev.find(it=>it.title===title)
+        step.status = 'finish';
+        step.description = `${title} success: ${JSON.stringify(info)}`;
+        return prev;
+      })
+      setCurrent(prev=>prev+1);
+      return info;
+    } catch (error) {
+      setStepItems((prev)=>{
+        prev.find(it=>it.title===title).status = 'error';
+        return prev;
+      })
+
+      console.log(`${title} error`, error);
+      return;
     }
-  ])
-
-  const split = async () => {
-    if (!productId) {
-      return messageApi.info('请输入产品ID')
-    }
-    const { baseInfo } = await getProductDetail(productId)
-    setProductInfo(baseInfo)
-
-    const tour = await getTourDaily(productId);
-    // console.log(tour.tourInfo)
-
-    // await splitProduct();
-    // TODO 分裂产品
-    // const { baseInfo } = await getProductDetail(productId)
-    // setProductInfo(baseInfo)
   }
 
-  console.log({ productInfo });
+  const split = async () => {
+    // if (!productId) {
+    //   return messageApi.info('请输入产品ID')
+    // }
 
+    const product = await doJob(()=>{
+      return productDuplicate(productId);
+    }, CreateStepConstant.DUPLICATE_PRODUCT);
+    console.log(product.newProductId);
+    const newProductId=product.newProductId
+
+    // const newProductId="48406430"
+    
+    const sale = await doJob(()=>{
+      return saveSaleControlInfo(newProductId);
+    },  CreateStepConstant.SALE_CONTROL);
+
+    const productInfo = await doJob(()=>{
+        return saveProduct(newProductId);
+      },  CreateStepConstant.PRODUCT_INFO);
+    console.log(productInfo);
+
+    // const newProductId="48407172"
+
+    const richText = await doJob(()=>{
+      return saveProductRichText(newProductId);
+    },  CreateStepConstant.PRODUCT_RICHTEXT);
+
+    console.log(richText);
+    
+    
+  }
+  
   return (
     <Flex vertical>
       {contextHolder}
