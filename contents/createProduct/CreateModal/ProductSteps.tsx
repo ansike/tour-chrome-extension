@@ -12,6 +12,7 @@ import { savePackage } from '~/contents/createProduct/scripts/savePackageItem';
 import { saveProductResource } from '~/contents/createProduct/scripts/saveProductMaintainType';
 import type { TourDay } from "./interface";
 import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceInventory';
+import { saveLineInfo } from '../scripts/saveLineInfo';
 
 
 type ProductStepsProps = {
@@ -74,7 +75,7 @@ const ProductSteps = (props: ProductStepsProps) => {
     }, CreateStepConstant.DUPLICATE_PRODUCT);
     const newProductId=product.newProductId
 
-    console.log('newProductId', newProductId);
+    // console.log('newProductId', newProductId);
 
     updateTourDayStatus(data.id, {productId: newProductId});
 
@@ -100,11 +101,16 @@ const ProductSteps = (props: ProductStepsProps) => {
       return saveProductResource(productId, newProductId);
     },  CreateStepConstant.RESOURCE);
 
-    console.log(resource);
+    // console.log(resource);
     
     const priceInventory = await doJob(() => {
       return savePriceInventory(newProductId);
     }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
+
+
+    const childProduct = await doJob(() => {
+      return saveLineInfo(newProductId);
+    }, CreateStepConstant.TRAFFIC_LINE)
 
   }
   

@@ -11,6 +11,7 @@ export const CreateStepConstant = {
   "PRICE_INVENTORY_SCHEDULE": '价格库存班期',
   "RESOURCE": '资源配置',
   "TERM": '条款维护',
+  "TRAFFIC_LINE": '线路及交通'
 }
 
 export const StepsConfMap: StepProps[] = Object.keys(CreateStepConstant).map(it=>{
