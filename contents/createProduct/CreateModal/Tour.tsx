@@ -13,7 +13,7 @@ interface TourProps {
 }
 
 const Tour = (props: TourProps) => {
-    const { productId, data, updateTourDayStatus } = props
+    const { productId, data, tourDailyDescriptions, updateTourDayStatus } = props
 
     return (
         <div style={{ padding: '8px 16px' }}>
@@ -25,7 +25,7 @@ const Tour = (props: TourProps) => {
             <ProductSteps
                 data={data}
                 productId={productId}
-                tourDailyDescriptions={[]}
+                tourDailyDescriptions={tourDailyDescriptions}
                 updateTourDayStatus={updateTourDayStatus}
             />
         </div>
