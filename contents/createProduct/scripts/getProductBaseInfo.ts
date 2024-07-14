@@ -1,13 +1,15 @@
+import { transformNumber2String } from "./util";
+
 export interface TourDailyDescription {
   [key: string]: any;
 }
 
-export const getTourDaily = async (productId: string) => {
-  const tourInfoId = await getProductTourInfoList(productId);
-  return await getTourDailyDetail(tourInfoId)
+export interface TourInfo {
+  tourDailyDescriptions: TourDailyDescription[];
+  [key: string]: any;
 }
 
-export const getProductTourInfoList = async (productId: string) => {
+const getProductTourInfoList = async (productId: string) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/getProductTourInfoList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {
@@ -37,16 +39,12 @@ export const getProductTourInfoList = async (productId: string) => {
     }
   )
   const text = await res.text()
-  const tourInfoIdRegex = /"tourInfoId":(\d+)/
-  const match = tourInfoIdRegex.exec(text)
-  return match[1]
+  const newText = transformNumber2String(text);
+  const data = JSON.parse(newText);
+  return data;
 }
 
-export const getTourDailyDetail = async (tourInfoId: string): Promise<{
-  tourInfo: {
-    tourDailyDescriptions: TourDailyDescription[]
-  }
-}> => {
+const getTourDailyDetail = async (tourInfoId: string): Promise<{ tourInfo: TourInfo }> => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/20049/getTourDailyDetail.json',
     {
@@ -73,5 +71,16 @@ export const getTourDailyDetail = async (tourInfoId: string): Promise<{
       credentials: 'include'
     }
   )
-  return await res.json()
+
+  const text = await res.text()
+  const newText = transformNumber2String(text);
+  return JSON.parse(newText);
+}
+
+export const getTourDaily = async (productId: string, key = 'tourInfoId') => {
+  const { tourInfos } = await getProductTourInfoList(productId);
+  const tourInfo = tourInfos[0];
+  const id = tourInfo[key];
+  const tourDaily = await getTourDailyDetail(id);
+  return { tourInfo, tourDaily }
 }

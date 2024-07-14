@@ -2,7 +2,7 @@ import { Button, Flex, Steps, message, type StepProps } from 'antd'
 import React, { useEffect, useState } from 'react';
 
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail';
-import { getTourDaily } from '~/contents/createProduct/scripts/getProductBaseInfo';
+import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/contents/createProduct/scripts/getProductBaseInfo';
 import { productDuplicate } from '~/contents/createProduct/scripts/productDuplicate';
 import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/CreateModal/constant';
 import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
@@ -15,6 +15,7 @@ import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceIn
 import { saveLineInfo } from '../scripts/saveLineInfo';
 import { updateResourceActive } from '../scripts/updateResourceActive';
 
+import { saveTourDailyDetail } from '../scripts/saveTourDailyDetail';
 
 type ProductStepsProps = {
   data: TourDay;
@@ -38,10 +39,10 @@ const ProductSteps = (props: ProductStepsProps) => {
   const doJob = async (fn: () => any, title: string) => {
     try {
       const info = await fn();
-      console.log('==',title, info);
+      console.log('==', title, info);
 
-      setStepItems((prev)=>{
-        const step = prev.find(it=>it.title===title)
+      setStepItems((prev) => {
+        const step = prev.find(it => it.title === title)
         step.status = 'finish';
         step.description = `${title} success: ${JSON.stringify(info)}`;
         return prev;
@@ -55,8 +56,8 @@ const ProductSteps = (props: ProductStepsProps) => {
 
       return info;
     } catch (error) {
-      setStepItems((prev)=>{
-        prev.find(it=>it.title===title).status = 'error';
+      setStepItems((prev) => {
+        prev.find(it => it.title === title).status = 'error';
         return prev;
       })
 
@@ -71,7 +72,7 @@ const ProductSteps = (props: ProductStepsProps) => {
       return messageApi.info('请输入产品ID')
     }
 
-    const product = await doJob(()=>{
+    const product = await doJob(() => {
       return productDuplicate(productId);
     }, CreateStepConstant.DUPLICATE_PRODUCT);
     
@@ -83,7 +84,7 @@ const ProductSteps = (props: ProductStepsProps) => {
 
     const sale = await doJob(()=>{
       return saveSaleControlInfo(newProductId);
-    },  CreateStepConstant.SALE_CONTROL);
+    }, CreateStepConstant.SALE_CONTROL);
 
     const productInfo = await doJob(()=>{
         return saveProduct(newProductId);
@@ -93,7 +94,11 @@ const ProductSteps = (props: ProductStepsProps) => {
     const richText = await doJob(()=>{
       return saveProductRichText(newProductId);
     },  CreateStepConstant.PRODUCT_RICHTEXT);
-    
+
+    const dailyInfo = await doJob(() => {
+      return saveTourDailyDetail(newProductId, tourDailyDescriptions);
+    }, CreateStepConstant.DAILY_INFO);
+
     const packageRes = await doJob(()=>{
       return savePackage(newProductId);
     },  CreateStepConstant.PACKAGE_MANAGE);
@@ -123,7 +128,7 @@ const ProductSteps = (props: ProductStepsProps) => {
 
     console.log('active ->', activeProduct)
   }
-  
+
   return (
     <Flex vertical>
       {contextHolder}

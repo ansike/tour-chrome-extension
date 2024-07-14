@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button, Card, Drawer, Flex, Input, Modal, message } from 'antd'
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail'
-import { getTourDaily, type TourDailyDescription } from '~/contents/createProduct/scripts/getProductBaseInfo'
+import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/contents/createProduct/scripts/getProductBaseInfo'
 import type { TourDay } from './interface'
 import Tour from './Tour'
 // import { splitProduct } from './util'
@@ -27,6 +27,7 @@ const CreateModal = (props: CreateModalProps) => {
   const [messageApi, contextHolder] = message.useMessage()
   const [productInfo, setProductInfo] = useState<any>();
   const [tourDay, setTourDay] = useState<TourDay[]>([]);
+  const tourInfoRef = useRef<TourInfo>();
 
   const handleOk = () => {
     setIsModalOpen(false)
@@ -42,6 +43,13 @@ const CreateModal = (props: CreateModalProps) => {
    * @returns 
    */
   function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay[] {
+    if (list.length <= 3) {
+      return [{
+        id: list.map(v => v.orderDay).join('-'),
+        status: 'init',
+        routes: list
+      }]
+    }
     const first = list.shift();
     const last = list.pop();
     const results: TourDailyDescription[][] = [];
@@ -58,7 +66,7 @@ const CreateModal = (props: CreateModalProps) => {
     return results.map(val => [first, ...val, last]).map((val, i) => ({
       id: val.map(v => v.orderDay).join('-'),
       status: 'init',
-      routes: val
+      routes: val.map((v, i) => ({ ...v, orderDay: i + 1 }))
     }));
 
     function generateSubCombinations(arr: TourDailyDescription[], count: number): TourDailyDescription[][] {
@@ -101,15 +109,16 @@ const CreateModal = (props: CreateModalProps) => {
     if (!productId) {
       return messageApi.info('请输入产品ID')
     }
-    const [{ baseInfo }, { tourInfo }] = await Promise.all([getProductDetail(productId), getTourDaily(productId)])
+    const [{ baseInfo }, { tourDaily }] = await Promise.all([getProductDetail(productId), getTourDaily(productId)])
+    tourInfoRef.current = tourDaily.tourInfo;
     setProductInfo(baseInfo)
-    const routes = permuteWithDeletions([...(tourInfo?.tourDailyDescriptions||[])])
-    console.log('routes', routes);
+    const routes = permuteWithDeletions([...(tourDaily.tourInfo.tourDailyDescriptions || [])])
+    console.log('路线组合', routes);
     setTourDay(routes)
   }
 
-  const updateTourDayStatus = (id: string, option: {status?: string, productId?: string}) => {
-    const {status='init', productId} = option;
+  const updateTourDayStatus = (id: string, option: { status?: string, productId?: string }) => {
+    const { status = 'init', productId } = option;
     setTourDay(val => val.map(v => ({
       ...v,
       status: v.id === id ? status : v.status,
@@ -117,7 +126,7 @@ const CreateModal = (props: CreateModalProps) => {
     })))
   }
 
-  console.log({tourDay});
+  console.log({ tourDay });
 
   return (
     <div>
@@ -153,10 +162,15 @@ const CreateModal = (props: CreateModalProps) => {
           {tourDay.length > 0 && (
             <Card>
               {
-                tourDay.slice(0, 1).map(val => {
+                tourDay.map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
-                      <Tour productId={productId} data={val} updateTourDayStatus={updateTourDayStatus} />
+                      <Tour
+                        productId={productId}
+                        data={val}
+                        updateTourDayStatus={updateTourDayStatus}
+                        tourDailyDescriptions={val.routes}
+                      />
                     </Card.Grid>
                   )
                 })
