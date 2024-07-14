@@ -76,10 +76,8 @@ const ProductSteps = (props: ProductStepsProps) => {
     }, CreateStepConstant.DUPLICATE_PRODUCT);
     
     const newProductId= product.newProductId
-
-    // console.log('newProductId', newProductId);
-    console.log('newProductId', newProductId);
     // const newProductId="48481212"
+    console.log('newProductId', newProductId);
 
     updateTourDayStatus(data.id, {productId: newProductId});
 
@@ -122,9 +120,9 @@ const ProductSteps = (props: ProductStepsProps) => {
 
 
     // const newProductId = '48474013'
-    const childProduct = await doJob(() => {
-      return saveLineInfo(newProductId);
-    }, CreateStepConstant.TRAFFIC_LINE)
+    // const childProduct = await doJob(() => {
+    //   return saveLineInfo(newProductId);
+    // }, CreateStepConstant.TRAFFIC_LINE)
 
 
     // 设置产品生效
