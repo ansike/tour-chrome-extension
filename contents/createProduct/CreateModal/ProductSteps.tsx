@@ -9,6 +9,7 @@ import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleCo
 import { saveProduct } from '~/contents/createProduct/scripts/saveProductBaseInfo';
 import { saveProductRichText } from '~/contents/createProduct/scripts/savedescriptioninfo';
 import { savePackage } from '~/contents/createProduct/scripts/savePackageItem';
+import { saveProductResource } from '~/contents/createProduct/scripts/saveProductMaintainType';
 import type { TourDay } from "./interface";
 
 
@@ -89,13 +90,18 @@ const ProductSteps = (props: ProductStepsProps) => {
       return saveProductRichText(newProductId);
     },  CreateStepConstant.PRODUCT_RICHTEXT);
     
-    // const newProductId="48407172"
     const packageRes = await doJob(()=>{
       return savePackage(newProductId);
     },  CreateStepConstant.PACKAGE_MANAGE);
-
-    console.log(packageRes);
     
+    // const newProductId="48429904"
+    const resource = await doJob(()=>{
+      return saveProductResource(productId, newProductId);
+    },  CreateStepConstant.RESOURCE);
+
+    console.log(resource);
+    
+
   }
   
   return (
