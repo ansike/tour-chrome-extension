@@ -69,3 +69,7 @@ export function getMergedCellValue (worksheet, rowIndex, colIndex) {
   }
   return null
 }
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
