@@ -60,7 +60,7 @@ export const savePriceInventory = async (productId: string) => {
       });
     
     const batchResult = await dateRes.json()
-
+    
     const date = batchResult.dates[currDay]
     const {adultPrice, childPrice, base, inventory} = date
 
@@ -132,4 +132,5 @@ export const savePriceInventory = async (productId: string) => {
       });
     
       console.log('save success!',modifRes)
+    return await modifRes.json()
 }

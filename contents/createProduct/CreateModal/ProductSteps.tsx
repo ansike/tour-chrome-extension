@@ -13,6 +13,7 @@ import { saveProductResource } from '~/contents/createProduct/scripts/saveProduc
 import type { TourDay } from "./interface";
 import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceInventory';
 import { saveLineInfo } from '../scripts/saveLineInfo';
+import { updateResourceActive } from '../scripts/updateResourceActive';
 
 
 type ProductStepsProps = {
@@ -73,7 +74,8 @@ const ProductSteps = (props: ProductStepsProps) => {
     const product = await doJob(()=>{
       return productDuplicate(productId);
     }, CreateStepConstant.DUPLICATE_PRODUCT);
-    const newProductId=product.newProductId
+    
+    const newProductId= product.newProductId
 
     // console.log('newProductId', newProductId);
 
@@ -108,10 +110,18 @@ const ProductSteps = (props: ProductStepsProps) => {
     }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
 
 
+    // const newProductId = '48474013'
     const childProduct = await doJob(() => {
       return saveLineInfo(newProductId);
     }, CreateStepConstant.TRAFFIC_LINE)
 
+
+    // 设置产品生效
+    const activeProduct = await doJob(() => {
+      return updateResourceActive(newProductId);
+    }, CreateStepConstant.ACTIVE_PRODUCT)
+
+    console.log('active ->', activeProduct)
   }
   
   return (

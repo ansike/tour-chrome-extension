@@ -47,7 +47,6 @@ export const saveLineInfo = async (parentProductId: string) => {
 
     const detail = await detailRes.json()
 
-    console.log('detail ->', detail)
     const {generalInfoDto , subLineInfoDto} = detail
 
 
@@ -97,4 +96,5 @@ export const saveLineInfo = async (parentProductId: string) => {
       });
 
     console.log('子产品线路信息创建成功')
+    return res.json()
 }
