@@ -175,7 +175,7 @@ const CreateModal = (props: CreateModalProps) => {
           {tourDay.length > 0 && (
             <Card>
               {
-                tourDay.map(val => {
+                tourDay.slice(1).map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
                       <Tour
