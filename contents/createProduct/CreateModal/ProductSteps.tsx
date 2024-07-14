@@ -1,6 +1,5 @@
 import { Flex, Steps, message, type StepProps } from 'antd'
 import React, { useEffect, useState } from 'react';
-
 import { productDuplicate } from '~/contents/createProduct/scripts/productDuplicate';
 import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/CreateModal/constant';
 import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
@@ -31,11 +30,11 @@ const ProductSteps = (props: ProductStepsProps) => {
   const [messageApi, contextHolder] = message.useMessage()
   const [stepItems, setStepItems] = useState<StepProps[]>(StepsConfMap)
 
-  useEffect(()=>{
-    if(productId){
+  useEffect(() => {
+    if (productId && data.status === 'running') {
       split();
     }
-  },[productId])
+  }, [productId, data.status])
 
   const doJob = async (fn: () => any, title: string) => {
     try {
@@ -49,9 +48,9 @@ const ProductSteps = (props: ProductStepsProps) => {
         return prev;
       })
 
-      setCurrent(prev=>{
-        const next = prev+1;
-        updateTourDayStatus(data.id, {status: `${next+1}/${stepItems.length} [${title}]`});
+      setCurrent(prev => {
+        const next = prev + 1;
+        updateTourDayStatus(data.id, { info: `${next + 1}/${stepItems.length} [${title}]` });
         return next
       });
 
@@ -63,7 +62,7 @@ const ProductSteps = (props: ProductStepsProps) => {
       })
 
       console.log(`${title} error`, error);
-      updateTourDayStatus(data.id, {status:`${current+1}/${stepItems.length} ${title} error ${error}`});
+      updateTourDayStatus(data.id, { info: `${current + 1}/${stepItems.length} ${title} error ${error}` });
       return;
     }
   }
@@ -73,43 +72,45 @@ const ProductSteps = (props: ProductStepsProps) => {
       return messageApi.info('请输入产品ID')
     }
 
+    // 复制产品
     const product = await doJob(() => {
       return productDuplicate(productId);
     }, CreateStepConstant.DUPLICATE_PRODUCT);
-    
-    const newProductId= product.newProductId
+
+    const newProductId = product.newProductId
 
     setDownloadData(prev => {
       const newArray =  formatData(newProductId, data)
       return [...prev, newArray]
     })
 
-    updateTourDayStatus(data.id, {productId: newProductId});
+    updateTourDayStatus(data.id, { productId: newProductId });
 
-    const sale = await doJob(()=>{
+    const sale = await doJob(() => {
       return saveSaleControlInfo(newProductId);
     }, CreateStepConstant.SALE_CONTROL);
 
-    const productInfo = await doJob(()=>{
-        return saveProduct(newProductId);
-      },  CreateStepConstant.PRODUCT_INFO);
+    const productInfo = await doJob(() => {
+      return saveProduct(newProductId);
+    }, CreateStepConstant.PRODUCT_INFO);
 
-    
-    const richText = await doJob(()=>{
+
+    const richText = await doJob(() => {
       return saveProductRichText(newProductId);
-    },  CreateStepConstant.PRODUCT_RICHTEXT);
+    }, CreateStepConstant.PRODUCT_RICHTEXT);
 
+    // 行程描述
     const dailyInfo = await doJob(() => {
-      return saveTourDailyDetail(newProductId, tourDailyDescriptions);
+      return saveTourDailyDetail(newProductId, data.routes);
     }, CreateStepConstant.DAILY_INFO);
 
-    const packageRes = await doJob(()=>{
+    const packageRes = await doJob(() => {
       return savePackage(newProductId);
     },  CreateStepConstant.PACKAGE_MANAGE);
     
     const resource = await doJob(()=>{
       return saveProductResource(productId, newProductId);
-    },  CreateStepConstant.RESOURCE);
+    }, CreateStepConstant.RESOURCE);
 
     
     const priceInventory = await doJob(() => {
