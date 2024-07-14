@@ -11,6 +11,7 @@ import { saveProductRichText } from '~/contents/createProduct/scripts/savedescri
 import { savePackage } from '~/contents/createProduct/scripts/savePackageItem';
 import { saveProductResource } from '~/contents/createProduct/scripts/saveProductMaintainType';
 import type { TourDay } from "./interface";
+import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceInventory';
 
 
 type ProductStepsProps = {
@@ -101,6 +102,9 @@ const ProductSteps = (props: ProductStepsProps) => {
 
     console.log(resource);
     
+    const priceInventory = await doJob(() => {
+      return savePriceInventory(newProductId);
+    }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
 
   }
   
