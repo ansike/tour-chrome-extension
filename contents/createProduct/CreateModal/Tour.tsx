@@ -31,6 +31,7 @@ const Tour = (props: TourProps) => {
         try {
             const info = await fn();
             console.log('==', title, info);
+            // TODO: info 的异常判断
             updateTourDayStatus(data.id, {
                 currentStep: data.currentStep + 1,
                 info: title,

@@ -153,7 +153,7 @@ const CreateModal = (props: CreateModalProps) => {
     }
   }, [routes])
 
-  const isLoading = routes.some(route => [].includes(route.status));
+  const isLoading = routes.some(route => ['wait', 'running'].includes(route.status));
 
   return (
     <div>
@@ -182,7 +182,7 @@ const CreateModal = (props: CreateModalProps) => {
             <Button type='primary' loading={loading} disabled={isLoading} onClick={getProduct}>
               分裂当前产品
             </Button>
-            <Button key={downloadData?.length || 0} type='primary'disabled={disabled} onClick={() => {
+            <Button key={downloadData?.length || 0} type='primary' disabled={disabled} onClick={() => {
               downloadXslx(downloadData, productId)
             }}>
               下载数据
