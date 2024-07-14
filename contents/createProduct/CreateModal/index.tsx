@@ -139,7 +139,7 @@ const CreateModal = (props: CreateModalProps) => {
       {contextHolder}
       <Drawer
         title='分裂产品'
-        width={800}
+        width={900}
         open={isModalOpen}
         onClose={handleCancel}
         maskClosable={false}
