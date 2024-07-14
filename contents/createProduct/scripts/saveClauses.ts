@@ -1,3 +1,5 @@
+import { sleep } from '../CreateModal/util'
+
 export const saveClauses = async (productId: string) => {
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
@@ -15,10 +17,12 @@ export const saveClauses = async (productId: string) => {
         productClause.centralDataDto.clausePackageId,
         tabEnum
       )
+      // 随机休眠 1s - 3s
+      await sleep(Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000)
     }
-    return "success"
+    return 'success'
   } catch (error) {
-    return error;
+    return error
   }
 }
 
