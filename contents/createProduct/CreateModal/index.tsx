@@ -134,8 +134,6 @@ const CreateModal = (props: CreateModalProps) => {
     })))
   }
 
-  console.log({ tourDay });
-
   return (
     <div>
       {contextHolder}
@@ -145,10 +143,11 @@ const CreateModal = (props: CreateModalProps) => {
         open={isModalOpen}
         onClose={handleCancel}
         maskClosable={false}
+        zIndex={1000000000000}
         footer={
           <Flex justify='flex-end' gap={16}>
             <Button onClick={handleCancel}>取消</Button>
-            <Button type='primary' onClick={handleOk}>保存</Button>
+            <Button type='primary' onClick={handleOk}>确认</Button>
           </Flex>
         }
       >
