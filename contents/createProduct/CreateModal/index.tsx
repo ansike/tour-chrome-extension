@@ -163,7 +163,7 @@ const CreateModal = (props: CreateModalProps) => {
               分裂当前产品
             </Button>
             <Button key={downloadData?.length || 0} type='primary'disabled={disabled} onClick={() => {
-              downloadXslx(downloadData)
+              downloadXslx(downloadData, productId)
             }}>
               下载数据
             </Button>
@@ -175,7 +175,7 @@ const CreateModal = (props: CreateModalProps) => {
           {tourDay.length > 0 && (
             <Card>
               {
-                tourDay.slice(0,2).map(val => {
+                tourDay.map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
                       <Tour

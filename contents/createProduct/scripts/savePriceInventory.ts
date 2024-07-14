@@ -6,8 +6,9 @@ export const savePriceInventory = async (productId: string) => {
    
    // pre
     let info;
+    let retry = 0;
 
-    while(true) {
+    while(retry < 10) {
         const result = await getPackageList(productId)
         const {itemList} = result
 
@@ -66,12 +67,12 @@ export const savePriceInventory = async (productId: string) => {
         const batchResult = await dateRes.json()
         
         const date = batchResult.dates[currDay]
-        console.log('date -->', date)
         const {adultPrice, childPrice, base, inventory} = date
         if(adultPrice && childPrice) {
            info = {adultPrice, childPrice, base, inventory}
            break;
         }
+        retry++;
         sleep(2000)
     }
 

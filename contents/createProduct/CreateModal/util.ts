@@ -123,7 +123,7 @@ export function formatData (productId, data){
 ]
  */
 
-export function downloadXslx(data: any) {
+export function downloadXslx(data: any,productId:string) {
 
   const workbook = XLSX.utils.book_new()
   const worksheet = XLSX.utils.json_to_sheet(data);
@@ -142,7 +142,13 @@ export function downloadXslx(data: any) {
 
   const downloadLink = document.createElement('a');
   downloadLink.href = URL.createObjectURL(blobData);
-  downloadLink.download = '产品分裂数据.xlsx';  
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = date.getMonth()+1
+  const day = date.getDay()
+  const hour = date.getHours()
+  const min = date.getMinutes()
+  downloadLink.download = `产品分裂数据-${productId}-${year}年${month}月${day}日${hour}时${min}分.xlsx`;  
 
   downloadLink.click()
 }
