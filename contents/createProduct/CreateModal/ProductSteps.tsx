@@ -1,8 +1,6 @@
-import { Button, Flex, Steps, message, type StepProps } from 'antd'
+import { Flex, Steps, message, type StepProps } from 'antd'
 import React, { useEffect, useState } from 'react';
 
-import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail';
-import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/contents/createProduct/scripts/getProductBaseInfo';
 import { productDuplicate } from '~/contents/createProduct/scripts/productDuplicate';
 import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/CreateModal/constant';
 import { saveSaleControlInfo } from '~/contents/createProduct/scripts/saveSaleControlInfo';
@@ -14,6 +12,7 @@ import type { TourDay } from "./interface";
 import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceInventory';
 import { saveLineInfo } from '../scripts/saveLineInfo';
 import { updateResourceActive } from '../scripts/updateResourceActive';
+import { saveClauses } from '~/contents/createProduct/scripts/saveClauses';
 
 import { saveTourDailyDetail } from '../scripts/saveTourDailyDetail';
 
@@ -79,6 +78,8 @@ const ProductSteps = (props: ProductStepsProps) => {
     const newProductId= product.newProductId
 
     // console.log('newProductId', newProductId);
+    console.log('newProductId', newProductId);
+    // const newProductId="48481212"
 
     updateTourDayStatus(data.id, {productId: newProductId});
 
@@ -103,16 +104,21 @@ const ProductSteps = (props: ProductStepsProps) => {
       return savePackage(newProductId);
     },  CreateStepConstant.PACKAGE_MANAGE);
     
-    // const newProductId="48429904"
     const resource = await doJob(()=>{
       return saveProductResource(productId, newProductId);
     },  CreateStepConstant.RESOURCE);
 
-    // console.log(resource);
     
     const priceInventory = await doJob(() => {
       return savePriceInventory(newProductId);
     }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
+    
+
+    const clause = await doJob(() => {
+      return saveClauses(newProductId);
+    }, CreateStepConstant.CLAUSE)
+    
+    console.log(clause);
 
 
     // const newProductId = '48474013'
