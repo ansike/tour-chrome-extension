@@ -73,3 +73,76 @@ export function getMergedCellValue (worksheet, rowIndex, colIndex) {
 export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// 辅助函数：将字符串转换为 ArrayBuffer
+function s2ab(s) {
+  const buf = new ArrayBuffer(s.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < s.length; i++) {
+    view[i] = s.charCodeAt(i) & 0xFF;
+  }
+  return buf;
+}
+
+export function formatData (productId, data){
+  const {routes} = data;
+
+  const result = {productId}
+  
+  routes.forEach((item,index) => {
+    result[`day-${index+1}`] = item.dailyDescription
+  })
+  return result;
+}
+
+
+/**
+ * 
+ * @param data json 格式
+ * const jsonData = [
+    { productID: ' pid-1', day1: 'xxx', day2: 'xxxx', day3: 'xxxx' },
+    {productID: 'pid-2', day1: 'xxx', day2: 'xxxx', day3: 'xxxx'  },
+  ];
+  [
+    {
+        "productId": 48481211,
+        "day-1": "【出发地-成都】接机/站-宽窄巷子-蜀风雅韵-锦里-酒店 | 专车",
+        "day-2": "【成都-广汉 古蜀探秘】熊猫基地-三星堆 | 专车",
+        "day-3": "【成都-都江堰】都江堰-青城山 | 专车",
+        "day-4": "【成都】成都市区一日citywalk   |  无车无导",
+        "day-5": "【成都-返程】自由活动-返程 | 专车送机/站服务"
+    },
+    {
+        "productId": 48481212,
+        "day-1": "【出发地-成都】接机/站-宽窄巷子-蜀风雅韵-锦里-酒店 | 专车",
+        "day-2": "【成都-广汉 古蜀探秘】熊猫基地-三星堆 | 专车",
+        "day-3": "【成都】成都市区一日citywalk   |  无车无导",
+        "day-4": "【成都-都江堰】都江堰-青城山 | 专车",
+        "day-5": "【成都-返程】自由活动-返程 | 专车送机/站服务"
+    }
+]
+ */
+
+export function downloadXslx(data: any) {
+
+  const workbook = XLSX.utils.book_new()
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  const headerRowCells = XLSX.utils.sheet_to_json(worksheet, {range: 1})
+  const colWidths = headerRowCells.map(cell => ({
+    width: 20, // 设置宽度为 20 个字符
+    alignment: { horizontal: 'left' } // 设置对齐方式为左对齐
+  }));
+  worksheet['!cols'] = colWidths
+
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  const excelData = XLSX.write(workbook, { type: 'binary' });
+  const blobData = new Blob([s2ab(excelData)], { type: 'application/octet-stream' });
+
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(blobData);
+  downloadLink.download = '产品分裂数据.xlsx';  
+
+  downloadLink.click()
+}

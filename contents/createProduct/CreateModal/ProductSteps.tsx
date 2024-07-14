@@ -16,16 +16,18 @@ import { saveLineInfo } from '../scripts/saveLineInfo';
 import { updateResourceActive } from '../scripts/updateResourceActive';
 
 import { saveTourDailyDetail } from '../scripts/saveTourDailyDetail';
+import { formatData } from './util';
 
 type ProductStepsProps = {
   data: TourDay;
   productId: string;
   tourDailyDescriptions: any[];
   updateTourDayStatus: (id: string, option: {status?: string, productId?: string}) => void;
+  setDownloadData:(data:any) => void
 }
 
 const ProductSteps = (props: ProductStepsProps) => {
-  const { data, productId, tourDailyDescriptions, updateTourDayStatus } = props
+  const { data, productId, tourDailyDescriptions, updateTourDayStatus, setDownloadData} = props
   const [current, setCurrent] = useState(0);
   const [messageApi, contextHolder] = message.useMessage()
   const [stepItems, setStepItems] = useState<StepProps[]>(StepsConfMap)
@@ -78,7 +80,12 @@ const ProductSteps = (props: ProductStepsProps) => {
     
     const newProductId= product.newProductId
 
-    // console.log('newProductId', newProductId);
+    setDownloadData(prev => {
+      const newArray =  formatData(newProductId, data)
+      return [...prev, newArray]
+    })
+// 
+
 
     updateTourDayStatus(data.id, {productId: newProductId});
 
@@ -125,7 +132,6 @@ const ProductSteps = (props: ProductStepsProps) => {
     const activeProduct = await doJob(() => {
       return updateResourceActive(newProductId);
     }, CreateStepConstant.ACTIVE_PRODUCT)
-
     console.log('active ->', activeProduct)
   }
 

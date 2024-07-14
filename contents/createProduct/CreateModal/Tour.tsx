@@ -6,6 +6,7 @@ interface TourProps {
     productId: string
     data: TourDay
     tourDailyDescriptions: TourDailyDescription[];
+    setDownloadData: (data:any) => void;
     updateTourDayStatus: (
         id: string,
         option: { status?: string; productId?: string }
@@ -13,7 +14,7 @@ interface TourProps {
 }
 
 const Tour = (props: TourProps) => {
-    const { productId, data, updateTourDayStatus } = props
+    const { productId, data, updateTourDayStatus, setDownloadData } = props
 
     return (
         <div style={{ padding: '8px 16px' }}>
@@ -27,6 +28,7 @@ const Tour = (props: TourProps) => {
                 productId={productId}
                 tourDailyDescriptions={[]}
                 updateTourDayStatus={updateTourDayStatus}
+                setDownloadData={setDownloadData}
             />
         </div>
     )

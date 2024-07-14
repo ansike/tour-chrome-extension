@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button, Card, Drawer, Flex, Input, Modal, message } from 'antd'
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail'
 import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/contents/createProduct/scripts/getProductBaseInfo'
 import type { TourDay } from './interface'
 import Tour from './Tour'
+import { downloadXslx } from './util'
 // import { splitProduct } from './util'
 
 // import cssText from 'data-text:~/contents/createProduct/style.css'
@@ -27,6 +28,9 @@ const CreateModal = (props: CreateModalProps) => {
   const [messageApi, contextHolder] = message.useMessage()
   const [productInfo, setProductInfo] = useState<any>();
   const [tourDay, setTourDay] = useState<TourDay[]>([]);
+  const [downloadData, setDownloadData] = useState([])
+  const [disabled, setDisabled] = useState<boolean>(true)
+
   const tourInfoRef = useRef<TourInfo>();
 
   const handleOk = () => {
@@ -36,6 +40,10 @@ const CreateModal = (props: CreateModalProps) => {
   const handleCancel = () => {
     setIsModalOpen(false)
   }
+
+  useEffect(() => {
+    setDisabled(!downloadData?.length)
+  }, [downloadData])
 
   /**
    * 由豆包生成
@@ -154,6 +162,11 @@ const CreateModal = (props: CreateModalProps) => {
             <Button type='primary' onClick={getProduct}>
               分裂当前产品
             </Button>
+            <Button key={downloadData?.length || 0} type='primary'disabled={disabled} onClick={() => {
+              downloadXslx(downloadData)
+            }}>
+              下载数据
+            </Button>
           </Flex>
           <div>
             <strong>产品信息：</strong>
@@ -162,7 +175,7 @@ const CreateModal = (props: CreateModalProps) => {
           {tourDay.length > 0 && (
             <Card>
               {
-                tourDay.map(val => {
+                tourDay.slice(0,2).map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
                       <Tour
@@ -170,6 +183,7 @@ const CreateModal = (props: CreateModalProps) => {
                         data={val}
                         updateTourDayStatus={updateTourDayStatus}
                         tourDailyDescriptions={val.routes}
+                        setDownloadData={setDownloadData}
                       />
                     </Card.Grid>
                   )
