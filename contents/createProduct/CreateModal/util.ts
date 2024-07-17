@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx'
+import { TourDay } from './interface'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -70,31 +71,30 @@ export function getMergedCellValue (worksheet, rowIndex, colIndex) {
   return null
 }
 
-export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // 辅助函数：将字符串转换为 ArrayBuffer
-function s2ab(s) {
-  const buf = new ArrayBuffer(s.length);
-  const view = new Uint8Array(buf);
+function s2ab (s) {
+  const buf = new ArrayBuffer(s.length)
+  const view = new Uint8Array(buf)
   for (let i = 0; i < s.length; i++) {
-    view[i] = s.charCodeAt(i) & 0xFF;
+    view[i] = s.charCodeAt(i) & 0xff
   }
-  return buf;
+  return buf
 }
 
-export function formatData (productId, data){
-  const {routes} = data;
+export function formatData (productId, data) {
+  const { routes } = data
 
-  const result = {productId}
-  
-  routes.forEach((item,index) => {
-    result[`day-${index+1}`] = item.dailyDescription
+  const result = { productId }
+
+  routes.forEach((item, index) => {
+    result[`day-${index + 1}`] = item.dailyDescription
   })
-  return result;
+  return result
 }
-
 
 /**
  * 
@@ -123,32 +123,44 @@ export function formatData (productId, data){
 ]
  */
 
-export function downloadXslx(data: any,productId:string) {
-
+export function downloadXslx (routes: TourDay[], productId: string) {
+  console.log(routes)
+  const data = routes.map(route => {
+    const days = route.routes.reduce((prev, cur) => {
+      prev['day-' + cur.orderDay] = cur.dailyDescription
+      return prev
+    }, {})
+    return {
+      productId: route.productId,
+      ...days
+    }
+  })
+  console.log({ data })
   const workbook = XLSX.utils.book_new()
-  const worksheet = XLSX.utils.json_to_sheet(data);
+  const worksheet = XLSX.utils.json_to_sheet(data)
 
-  const headerRowCells = XLSX.utils.sheet_to_json(worksheet, {range: 1})
+  const headerRowCells = XLSX.utils.sheet_to_json(worksheet, { range: 1 })
   const colWidths = headerRowCells.map(cell => ({
     width: 20, // 设置宽度为 20 个字符
     alignment: { horizontal: 'left' } // 设置对齐方式为左对齐
-  }));
+  }))
   worksheet['!cols'] = colWidths
 
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+  const excelData = XLSX.write(workbook, { type: 'binary' })
+  const blobData = new Blob([s2ab(excelData)], {
+    type: 'application/octet-stream'
+  })
 
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-  const excelData = XLSX.write(workbook, { type: 'binary' });
-  const blobData = new Blob([s2ab(excelData)], { type: 'application/octet-stream' });
-
-  const downloadLink = document.createElement('a');
-  downloadLink.href = URL.createObjectURL(blobData);
+  const downloadLink = document.createElement('a')
+  downloadLink.href = URL.createObjectURL(blobData)
   const date = new Date()
   const year = date.getFullYear()
-  const month = date.getMonth()+1
+  const month = date.getMonth() + 1
   const day = date.getDay()
   const hour = date.getHours()
   const min = date.getMinutes()
-  downloadLink.download = `产品分裂数据-${productId}-${year}年${month}月${day}日${hour}时${min}分.xlsx`;  
+  downloadLink.download = `产品分裂数据-${productId}-${year}年${month}月${day}日${hour}时${min}分.xlsx`
 
   downloadLink.click()
 }

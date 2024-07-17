@@ -239,8 +239,10 @@ function formatProductClauses (clause) {
                   const ele = dto.componentElementDtos.find(
                     dto2 => dto2.elementCode === dto.value
                   )
-                  res.value = ele.elementValue
-                  res.elementCode = ele.elementCode
+                  if (ele) {
+                    res.value = ele.elementValue
+                    res.elementCode = ele.elementCode
+                  }
                 }
 
                 return res
@@ -267,8 +269,10 @@ function formatProductClauses (clause) {
                       const ele = dto.componentElementDtos.find(
                         dto2 => dto2.elementCode === dto.value
                       )
-                      res.value = ele.elementValue
-                      res.elementCode = ele.elementCode
+                      if (ele) {
+                        res.value = ele.elementValue
+                        res.elementCode = ele.elementCode
+                      }
                     }
 
                     return res

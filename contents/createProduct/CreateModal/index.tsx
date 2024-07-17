@@ -1,24 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Card, Drawer, Flex, Input, Modal, message } from 'antd'
 import { getProductDetail } from '~/contents/createProduct/scripts/getProductDetail'
 import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/contents/createProduct/scripts/getProductBaseInfo'
 import type { TourDay } from './interface'
 import Tour from './Tour'
 import { downloadXslx } from './util'
-// import { splitProduct } from './util'
-
-// import cssText from 'data-text:~/contents/createProduct/style.css'
-
-// export const getStyle = () => {
-//   const style = document.createElement('style')
-//   style.textContent = cssText
-//   return style
-// }
 
 type CreateModalProps = {
   isModalOpen: boolean
   setIsModalOpen: (bool: boolean) => void
 }
+
 const CreateModal = (props: CreateModalProps) => {
   const { isModalOpen, setIsModalOpen } = props
   const queryParams = new URLSearchParams(window.location.search)
@@ -27,11 +19,9 @@ const CreateModal = (props: CreateModalProps) => {
   )
   const [messageApi, contextHolder] = message.useMessage()
   const [productInfo, setProductInfo] = useState<any>();
-  const [tourDay, setTourDay] = useState<TourDay[]>([]);
-  const [downloadData, setDownloadData] = useState([])
-  const [disabled, setDisabled] = useState<boolean>(true)
-
-  const tourInfoRef = useRef<TourInfo>();
+  const [originRoute, setOriginRoute] = useState<TourDailyDescription[]>([]);
+  const [routes, setRoutes] = useState<TourDay[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleOk = () => {
     setIsModalOpen(false)
@@ -40,10 +30,6 @@ const CreateModal = (props: CreateModalProps) => {
   const handleCancel = () => {
     setIsModalOpen(false)
   }
-
-  useEffect(() => {
-    setDisabled(!downloadData?.length)
-  }, [downloadData])
 
   /**
    * 由豆包生成
@@ -54,8 +40,9 @@ const CreateModal = (props: CreateModalProps) => {
     if (list.length <= 3) {
       return [{
         id: list.map(v => v.orderDay).join('-'),
-        status: 'init',
-        routes: list
+        status: 'wait',
+        routes: list,
+        currentStep: 0
       }]
     }
     const first = list.shift();
@@ -73,8 +60,9 @@ const CreateModal = (props: CreateModalProps) => {
 
     return results.map(val => [first, ...val, last]).map((val, i) => ({
       id: val.map(v => v.orderDay).join('-'),
-      status: 'init',
-      routes: val.map((v, i) => ({ ...v, orderDay: i + 1 }))
+      status: 'wait',
+      routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
+      currentStep: 0
     }));
 
     function generateSubCombinations(arr: TourDailyDescription[], count: number): TourDailyDescription[][] {
@@ -117,29 +105,56 @@ const CreateModal = (props: CreateModalProps) => {
     if (!productId) {
       return messageApi.info('请输入产品ID')
     }
-    const [{ baseInfo }, { tourDaily }] = await Promise.all([getProductDetail(productId), getTourDaily(productId)])
-    tourInfoRef.current = tourDaily.tourInfo;
-    setProductInfo(baseInfo)
-    const routes = permuteWithDeletions([...(tourDaily.tourInfo.tourDailyDescriptions || [])])
-    console.log('路线组合', routes);
-    setTourDay(routes)
+    try {
+      setLoading(true);
+      const [{ baseInfo }, { tourDaily }] = await Promise.all([getProductDetail(productId), getTourDaily(productId)])
+      setProductInfo(baseInfo)
+      const _originRoutes = tourDaily.tourInfo.tourDailyDescriptions || [];
+      setOriginRoute(_originRoutes);
+      const routes = permuteWithDeletions([..._originRoutes])
+      console.log('路线组合', routes);
+      setRoutes(routes.slice(1));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const updateTourDayStatus = (id: string, option: { status?: string, productId?: string }) => {
-    const { status = 'init', productId } = option;
-    setTourDay(val => val.map(v => ({
-      ...v,
-      status: v.id === id ? status : v.status,
-      productId: v.productId ? v.productId : v.id === id ? (productId || '') : v.productId
-    })))
+  const updateTourDayStatus = (id: string, option: Partial<Omit<TourDay, 'id' | 'routes'>>) => {
+    setRoutes(val => val.map(v => {
+      if (v.id === id) {
+        return ({ ...v, ...option })
+      }
+      return v;
+    }))
   }
+
+  useEffect(() => {
+    const data = routes.reduce<{ running: TourDay[]; wait: TourDay[] }>((pre, cur) => {
+      if (cur.status === 'running') {
+        pre.running.push(cur);
+      }
+      if (cur.status === 'wait') {
+        pre.wait.push(cur);
+      }
+      return pre;
+    }, { running: [], wait: [] });
+
+    if (data.running.length < 2 && data.wait.length > 0) {
+      const task = data.wait.shift();
+      updateTourDayStatus(task.id, { status: 'running' })
+    }
+  }, [routes])
+
+  const isLoading = routes.some(route => [].includes(route?.status));
 
   return (
     <div>
       {contextHolder}
       <Drawer
         title='分裂产品'
-        width={900}
+        width={800}
         open={isModalOpen}
         onClose={handleCancel}
         maskClosable={false}
@@ -158,11 +173,11 @@ const CreateModal = (props: CreateModalProps) => {
               value={productId}
               onChange={v => setProductId(v.target.value?.replace(/\s+/, ''))}
             />
-            <Button type='primary' onClick={getProduct}>
+            <Button type='primary' loading={loading} disabled={isLoading} onClick={getProduct}>
               分裂当前产品
             </Button>
-            <Button key={downloadData?.length || 0} type='primary'disabled={disabled} onClick={() => {
-              downloadXslx(downloadData, productId)
+            <Button type='primary' onClick={() => {
+              downloadXslx(routes, productId)
             }}>
               下载数据
             </Button>
@@ -171,19 +186,32 @@ const CreateModal = (props: CreateModalProps) => {
             <strong>产品信息：</strong>
             <span>{productInfo?.name || '-'}</span>
           </div>
-          {tourDay.length > 0 && (
+          {
+            originRoute.length > 0 && (
+              <div>
+                {
+                  originRoute.map(route => {
+                    return (
+                      <div key={route.orderDay}>
+                        <strong>{`D${route.orderDay}: `}</strong>
+                        {route.dailyDescription}
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            )
+          }
+          {routes.length > 0 && (
             <Card>
               {
-                tourDay.slice(5).map(val => {
+                routes.map(val => {
                   return (
                     <Card.Grid key={val.id} style={{ width: '25%', padding: 0 }}>
                       <Tour
                         productId={productId}
                         data={val}
-                        updateTourDayStatus={updateTourDayStatus}
-                        tourDailyDescriptions={val.routes}
-                        setDownloadData={setDownloadData}
-                      />
+                        updateTourDayStatus={updateTourDayStatus}/>
                     </Card.Grid>
                   )
                 })
