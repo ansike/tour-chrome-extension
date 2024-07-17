@@ -10,7 +10,7 @@ import { savePackage } from '~/contents/createProduct/scripts/savePackageItem';
 import { saveProductResource } from '~/contents/createProduct/scripts/saveProductMaintainType';
 import type { TourDay } from "./interface";
 import { savePriceInventory } from '~/contents/createProduct/scripts/savePriceInventory';
-import { saveLineInfo } from '../scripts/saveLineInfo';
+// import { saveLineInfo } from '../scripts/saveLineInfo';
 import { updateResourceActive } from '../scripts/updateResourceActive';
 import { saveClauses } from '~/contents/createProduct/scripts/saveClauses';
 
@@ -94,7 +94,6 @@ const ProductSteps = (props: ProductStepsProps) => {
         return saveProduct(newProductId);
       },  CreateStepConstant.PRODUCT_INFO);
 
-    
     const richText = await doJob(()=>{
       return saveProductRichText(newProductId);
     },  CreateStepConstant.PRODUCT_RICHTEXT);
@@ -107,21 +106,19 @@ const ProductSteps = (props: ProductStepsProps) => {
       return savePackage(newProductId);
     },  CreateStepConstant.PACKAGE_MANAGE);
     
+    const priceInventory = await doJob(() => {
+      return savePriceInventory(productId, newProductId);
+    }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
+    
     const resource = await doJob(()=>{
       return saveProductResource(productId, newProductId);
     },  CreateStepConstant.RESOURCE);
-
-    
-    const priceInventory = await doJob(() => {
-      return savePriceInventory(newProductId);
-    }, CreateStepConstant.PRICE_INVENTORY_SCHEDULE)
-    
 
     const clause = await doJob(() => {
       return saveClauses(newProductId);
     }, CreateStepConstant.CLAUSE)
     
-    console.log(clause);
+    // console.log(clause);
 
 
     // const newProductId = '48474013'

@@ -18,7 +18,6 @@ export const updateResourceActive = async (productId:string ) => {
         "active": "T"
     }
 
-
     const res = await fetch("https://online.ctrip.com/restapi/soa2/15638/updateResourceActive.json?_fxpcqlniredt=09031015310214817373&_fxpcqlniredt=09031015310214817373", {
         "headers": {
           "accept": "*/*",

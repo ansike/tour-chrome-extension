@@ -17,8 +17,8 @@ export const saveClauses = async (productId: string) => {
         productClause.centralDataDto.clausePackageId,
         tabEnum
       )
-      // 随机休眠 1s - 3s
-      await sleep(Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000)
+      // 随机休眠 1s - 4s
+      await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000)
     }
     return 'success'
   } catch (error) {

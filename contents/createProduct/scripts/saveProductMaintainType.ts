@@ -1,5 +1,7 @@
 // 无须过多的参数，可以固定
 
+import { getPackageList } from './savePackageItem'
+
 export const saveProductResource = async (
   prevProductId: string,
   productId: string
@@ -10,6 +12,7 @@ export const saveProductResource = async (
   // 创建携程草稿，随后会产生新的productId和segmentId，后续的save都是save 草稿的product+segment
   await createProductDraft(productId)
 
+  const packageList = await getPackageList(productId)
   // 获取 segments
   const prevSegments = await getSegments(prevProductId)
   const { productSegments, draftProductSegments } = await getSegments(productId)
@@ -17,11 +20,17 @@ export const saveProductResource = async (
   for (let i = 0; i < prevSegments.productSegments.segments.length; i++) {
     const segment = prevSegments.productSegments.segments[i]
     const curSegment = draftProductSegments.segments[i]
-    console.log(segment)
+    const packages = {
+      masterResourceId: packageList.itemList[0].singleResourceId,
+      packageName: packageList.itemList[0].name,
+      segmentId: curSegment?.segmentId || 0,
+      servantResourceId: packageList.itemList[0].singleResourceId
+    }
     // 存在修改
     if (curSegment) {
       await saveSegment({
         ...segment,
+        packages,
         productId: curSegment.productId,
         segmentId: curSegment.segmentId
       })
@@ -30,12 +39,13 @@ export const saveProductResource = async (
       delete segment.segmentId
       await saveSegment({
         ...segment,
+        packages,
         productId: draftProductSegments.segments[0].productId,
         segmentId: 0
       })
     }
   }
-  const res = await submitSegments(productId);
+  const res = await submitSegments(productId)
   // TODO res 返回不符合预期需要重试日期+删除部分行程。
 
   return res

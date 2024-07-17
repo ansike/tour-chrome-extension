@@ -1,6 +1,6 @@
 export const savePackage = async (productId: string) => {
   const packages = await getPackageList(productId)
-  console.log(packages)
+  console.log({packages})
   return await savePackageItem(productId, packages.itemList[0])
 }
 
