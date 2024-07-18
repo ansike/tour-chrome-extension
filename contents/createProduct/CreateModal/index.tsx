@@ -147,7 +147,7 @@ const CreateModal = (props: CreateModalProps) => {
     }
   }, [routes])
 
-  const isLoading = routes.some(route => [].includes(route?.status));
+  const isLoading = routes.some(route => ['running', 'wait'].includes(route?.status));
 
   return (
     <div>
@@ -176,7 +176,7 @@ const CreateModal = (props: CreateModalProps) => {
             <Button type='primary' loading={loading} disabled={isLoading} onClick={getProduct}>
               分裂当前产品
             </Button>
-            <Button type='primary' onClick={() => {
+            <Button type='primary' disabled={isLoading || !routes.length} onClick={() => {
               downloadXslx(routes, productId)
             }}>
               下载数据
@@ -184,7 +184,7 @@ const CreateModal = (props: CreateModalProps) => {
           </Flex>
           <div>
             <strong>产品信息：</strong>
-            <span>{productInfo?.name || '-'}</span>
+            <span>{productInfo?.name || '输入产品ID，点击【分裂当前产品】按钮分裂当前产品 '}</span>
           </div>
           {
             originRoute.length > 0 && (
