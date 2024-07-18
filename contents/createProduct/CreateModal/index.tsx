@@ -5,6 +5,7 @@ import { getTourDaily, type TourDailyDescription, type TourInfo } from '~/conten
 import type { TourDay } from './interface'
 import Tour from './Tour'
 import { downloadXslx } from './util'
+import copy from "copy-to-clipboard"
 
 type CreateModalProps = {
   isModalOpen: boolean
@@ -151,7 +152,6 @@ const CreateModal = (props: CreateModalProps) => {
 
   return (
     <div>
-      {contextHolder}
       <Drawer
         title='分裂产品'
         width={800}
@@ -166,6 +166,7 @@ const CreateModal = (props: CreateModalProps) => {
           </Flex>
         }
       >
+        {contextHolder}
         <Flex vertical gap={16}>
           <Flex gap={16}>
             <Input
@@ -175,6 +176,18 @@ const CreateModal = (props: CreateModalProps) => {
             />
             <Button type='primary' loading={loading} disabled={isLoading} onClick={getProduct}>
               分裂当前产品
+            </Button>
+            <Button type='primary' 
+            // disabled={isLoading || !routes.length}
+             onClick={() => {
+              const datesStr = routes.map(route=>route.productId).join(',');
+              copy(datesStr);
+              messageApi.open({
+                type: "success",
+                content: `copy success`
+              })
+            }}>
+              复制分裂的产品ID
             </Button>
             <Button type='primary' disabled={isLoading || !routes.length} onClick={() => {
               downloadXslx(routes, productId)

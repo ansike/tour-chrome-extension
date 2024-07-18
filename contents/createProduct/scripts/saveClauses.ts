@@ -4,6 +4,7 @@ export const saveClauses = async (productId: string) => {
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
       const productClause = await listProductClauses(productId, tabEnum)
+      await sleep(300)
       const clausePackage = await getClausePackage(productClause)
       const clausePackageItemDtos = formatProductClauses(
         clausePackage.clauseTypeDtos
@@ -29,7 +30,7 @@ export const saveClauses = async (productId: string) => {
 export const getClausePackage = async (productClause: any) => {
   const body = {
     ...productClause.centralDataDto,
-    clauseFilterConditionDto: productClause.centralDataDto.filterConditionDto,
+    clauseFilterConditionDto: productClause.centralDataDto?.filterConditionDto,
     firstClassClauseTypeIds:
       productClause.centralDataDto.additionalInfoDto.firstClassTypeIds
   }

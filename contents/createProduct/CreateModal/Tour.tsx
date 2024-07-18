@@ -102,7 +102,7 @@ const Tour = (props: TourProps) => {
 
   return (
     <div style={{ padding: '8px 16px' }}>
-      {data?.id}
+      <div>分裂顺序：{data?.id}</div>
       <div>
         <div>
           {data?.productId ? data?.productId + ' | ' : ''}
@@ -110,8 +110,8 @@ const Tour = (props: TourProps) => {
         </div>
         <div>
           <Progress
-            percent={Math.floor((data?.currentStep + 1) / stepLength* 100)}
-            size="small"
+            percent={Math.floor(((data?.currentStep + 1) / stepLength) * 100)}
+            size='small'
           />
         </div>
       </div>
