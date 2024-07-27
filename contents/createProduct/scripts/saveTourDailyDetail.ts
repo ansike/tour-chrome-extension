@@ -41,6 +41,9 @@ const checkTourDaily = async (tourInfo: any, tourDaily: string, saveType: 8 | 3)
     });
 
     const checkJson = await checkRes.json();
+    if (checkJson.ResponseStatus.Ack === 'Failure') {
+        throw new Error(checkJson.ResponseStatus.Errors.map(it => it.Message).join(','))
+    }
     const tourDailyText = transformNumber2String(checkJson.tourDaily);
     return tourDailyText;
 }
