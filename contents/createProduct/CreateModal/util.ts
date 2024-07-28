@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx'
 import { TourDay } from './interface'
+import type { TourDailyDescription } from '../scripts/getProductBaseInfo'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -164,3 +165,53 @@ export function downloadXslx (routes: TourDay[], productId: string) {
 
   downloadLink.click()
 }
+
+  /**
+   * 由豆包生成，除去首末两天的线路全排列
+   * @param arr
+   * @returns
+   */
+  export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay[] {
+    if (list.length <= 3) {
+      return [
+        {
+          id: list.map((v) => v.orderDay).join("-"),
+          status: "wait",
+          routes: list,
+          currentStep: 0,
+        },
+      ];
+    }
+    const first = list.shift();
+    const last = list.pop();
+    const results: TourDailyDescription[][] = [];
+
+    const permutations = generatePermutations(list);
+    console.log({ permutations });
+    results.push(...permutations);
+
+    return results
+      .map((val) => [first, ...val, last])
+      .map((val, i) => ({
+        id: val.map((v) => v.orderDay).join("-"),
+        status: "wait",
+        routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
+        currentStep: 0,
+      }));
+
+    function generatePermutations(
+      arr: TourDailyDescription[],
+    ): TourDailyDescription[][] {
+      if (arr.length === 0) return [[]];
+      const result: TourDailyDescription[][] = [];
+      for (let i = 0; i < arr.length; i++) {
+        const current = arr[i];
+        const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+        const subPermutations = generatePermutations(remaining);
+        for (const subPermutation of subPermutations) {
+          result.push([current, ...subPermutation]);
+        }
+      }
+      return result;
+    }
+  }
