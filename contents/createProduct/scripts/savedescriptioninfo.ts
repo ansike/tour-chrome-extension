@@ -1,10 +1,8 @@
-// 无须过多的参数，可以固定
-
+// 保存产品图文
 import { parseHtmlToObj } from '~/contents/createProduct/CreateModal/util'
 
 export const saveProductRichText = async (productId: string) => {
   const productImageText = await getProductImageText(productId)
-  console.log({productImageText});
   return await saveProductBaseInfo(productImageText, productId)
 }
 

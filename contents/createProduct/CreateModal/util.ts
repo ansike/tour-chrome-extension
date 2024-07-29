@@ -101,8 +101,8 @@ export function formatData (productId, data) {
  * 
  * @param data json 格式
  * const jsonData = [
-    { productID: ' pid-1', day1: 'xxx', day2: 'xxxx', day3: 'xxxx' },
-    {productID: 'pid-2', day1: 'xxx', day2: 'xxxx', day3: 'xxxx'  },
+    { productID: 'pid-1', day1: 'xxx', day2: 'xxxx', day3: 'xxxx' },
+    { productID: 'pid-2', day1: 'xxx', day2: 'xxxx', day3: 'xxxx'  },
   ];
   [
     {

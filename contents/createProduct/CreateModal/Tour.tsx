@@ -3,14 +3,15 @@ import { useEffect, useState } from "react";
 
 import { productDuplicate } from "~/contents/createProduct/scripts/productDuplicate";
 
+import { createSubProduct } from "../scripts/createSubProduct";
 import { saveClauses } from "../scripts/saveClauses";
 import { saveProductRichText } from "../scripts/savedescriptioninfo";
-import { saveLineInfo } from "../scripts/saveLineInfo";
 import { savePackage } from "../scripts/savePackageItem";
 import { savePriceInventory } from "../scripts/savePriceInventory";
 import { saveProduct } from "../scripts/saveProductBaseInfo";
-import { saveProductResource } from "../scripts/saveProductMaintainType";
+import { saveProductResource } from "../scripts/saveProductResource";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
+import { saveSubProductResource } from "../scripts/saveSubProductResource";
 import { saveTourDailyDetail } from "../scripts/saveTourDailyDetail";
 import { updateResourceActive } from "../scripts/updateResourceActive";
 import type { TourDay } from "./interface";
@@ -57,40 +58,51 @@ const Tour = (props: TourProps) => {
     };
 
     const stepsMap: StepFn[] = [
-      (data, productId) =>
-        doJob(() => productDuplicate(productId), data, "复制产品"),
-      (data, productId) =>
-        doJob(() => saveSaleControlInfo(data.productId), data, "销售控制"),
-      (data, productId) =>
-        doJob(() => saveProduct(data.productId), data, "产品信息"),
-      (data, productId) =>
-        doJob(() => saveProductRichText(data.productId), data, "产品图文"),
+      // (data, productId) =>
+      //   doJob(() => productDuplicate(productId), data, "复制产品"),
+      // (data, productId) =>
+      //   doJob(() => saveSaleControlInfo(data.productId), data, "销售控制"),
+      // (data, productId) =>
+      //   doJob(() => saveProduct(data.productId), data, "产品信息"),
+      // (data, productId) =>
+      //   doJob(() => saveProductRichText(data.productId), data, "产品图文"),
+      // (data, productId) =>
+      //   doJob(
+      //     () => saveTourDailyDetail(data.productId, data.routes),
+      //     data,
+      //     "行程描述",
+      //   ),
+      // (data, productId) =>
+      //   doJob(() => savePackage(data.productId), data, "套餐管理"),
+      // (data, productId) =>
+      //   doJob(
+      //     () => savePriceInventory(productId, data.productId),
+      //     data,
+      //     "价格库存班期",
+      //   ),
+      // (data, productId) =>
+      //   doJob(
+      //     () => saveProductResource(productId, data.productId),
+      //     data,
+      //     "资源配置",
+      //   ),
+      // (data, productId) =>
+      //   doJob(() => saveClauses(data.productId), data, "条款维护"),
+      // (data, productId) =>
+      //   doJob(() => updateResourceActive(data.productId), data, "激活产品"),
+
+      // -------------------- 以下为子产品 --------------------
+      // (data, productId) =>
+      //   doJob(() => createSubProduct("49492582"), data, "线路及交通"),
+      // (data, productId) =>
+      //   doJob(() => saveProductRichText("49492798"), data, "子产品图文信息"),
       (data, productId) =>
         doJob(
-          () => saveTourDailyDetail(data.productId, data.routes),
+          () => saveSubProductResource("49492798"),
           data,
-          "行程描述",
+          "子产品资源配置",
         ),
-      (data, productId) =>
-        doJob(() => savePackage(data.productId), data, "套餐管理"),
-      (data, productId) =>
-        doJob(
-          () => savePriceInventory(productId, data.productId),
-          data,
-          "价格库存班期",
-        ),
-      (data, productId) =>
-        doJob(
-          () => saveProductResource(productId, data.productId),
-          data,
-          "资源配置",
-        ),
-      (data, productId) =>
-        doJob(() => saveClauses(data.productId), data, "条款维护"),
-      (data, productId) =>
-        doJob(() => saveLineInfo(data.productId), data, "线路及交通"),
-      (data, productId) =>
-        doJob(() => updateResourceActive(data.productId), data, "激活产品"),
+
       (data, productId) => finish(data),
     ];
 

@@ -8,4 +8,5 @@ export interface TourDay {
     info?: string;
     productId?: string;
     currentStep: number;
+    subProduct: any[];
 }

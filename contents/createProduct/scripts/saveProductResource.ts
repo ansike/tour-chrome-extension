@@ -13,24 +13,26 @@ export const saveProductResource = async (
   await createProductDraft(productId)
 
   const packageList = await getPackageList(productId)
+  console.log({ packageList })
   // 获取 segments
   const prevSegments = await getSegments(prevProductId)
-  const { productSegments, draftProductSegments } = await getSegments(productId)
+  const { draftProductSegments } = await getSegments(productId)
 
+  console.log({ draftProductSegments })
   for (let i = 0; i < prevSegments.productSegments.segments.length; i++) {
     const segment = prevSegments.productSegments.segments[i]
     const curSegment = draftProductSegments.segments[i]
-    const packages = {
+    const packages = [{
       masterResourceId: packageList.itemList[0].singleResourceId,
       packageName: packageList.itemList[0].name,
       segmentId: curSegment?.segmentId || 0,
-      servantResourceId: packageList.itemList[0].singleResourceId
-    }
+      servantResourceId: packageList.itemList[0].optionalResourceId
+    }]
     // 存在修改
     if (curSegment) {
       await saveSegment({
         ...segment,
-        packages,
+        packages: i === 0 ? packages : [],
         productId: curSegment.productId,
         segmentId: curSegment.segmentId
       })
@@ -39,7 +41,7 @@ export const saveProductResource = async (
       delete segment.segmentId
       await saveSegment({
         ...segment,
-        packages,
+        packages:[],
         productId: draftProductSegments.segments[0].productId,
         segmentId: 0
       })
@@ -118,6 +120,7 @@ export const getSegments = async (productId: string) => {
 
 // 获取前一个产品的segments
 export const saveSegment = async segment => {
+  console.log({ segment })
   const data = {
     contentType: 'json',
     head: {
@@ -245,7 +248,7 @@ export const submitSegments = async (productId: string) => {
   return await res.json()
 }
 
-function getRandomDate () {
+function getRandomDate() {
   const today = new Date()
   const futureDate = new Date(
     today.getFullYear(),
