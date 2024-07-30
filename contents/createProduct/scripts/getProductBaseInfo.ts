@@ -44,7 +44,7 @@ const getProductTourInfoList = async (productId: string) => {
   return data;
 }
 
-const getTourDailyDetail = async (tourInfoId: string): Promise<{ tourInfo: TourInfo }> => {
+export const getTourDailyDetail = async (tourInfoId: string): Promise<{ tourInfo: TourInfo }> => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/20049/getTourDailyDetail.json',
     {

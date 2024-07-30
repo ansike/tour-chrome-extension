@@ -4,6 +4,7 @@ export const createSubProduct = async (parentProductId: string) => {
   // step 1:获取productinfo
   const detail = await getPackageProductDetail(parentProductId)
   const { generalInfoDto, subLineInfoDto } = detail
+  
   // step 2:父子产品绑定
   const res = await saveLineInfo({
     parentProductId: parentProductId,
@@ -11,8 +12,7 @@ export const createSubProduct = async (parentProductId: string) => {
     subLineInfoDto: { ...subLineInfoDto, advanceBookingDays: 1, advanceBookingTime: '18:00', lineDescription: "飞机往返" }
   })
 
-  console.log('子产品线路信息创建成功', res)
-  return res
+  return res.subProductId
 }
 
 const saveLineInfo = async ({ parentProductId, generalInfoDto, subLineInfoDto }) => {

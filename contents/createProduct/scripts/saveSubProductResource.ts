@@ -1,6 +1,6 @@
 // 无须过多的参数，可以固定
 
-import { getPackageList } from './savePackageItem'
+import { sleep } from '../CreateModal/util';
 
 export const saveSubProductResource = async (
   productId: string
@@ -11,31 +11,36 @@ export const saveSubProductResource = async (
 
   // 获取 segments
   const { draftProductSegments } = await getSegments(productId)
-  const destinyCity = draftProductSegments.productDepartureCity.departureCities[0];
+  const destinyCity = draftProductSegments.segments[0].segmentBase.destinationCity;
 
-  // 在最前方增加一条行程
-  await saveSegment({
-    segmentBase: {
-      departureAdjustDays: 0,
-      departureCity: { cityId: 0, cityName: "多出发" },
-      destinationCity: destinyCity,
-      segmentNumber: 1
-    },
-    productId,
-    segmentId: 0
-  })
+  console.log({ draftProductSegments })
+  if (draftProductSegments.segments[0].segmentBase.departureCity.cityId !== 0) {
+    // 在最前方增加一条行程
+    await saveSegment({
+      segmentBase: {
+        departureAdjustDays: 0,
+        departureCity: { cityId: 0, cityName: "多出发" },
+        destinationCity: destinyCity,
+        segmentNumber: 1
+      },
+      productId,
+      segmentId: 0
+    })
+  }
 
-  // 在最后增加子产品一条行程
-  await saveSegment({
-    segmentBase: {
-      departureAdjustDays: 0,
-      departureCity: destinyCity,
-      destinationCity: { cityId: 0, cityName: "多到达" },
-      segmentNumber: draftProductSegments.segments.length + 2
-    },
-    productId,
-    segmentId: 0
-  })
+  if (draftProductSegments.segments[draftProductSegments.segments.length - 1].segmentBase.destinationCity.cityId !== 0) {
+    // 在最后增加子产品一条行程
+    await saveSegment({
+      segmentBase: {
+        departureAdjustDays: 0,
+        departureCity: destinyCity,
+        destinationCity: { cityId: 0, cityName: "多到达" },
+        segmentNumber: draftProductSegments.segments.length + 2
+      },
+      productId,
+      segmentId: 0
+    })
+  }
 
   const { draftProductSegments: newSegments } = await getSegments(productId);
 
@@ -57,6 +62,7 @@ export const saveSubProductResource = async (
     "isIncludeSystemFlight": "T",
     "isAutoMatchingManualFlight": "T"
   }
+
   await saveSegment({
     ...newSegments.segments[0],
     flight,
@@ -66,23 +72,79 @@ export const saveSubProductResource = async (
     flight,
   })
 
-  // 获取所有的出发城市
-  const { multiDepartureCities } = await getMultiDepartureCities();
-  const cities = getTransitionCitiesByType(multiDepartureCities.slice(1), 'hasAirport');
-  const filteredCities = cities.filter(item => item.cityId !== destinyCity.cityId);
-  await saveSegmentCommonData(productId, filteredCities);
-  console.log({ cities })
+  async function setMutipleDepartureCities(productId: string) {
+    // 获取所有的出发城市
+    const { multiDepartureCities } = await getMultiDepartureCities();
+    // 拥有机场的城市
+    const cities = getTransitionCitiesByType(multiDepartureCities.slice(1), 'hasAirport');
 
-  // TODO 检查飞机校验通过保存资源配置
+    // 不包含当前的城市
+    let filteredCities = cities.filter(item => item.cityId !== destinyCity.cityId);
+    
+    // 保存当前城市
+    await saveSegmentCommonData(productId, filteredCities);
+    // 提交分段
+    await submitSegments(productId)
 
-  // const departureCities = multiDepartureCities
-  const res = await submitSegments(productId)
-  // TODO res 返回不符合预期需要重试日期+删除部分行程。
+    // 检查提交的城市是否含有特定的航班
+    const checkSegmentResultCities = async (productId: string) => {
+      let isChecking = true;
+      while (isChecking) {
+        const res = await getSubmitSegmentsResult(productId);
+        if (res.result === 'F') {
+          isChecking = false
+          const errorCityIds = res.checkSegmentResultCities.map(it => it.city.cityId);
+          filteredCities = filteredCities.filter(item => !errorCityIds.includes(item.cityId));
+          await saveSegmentCommonData(productId, filteredCities);
+          await submitSegments(productId);
+          await checkSegmentResultCities(productId);
+        } else if (res.result === 'T') {
+          isChecking = false
+        }
+        await sleep(1000)
+      }
+    }
+    await checkSegmentResultCities(productId);
 
-  return res
+  }
+  await setMutipleDepartureCities(productId);
+
+  return 'success'
 }
 
-//
+function getRandomDate() {
+  const today = new Date()
+  const futureDate = new Date(
+    today.getFullYear(),
+    today.getMonth() + 3,
+    today.getDate()
+  )
+  const randomDates = []
+
+  while (randomDates.length < 3) {
+    const randomTimestamp =
+      Math.random() * (futureDate.getTime() - today.getTime()) + today.getTime()
+    const randomDate = new Date(randomTimestamp)
+    const formattedDate = randomDate.toISOString().slice(0, 10)
+
+    if (!randomDates.includes(formattedDate)) {
+      randomDates.push(formattedDate)
+    }
+  }
+
+  return randomDates
+}
+
+function getTransitionCitiesByType(multiDepartureCities, type) {
+  return multiDepartureCities.map((item) => {
+    return item.departureCities.filter((it) => it[type]);
+  }).reduce((prev, cur) => {
+    return prev.concat(cur)
+  }, [])
+}
+
+
+// 设置使用携程资源
 export const saveProductMaintainType = async (productId: string) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/saveProductMaintainType?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
@@ -351,35 +413,34 @@ export const getMultiDepartureCities = async () => {
 
   return await res.json()
 }
+// 获取提交结果
+export const getSubmitSegmentsResult = async (productId: string) => {
+  const res = await fetch("https://online.ctrip.com/restapi/soa2/15638/getSubmitSegmentsResult?_fxpcqlniredt=09031147210876379845&_fxpcqlniredt=09031147210876379845", {
+    "headers": {
+      "accept": "*/*",
+      "accept-language": "en",
+      "cache-control": "no-cache",
+      "content-type": "application/json",
+      "cookieorigin": "https://vbooking.ctrip.com",
+      "pragma": "no-cache",
+      "priority": "u=1, i",
+      "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-site",
+      "x-ctx-locale": "zh-CN"
+    },
+    "referrer": "https://vbooking.ctrip.com/product/input/newResourceRule?productid=49492798&from=vbk",
+    "referrerPolicy": "no-referrer-when-downgrade",
+    "body": `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031147210876379845\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":${productId}}`,
+    "method": "POST",
+    "mode": "cors",
+    "credentials": "include"
+  });
 
-function getRandomDate() {
-  const today = new Date()
-  const futureDate = new Date(
-    today.getFullYear(),
-    today.getMonth() + 3,
-    today.getDate()
-  )
-  const randomDates = []
-
-  while (randomDates.length < 3) {
-    const randomTimestamp =
-      Math.random() * (futureDate.getTime() - today.getTime()) + today.getTime()
-    const randomDate = new Date(randomTimestamp)
-    const formattedDate = randomDate.toISOString().slice(0, 10)
-
-    if (!randomDates.includes(formattedDate)) {
-      randomDates.push(formattedDate)
-    }
-  }
-
-  return randomDates
+  return await res.json()
 }
 
-function getTransitionCitiesByType(multiDepartureCities, type) {
-  return multiDepartureCities.map((item) => {
-    return item.departureCities.filter((it) => it[type]);
-  }).reduce((prev, cur) => {
-    return prev.concat(cur)
-  }, [])
-}
 

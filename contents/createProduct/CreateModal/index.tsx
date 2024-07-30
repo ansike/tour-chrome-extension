@@ -53,7 +53,7 @@ const CreateModal = (props: CreateModalProps) => {
       setOriginRoute(_originRoutes);
       const routes = permuteWithDeletions([..._originRoutes]);
       console.log("路线组合", routes);
-      setRoutes(routes.slice(0,1));
+      setRoutes(routes.slice(1,2));
     } catch (error) {
       console.log(error);
     } finally {
