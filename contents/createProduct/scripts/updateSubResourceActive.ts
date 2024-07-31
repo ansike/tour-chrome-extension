@@ -1,11 +1,12 @@
 import { parseHtmlToObj } from "../CreateModal/util";
 
 
-export const activeSubProduct = async (parentProductId: string, productId: string) => {
+export const activeSubProduct = async (parentProductId: string) => {
   const pkgObj = await getPackageId(parentProductId);
-  const packageId = pkgObj.childList[0].packageId;
-  const res = await updatePackageStatus(packageId);
-  return res
+  for(const pkg of pkgObj.childList){
+    await updatePackageStatus(pkg.packageId);
+  }
+  return "success"
 }
 
 export const updatePackageStatus = async (packageId: string) => {

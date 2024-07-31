@@ -1,6 +1,6 @@
 import { sleep } from '~/contents/createProduct/CreateModal/util'
 
-export const saveSubClauses = async (productId: string) => {
+export const saveSubClauses = async (productId: string, clauses: any[]) => {
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
       const productClause = await listProductClauses(productId, tabEnum)
@@ -9,32 +9,13 @@ export const saveSubClauses = async (productId: string) => {
       const clausePackageItemDtos = formatProductClauses(
         clausePackage.clauseTypeDtos
       )
-      if (tabEnum === 1 && !clausePackageItemDtos.find(it=>it.clauseItemId === 3035)) {
+      if (tabEnum === 1 && !clausePackageItemDtos.find(it => it.clauseItemId === 3035)) {
         // 插入飞机
         clausePackageItemDtos.unshift(
-          {
-            "clauseItemId": 3035,
-            "secondClassTypeId": 86,
-            "elementDtos": [
-              {
-                "componentCode": "traffic0",
-                "value": "往返",
-                "elementCode": "A"
-              },
-              {
-                "componentCode": "traffic2",
-                "value": "经济舱机票",
-                "elementCode": "A"
-              },
-              {
-                "componentCode": "traffic3",
-                "value": "（已含机建、燃油税）"
-              }
-            ]
-          }
+          ...clauses
         )
       }
-
+      await sleep(300)
       await saveClausePackage({
         productClause,
         clausePackageItemDtos
@@ -166,46 +147,49 @@ export const saveClausePackage = async ({
   productClause,
   clausePackageItemDtos
 }) => {
-  console.log({
-    productClause,
-    clausePackageItemDtos
-  })
+  try {
+    const body = {
+      ...productClause.centralDataDto,
+      firstClassClauseTypeIds:
+        productClause.centralDataDto.additionalInfoDto.firstClassTypeIds,
+      clausePackageItemDtos,
+      pICategoryId: productClause.centralDataDto.filterConditionDto.pICategoryId
+    }
 
-  const body = {
-    ...productClause.centralDataDto,
-    firstClassClauseTypeIds:
-      productClause.centralDataDto.additionalInfoDto.firstClassTypeIds,
-    clausePackageItemDtos,
-    pICategoryId: productClause.centralDataDto.filterConditionDto.pICategoryId
+    const res = await fetch(
+      'https://online.ctrip.com/restapi/soa2/20046/saveClausePackage',
+      {
+        headers: {
+          accept: '*/*',
+          'accept-language': 'zh-CN,zh;q=0.9',
+          'content-type': 'text/plain;charset=UTF-8',
+          cookieorigin: 'https://vbooking.ctrip.com',
+          priority: 'u=1, i',
+          'sec-ch-ua':
+            '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+          'sec-ch-ua-mobile': '?0',
+          'sec-ch-ua-platform': '"macOS"',
+          'sec-fetch-dest': 'empty',
+          'sec-fetch-mode': 'cors',
+          'sec-fetch-site': 'same-site',
+          'x-tt-core': '1'
+        },
+        referrerPolicy: 'no-referrer-when-downgrade',
+        body: JSON.stringify(body),
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include'
+      }
+    )
+
+    return await res.json()
+  } catch (error) {
+    return await saveClausePackage({
+      productClause,
+      clausePackageItemDtos
+    });
   }
 
-  const res = await fetch(
-    'https://online.ctrip.com/restapi/soa2/20046/saveClausePackage',
-    {
-      headers: {
-        accept: '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9',
-        'content-type': 'text/plain;charset=UTF-8',
-        cookieorigin: 'https://vbooking.ctrip.com',
-        priority: 'u=1, i',
-        'sec-ch-ua':
-          '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'x-tt-core': '1'
-      },
-      referrerPolicy: 'no-referrer-when-downgrade',
-      body: JSON.stringify(body),
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include'
-    }
-  )
-
-  return await res.json()
 }
 
 export const saveProductClauses = async (

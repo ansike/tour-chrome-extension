@@ -1,5 +1,5 @@
 
-export const createSubProduct = async (parentProductId: string) => {
+export const createSubProduct = async (parentProductId: string, lineDescription) => {
 
   // step 1:获取productinfo
   const detail = await getPackageProductDetail(parentProductId)
@@ -9,7 +9,7 @@ export const createSubProduct = async (parentProductId: string) => {
   const res = await saveLineInfo({
     parentProductId: parentProductId,
     generalInfoDto: generalInfoDto,
-    subLineInfoDto: { ...subLineInfoDto, advanceBookingDays: 1, advanceBookingTime: '18:00', lineDescription: "飞机往返" }
+    subLineInfoDto: { ...subLineInfoDto, advanceBookingDays: 1, advanceBookingTime: '18:00', lineDescription }
   })
 
   return res.subProductId
@@ -52,7 +52,6 @@ const saveLineInfo = async ({ parentProductId, generalInfoDto, subLineInfoDto })
       "sec-fetch-site": "same-site",
       "x-ctx-locale": "zh-CN"
     },
-    "referrer": "https://vbooking.ctrip.com/ivbk/vendor/childProductInfo?productid=48468157&pid=48435998&from=vbk&isTab=1",
     "referrerPolicy": "no-referrer-when-downgrade",
     "body": JSON.stringify(body),
     "method": "POST",
@@ -96,7 +95,6 @@ const getPackageProductDetail = async (parentProductId) => {
       "sec-fetch-site": "same-site",
       "x-ctx-locale": "zh-CN"
     },
-    "referrer": "https://vbooking.ctrip.com/ivbk/vendor/childProductInfo?productid=0&pid=48469352&from=vbk",
     "referrerPolicy": "no-referrer-when-downgrade",
     "body": JSON.stringify(detailBody),
     "method": "POST",

@@ -7,6 +7,7 @@ import { saveSubProductResource } from '../scripts/saveSubProductResource'
 import { saveSubTourDailyDetail } from '../scripts/saveSubTourDailyDetail'
 import { saveSubClauses } from '../scripts/saveSubClauses'
 import { activeSubProduct } from '../scripts/updateSubResourceActive'
+import { subProductCategories } from './constant'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -223,21 +224,22 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
 }
 
 export async function createProduct(productId: string) {
-
-  // TODO 子产品线路的类型分化
-
-  const subProductId = await createSubProduct(productId);
-
-  // 子产品富文本
-  await saveProductRichText(subProductId);
-  // 子产品资源配置
-  await saveSubProductResource(subProductId);
-  // 子产品行程描述
-  await saveSubTourDailyDetail(subProductId);
-  // 子产品条款维护
-  await saveSubClauses(subProductId);
+  for (const sub of subProductCategories) {
+    // 创建子产品
+    const subProductId = await createSubProduct(productId, sub.lineDescription);
+    // 子产品富文本
+    await saveProductRichText(subProductId);
+    // 子产品资源配置
+    await saveSubProductResource(subProductId, sub.transitionType,sub.enter, sub.leave);
+    // 子产品行程描述
+    await saveSubTourDailyDetail(subProductId);
+    // 子产品条款维护
+    await saveSubClauses(subProductId, sub.clauses);
+    sleep(1000);
+  }
+  
   // 子产品激活
-  await activeSubProduct(productId, subProductId)
+  await activeSubProduct(productId);
 
   return "success"
 }

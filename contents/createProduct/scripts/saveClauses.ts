@@ -9,6 +9,7 @@ export const saveClauses = async (productId: string) => {
       const clausePackageItemDtos = formatProductClauses(
         clausePackage.clauseTypeDtos
       )
+      await sleep(300)
       await saveClausePackage({
         productClause,
         clausePackageItemDtos
