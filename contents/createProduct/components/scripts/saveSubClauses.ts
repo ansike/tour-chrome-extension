@@ -1,6 +1,7 @@
-import { sleep } from '~/contents/createProduct/CreateModal/util'
+import { sleep } from "../util"
 
-export const saveSubClauses = async (productId: string, clauses: any[]) => {
+export const saveSubClauses = async (productId: string, sub: any) => {
+  const { clauses } = sub;
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
       const productClause = await listProductClauses(productId, tabEnum)

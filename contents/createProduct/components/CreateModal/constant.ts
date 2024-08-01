@@ -81,6 +81,7 @@ const train = {
 // 子产品线路分类
 export const subProductCategories = [
   {
+    step: 0,
     transitionType: 'hasAirport',
     lineDescription: '飞机往返',
     enter: { flight },
@@ -109,8 +110,9 @@ export const subProductCategories = [
     ]
   },
   {
+    step: 0,
     transitionType: 'hasTrain',
-    lineDescription: '高铁往返',
+    lineDescription: '火车往返',
     enter: { train },
     leave: { train },
     clauses: [
@@ -143,8 +145,9 @@ export const subProductCategories = [
     ]
   },
   {
+    step: 0,
     transitionType: 'both',
-    lineDescription: '飞机进高铁出',
+    lineDescription: '飞机进火车出',
     enter: { flight },
     leave: { train },
     clauses: [
@@ -197,8 +200,9 @@ export const subProductCategories = [
     ]
   },
   {
+    step: 0,
     transitionType: 'both',
-    lineDescription: '高铁进飞机出',
+    lineDescription: '火车进飞机出',
     enter: { train },
     leave: { flight },
     clauses: [

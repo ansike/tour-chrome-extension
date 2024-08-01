@@ -1,13 +1,13 @@
 import * as XLSX from 'xlsx'
-import type { TourDay } from './interface'
-import type { TourDailyDescription } from '../scripts/getProductBaseInfo'
-import { createSubProduct } from '../scripts/createSubProduct'
-import { saveProductRichText } from '../scripts/savedescriptioninfo'
-import { saveSubProductResource } from '../scripts/saveSubProductResource'
-import { saveSubTourDailyDetail } from '../scripts/saveSubTourDailyDetail'
-import { saveSubClauses } from '../scripts/saveSubClauses'
-import { activeSubProduct } from '../scripts/updateSubResourceActive'
-import { subProductCategories } from './constant'
+import type { TourDay } from './CreateModal/interface'
+import type { TourDailyDescription } from './scripts/getProductBaseInfo'
+import { createSubProduct } from './scripts/createSubProduct'
+import { saveProductRichText } from './scripts/savedescriptioninfo'
+import { saveSubProductResource } from './scripts/saveSubProductResource'
+import { saveSubTourDailyDetail } from './scripts/saveSubTourDailyDetail'
+import { saveSubClauses } from './scripts/saveSubClauses'
+import { activeSubProduct, getPackageId } from './scripts/updateSubResourceActive'
+import { subProductCategories } from './CreateModal/constant'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -204,6 +204,7 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
       status: "wait",
       routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
       currentStep: 0,
+      subProducts: JSON.parse(JSON.stringify(subProductCategories)),
     }));
 
   function generatePermutations(
@@ -223,23 +224,52 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
   }
 }
 
-export async function createProduct(productId: string) {
-  for (const sub of subProductCategories) {
+export const stepFns = [
+  saveProductRichText,// 子产品富文本
+  saveSubProductResource,// 子产品资源配置
+  saveSubTourDailyDetail,// 子产品行程描述
+  saveSubClauses,// 子产品条款维护
+];
+
+// 创建子产品
+export async function createProduct(product: TourDay, updateTourDayStatus) {
+  const { productId, subProducts = [] } = product
+
+  const pkgObj = await getPackageId(productId);
+  const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
+  const mappedSubProducts = subProducts.map(sub => {
+    if (existSubProductNames.includes(sub.lineDescription)) {
+      sub.productId = '已经存在';
+      sub.step = stepFns.length;
+    }
+    return sub;
+  })
+
+  // 根据已经存在的子产品过滤一下，避免重复创建
+  updateTourDayStatus(productId, {
+    subProducts: mappedSubProducts
+  });
+
+  for (let i = 0; i < mappedSubProducts.length; i++) {
+    const sub = mappedSubProducts[i];
+    if (sub.productId === '已经存在') continue;
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
-    // 子产品富文本
-    await saveProductRichText(subProductId);
-    // 子产品资源配置
-    await saveSubProductResource(subProductId, sub.transitionType,sub.enter, sub.leave);
-    // 子产品行程描述
-    await saveSubTourDailyDetail(subProductId);
-    // 子产品条款维护
-    await saveSubClauses(subProductId, sub.clauses);
-    sleep(1000);
-  }
-  
-  // 子产品激活
-  await activeSubProduct(productId);
+    sub.productId = subProductId;
+    for (let i = 0; i < stepFns.length; i++) {
+      const fn = stepFns[i];
+      await fn(subProductId, sub);
+      sub.step++;
+      updateTourDayStatus(productId, {
+        subProducts: mappedSubProducts
+      });
+    }
 
-  return "success"
+    // 子产品激活
+    await activeSubProduct(productId, subProductId)
+  }
+
+  return {
+    mappedSubProducts
+  }
 }

@@ -1,16 +1,16 @@
-import { Button, Card, Drawer, Flex, Input, message, Modal } from "antd";
+import { Button, Card, Drawer, Flex, Input, message } from "antd";
 import copy from "copy-to-clipboard";
 import React, { useEffect, useState } from "react";
 
 import {
   getTourDaily,
   type TourDailyDescription,
-} from "~/contents/createProduct/scripts/getProductBaseInfo";
-import { getProductDetail } from "~/contents/createProduct/scripts/getProductDetail";
+} from "~contents/createProduct/components/scripts/getProductBaseInfo";
+import { getProductDetail } from "~contents/createProduct/components/scripts/getProductDetail";
 
 import type { TourDay } from "./interface";
 import Tour from "./Tour";
-import { downloadXslx, permuteWithDeletions } from "./util";
+import { downloadXslx, permuteWithDeletions } from "../util";
 
 type CreateModalProps = {
   isModalOpen: boolean;
@@ -107,7 +107,6 @@ const CreateModal = (props: CreateModalProps) => {
         open={isModalOpen}
         onClose={handleCancel}
         maskClosable={false}
-        zIndex={1000000000000}
         footer={
           <Flex justify="flex-end" gap={16}>
             <Button onClick={handleCancel}>取消</Button>
@@ -174,11 +173,13 @@ const CreateModal = (props: CreateModalProps) => {
               })}
             </div>
           )}
-          {routes.length > 0 && (
+          {routes.length > 0 ? (
             <Card>
               {routes.map((val) => {
                 return (
-                  <Card.Grid key={val.id} style={{ width: "25%", padding: 0 }}>
+                  <Card.Grid
+                    key={val.id}
+                    style={{ width: "33.33%", padding: 0 }}>
                     <Tour
                       productId={productId}
                       data={val}
@@ -188,7 +189,7 @@ const CreateModal = (props: CreateModalProps) => {
                 );
               })}
             </Card>
-          )}
+          ) : null}
         </Flex>
       </Drawer>
     </div>

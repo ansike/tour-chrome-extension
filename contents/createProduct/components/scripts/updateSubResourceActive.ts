@@ -1,10 +1,12 @@
-import { parseHtmlToObj } from "../CreateModal/util";
+import { parseHtmlToObj } from "../util";
 
 
-export const activeSubProduct = async (parentProductId: string) => {
+export const activeSubProduct = async (parentProductId: string, productId: string) => {
   const pkgObj = await getPackageId(parentProductId);
   for(const pkg of pkgObj.childList){
-    await updatePackageStatus(pkg.packageId);
+    if(pkg.subProductId === productId){
+      await updatePackageStatus(pkg.packageId);
+    }
   }
   return "success"
 }
@@ -64,5 +66,4 @@ export const getPackageId = async (parentProductId: string) => {
 
   const text = await res.text()
   return parseHtmlToObj(text)
-
 }

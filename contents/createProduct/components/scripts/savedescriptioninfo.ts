@@ -1,5 +1,6 @@
 // 保存产品图文
-import { parseHtmlToObj } from '~/contents/createProduct/CreateModal/util'
+
+import { parseHtmlToObj } from "../util"
 
 export const saveProductRichText = async (productId: string) => {
   const productImageText = await getProductImageText(productId)

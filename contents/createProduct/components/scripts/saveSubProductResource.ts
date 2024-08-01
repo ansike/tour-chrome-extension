@@ -1,14 +1,12 @@
 // 无须过多的参数，可以固定
 
-import { sleep } from '../CreateModal/util';
+import { sleep } from '../util';
 
 export const saveSubProductResource = async (
   productId: string,
-  transitionType: string,
-  enter: any,
-  leave: any
+  sub: any
 ) => {
-
+  const { transitionType, enter, leave } = sub;
   // 创建携程草稿，随后会产生新的productId和segmentId，后续的save都是save 草稿的product+segment
   await createProductDraft(productId)
 
@@ -85,6 +83,11 @@ export const saveSubProductResource = async (
           filteredCities = filteredCities.filter(item => !errorCityIds.includes(item.cityId));
           await sleep(1000);
           console.log(productId, { filteredCities })
+          // 检索到的城市无资源考虑重新设置出发城市
+          if(!filteredCities.length){
+            isChecking = false;
+            return await setMutipleDepartureCities(productId);
+          }
           await saveSegmentCommonData(productId, filteredCities);
           await submitSegments(productId);
           await checkSegmentResultCities(productId);

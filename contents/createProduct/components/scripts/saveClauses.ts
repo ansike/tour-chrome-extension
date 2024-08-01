@@ -1,4 +1,4 @@
-import { sleep } from '~/contents/createProduct/CreateModal/util'
+import { sleep } from "../util"
 
 export const saveClauses = async (productId: string) => {
   try {
