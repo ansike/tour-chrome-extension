@@ -8,9 +8,9 @@ import {
 } from "~contents/createProduct/components/scripts/getProductBaseInfo";
 import { getProductDetail } from "~contents/createProduct/components/scripts/getProductDetail";
 
+import { downloadXslx, permuteWithDeletions } from "../util";
 import type { TourDay } from "./interface";
 import Tour from "./Tour";
-import { downloadXslx, permuteWithDeletions } from "../util";
 
 type CreateModalProps = {
   isModalOpen: boolean;

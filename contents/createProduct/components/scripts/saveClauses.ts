@@ -1,31 +1,54 @@
-import { sleep } from "../util"
+// import { sleep } from "../util"
 
 export const saveClauses = async (productId: string) => {
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
-      const productClause = await listProductClauses(productId, tabEnum)
-      await sleep(300)
-      const clausePackage = await getClausePackage(productClause)
-      const clausePackageItemDtos = formatProductClauses(
-        clausePackage.clauseTypeDtos
-      )
-      await sleep(300)
-      await saveClausePackage({
-        productClause,
-        clausePackageItemDtos
-      })
-      await saveProductClauses(
-        productId,
-        productClause.centralDataDto.clausePackageId,
-        tabEnum
-      )
-      // 随机休眠 1s - 4s
-      await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000)
+      await setClausePackage(productId, tabEnum);
     }
     return 'success'
   } catch (error) {
     return error
   }
+}
+
+
+export const setClausePackage = async (productId, tabEnum) => {
+  const productClause = await listProductClauses(productId, tabEnum)
+  const clausePackage = await getClausePackage(productClause)
+  const clausePackageItemDtos = formatProductClauses(
+    clausePackage.clauseTypeDtos
+  )
+  if (tabEnum === 3) {
+    // 单房差
+    const hasSingle = clausePackageItemDtos.find(it => it.clauseItemId === 3010);
+    if (!hasSingle) {
+      clausePackageItemDtos.push(
+        {
+          "clauseItemId": 3010,
+          "secondClassTypeId": 25,
+          "elementDtos": [
+            {
+              "componentCode": "singlepricetype32",
+              "value": "综合考量目前常规团队出行人群结构并考虑实际入住体验等因素，本产品暂时无法提供拼房。报价是按照2成人入住1间房计算的价格，请在页面中选择所需房间数或单人房差选项"
+            }
+          ]
+        }
+      )
+    }
+  }
+
+  await saveClausePackage({
+    productClause,
+    clausePackageItemDtos
+  })
+
+  await saveProductClauses(
+    productId,
+    productClause.centralDataDto.clausePackageId,
+    tabEnum
+  )
+  // // 随机休眠 1s - 4s
+  // await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000)
 }
 
 export const getClausePackage = async (productClause: any) => {
@@ -220,7 +243,7 @@ export const saveProductClauses = async (
   return await res.json()
 }
 
-function formatProductClauses (clause) {
+function formatProductClauses(clause) {
   return (
     clause
       // .filter(clause => clause.clauseTypeName !== '餐食')
