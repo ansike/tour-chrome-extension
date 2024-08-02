@@ -95,7 +95,7 @@ export const saveSubProductResource = async (
           console.log(productId, res.messages)
           isChecking = false
         } else if (res.result === 'U') {
-          await sleep(res.leftTime)
+          await sleep(1500);
         }
       }
     }
