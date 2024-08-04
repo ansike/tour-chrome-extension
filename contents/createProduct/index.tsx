@@ -2,7 +2,6 @@ import { Dropdown, type MenuProps } from "antd";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
 import { useState } from "react";
-
 import CreateModal from "./components/CreateModal";
 import CreateSubProduct from "./components/CreateSubProduct";
 

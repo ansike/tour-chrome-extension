@@ -30,7 +30,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
     try {
       const { baseInfo, parentChilren } = await getProductDetail(productId);
       // 如果有父产品，说明当前为子产品不符合输入要求。
-      if (parentChilren.parentProductId) {
+      if (parentChilren?.parentProductId) {
         setLoading(false);
         return message.error("当前的产品为子产品，请输入正确的母产品ID");
       }

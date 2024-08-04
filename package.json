@@ -1,9 +1,9 @@
 {
-  "name": "tour-extension",
+  "name": "tour-helper",
   "displayName": "Tour Helper",
-  "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
-  "author": "Plasmo Corp. <foss@plasmo.com>",
+  "version": "0.1.1",
+  "description": "A Tour Helper Extension.",
+  "author": "ansike. <ansike@qq.com>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
