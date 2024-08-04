@@ -19,7 +19,7 @@ export const getProductDetail = async (productId: string) => {
         'x-tt-env': 'boe_planning_ldx'
       },
       referrerPolicy: 'no-referrer-when-downgrade',
-      body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031072216594047056\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\",\"needAdvancedSettings\":true,\"needBaseInfo\":true,\"needBookingControls\":true,\"needContractInfo\":true,\"needMeta\":true,\"needNameArea\":true,\"need4135PackageInfo\":true,\"needSaleControlInfo\":true,\"needViewLink\":true,\"needDistrictScenicSpots\":true}`,
+      body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031072216594047056\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\",\"needAdvancedSettings\":true,\"needBaseInfo\":true,\"needBookingControls\":true,\"needContractInfo\":true,\"needMeta\":true,\"needNameArea\":true,\"need4135PackageInfo\":true,\"needSaleControlInfo\":true,\"needViewLink\":true,\"needDistrictScenicSpots\":true,\"needParentChildren\":true}`,
       method: 'POST',
       mode: 'cors',
       credentials: 'include'

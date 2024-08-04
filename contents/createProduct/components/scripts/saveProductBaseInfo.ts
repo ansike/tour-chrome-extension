@@ -1,6 +1,7 @@
 // 无须过多的参数，可以固定
 
-import { parseHtmlToObj } from "~/contents/createProduct/CreateModal/util"
+import { parseHtmlToObj } from "../util"
+
 
 export const saveProduct = async (productId: string) => {
   const productInfo = await getProductBaseInfo(productId)

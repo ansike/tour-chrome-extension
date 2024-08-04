@@ -1,13 +1,20 @@
 import * as XLSX from 'xlsx'
-import { TourDay } from './interface'
-import type { TourDailyDescription } from '../scripts/getProductBaseInfo'
+import type { TourDay } from './CreateModal/interface'
+import type { TourDailyDescription } from './scripts/getProductBaseInfo'
+import { createSubProduct } from './scripts/createSubProduct'
+import { saveProductRichText } from './scripts/savedescriptioninfo'
+import { saveSubProductResource } from './scripts/saveSubProductResource'
+import { saveSubTourDailyDetail } from './scripts/saveSubTourDailyDetail'
+import { saveSubClauses } from './scripts/saveSubClauses'
+import { activeSubProduct, getPackageId } from './scripts/updateSubResourceActive'
+import { subProductCategories } from './CreateModal/constant'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
   if (match) {
     // TODO 换一个方法获取 product 基础数据
     const str = match[1].split(' = ')[2].split('\n')[0]
-    const obj = JSON.parse(str)
+    // const obj = JSON.parse(str)
     return JSON.parse(str)
   } else {
     console.log('Unable to find __INITIAL_STATE__ object in the input string.')
@@ -15,7 +22,7 @@ export const parseHtmlToObj = (html: string) => {
   }
 }
 
-export function exportExcelToNestedJSON (excelData: any) {
+export function exportExcelToNestedJSON(excelData: any) {
   try {
     // 读取 Excel 数据
     const workbook = XLSX.read(excelData, { type: 'array' })
@@ -57,7 +64,7 @@ export function exportExcelToNestedJSON (excelData: any) {
 }
 
 // 获取合并单元格的值
-export function getMergedCellValue (worksheet, rowIndex, colIndex) {
+export function getMergedCellValue(worksheet, rowIndex, colIndex) {
   const cell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: colIndex })]
   if (cell && cell.l && cell.l.target) {
     const { r: mergedRowIndex, c: mergedColIndex } = XLSX.utils.decode_cell(
@@ -72,12 +79,12 @@ export function getMergedCellValue (worksheet, rowIndex, colIndex) {
   return null
 }
 
-export function sleep (ms) {
+export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // 辅助函数：将字符串转换为 ArrayBuffer
-function s2ab (s) {
+function s2ab(s) {
   const buf = new ArrayBuffer(s.length)
   const view = new Uint8Array(buf)
   for (let i = 0; i < s.length; i++) {
@@ -86,7 +93,7 @@ function s2ab (s) {
   return buf
 }
 
-export function formatData (productId, data) {
+export function formatData(productId, data) {
   const { routes } = data
 
   const result = { productId }
@@ -101,8 +108,8 @@ export function formatData (productId, data) {
  * 
  * @param data json 格式
  * const jsonData = [
-    { productID: ' pid-1', day1: 'xxx', day2: 'xxxx', day3: 'xxxx' },
-    {productID: 'pid-2', day1: 'xxx', day2: 'xxxx', day3: 'xxxx'  },
+    { productID: 'pid-1', day1: 'xxx', day2: 'xxxx', day3: 'xxxx' },
+    { productID: 'pid-2', day1: 'xxx', day2: 'xxxx', day3: 'xxxx'  },
   ];
   [
     {
@@ -124,7 +131,7 @@ export function formatData (productId, data) {
 ]
  */
 
-export function downloadXslx (routes: TourDay[], productId: string) {
+export function downloadXslx(routes: TourDay[], productId: string) {
   console.log(routes)
   const data = routes.map(route => {
     const days = route.routes.reduce((prev, cur) => {
@@ -166,52 +173,103 @@ export function downloadXslx (routes: TourDay[], productId: string) {
   downloadLink.click()
 }
 
-  /**
-   * 由豆包生成，除去首末两天的线路全排列
-   * @param arr
-   * @returns
-   */
-  export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay[] {
-    if (list.length <= 3) {
-      return [
-        {
-          id: list.map((v) => v.orderDay).join("-"),
-          status: "wait",
-          routes: list,
-          currentStep: 0,
-        },
-      ];
-    }
-    const first = list.shift();
-    const last = list.pop();
-    const results: TourDailyDescription[][] = [];
-
-    const permutations = generatePermutations(list);
-    console.log({ permutations });
-    results.push(...permutations);
-
-    return results
-      .map((val) => [first, ...val, last])
-      .map((val, i) => ({
-        id: val.map((v) => v.orderDay).join("-"),
+/**
+ * 由豆包生成，除去首末两天的线路全排列
+ * @param arr
+ * @returns
+ */
+export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay[] {
+  if (list.length <= 3) {
+    return [
+      {
+        id: list.map((v) => v.orderDay).join("-"),
         status: "wait",
-        routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
+        routes: list,
         currentStep: 0,
-      }));
-
-    function generatePermutations(
-      arr: TourDailyDescription[],
-    ): TourDailyDescription[][] {
-      if (arr.length === 0) return [[]];
-      const result: TourDailyDescription[][] = [];
-      for (let i = 0; i < arr.length; i++) {
-        const current = arr[i];
-        const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
-        const subPermutations = generatePermutations(remaining);
-        for (const subPermutation of subPermutations) {
-          result.push([current, ...subPermutation]);
-        }
-      }
-      return result;
-    }
+      },
+    ];
   }
+  const first = list.shift();
+  const last = list.pop();
+  const results: TourDailyDescription[][] = [];
+
+  const permutations = generatePermutations(list);
+  console.log("=====", { permutations });
+  results.push(...permutations);
+
+  return results
+    .map((val) => [first, ...val, last])
+    .map((val, i) => ({
+      id: val.map((v) => v.orderDay).join("-"),
+      status: "wait",
+      routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
+      currentStep: 0,
+      subProducts: JSON.parse(JSON.stringify(subProductCategories)),
+    }));
+
+  function generatePermutations(
+    arr: TourDailyDescription[],
+  ): TourDailyDescription[][] {
+    if (arr.length === 0) return [[]];
+    const result: TourDailyDescription[][] = [];
+    for (let i = 0; i < arr.length; i++) {
+      const current = arr[i];
+      const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+      const subPermutations = generatePermutations(remaining);
+      for (const subPermutation of subPermutations) {
+        result.push([current, ...subPermutation]);
+      }
+    }
+    return result;
+  }
+}
+
+export const stepFns = [
+  saveProductRichText,// 子产品富文本
+  saveSubProductResource,// 子产品资源配置
+  saveSubTourDailyDetail,// 子产品行程描述
+  saveSubClauses,// 子产品条款维护
+];
+
+// 创建子产品
+export async function createProduct(product: TourDay, updateTourDayStatus) {
+  const { productId, subProducts = [] } = product
+
+  const pkgObj = await getPackageId(productId);
+  const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
+  const mappedSubProducts = subProducts.map(sub => {
+    if (existSubProductNames.includes(sub.lineDescription)) {
+      sub.productId = '已经存在';
+      sub.step = stepFns.length;
+    }
+    return sub;
+  })
+
+  // 根据已经存在的子产品过滤一下，避免重复创建
+  updateTourDayStatus(productId, {
+    subProducts: mappedSubProducts
+  });
+
+  for (let i = 0; i < mappedSubProducts.length; i++) {
+    const sub = mappedSubProducts[i];
+    if (sub.productId === '已经存在') continue;
+    // 创建子产品
+    const subProductId = await createSubProduct(productId, sub.lineDescription);
+    sub.productId = subProductId;
+    for (let i = 0; i < stepFns.length; i++) {
+      const fn = stepFns[i];
+      await fn(subProductId, sub);
+      sub.step++;
+      updateTourDayStatus(productId, {
+        subProducts: mappedSubProducts
+      });
+    }
+
+    // 子产品激活
+    await activeSubProduct(productId, subProductId)
+  }
+
+  return {
+    mappedSubProducts
+  }
+}

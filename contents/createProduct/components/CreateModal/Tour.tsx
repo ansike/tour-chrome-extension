@@ -1,19 +1,18 @@
+import { CheckCircleTwoTone } from "@ant-design/icons";
 import { Button, Progress } from "antd";
 import { useEffect, useState } from "react";
-
-import { productDuplicate } from "~/contents/createProduct/scripts/productDuplicate";
-
+import { productDuplicate } from "~contents/createProduct/components/scripts/productDuplicate";
+import type { TourDay } from "./interface";
 import { saveClauses } from "../scripts/saveClauses";
-import { saveProductRichText } from "../scripts/savedescriptioninfo";
-import { saveLineInfo } from "../scripts/saveLineInfo";
 import { savePackage } from "../scripts/savePackageItem";
-import { savePriceInventory } from "../scripts/savePriceInventory";
 import { saveProduct } from "../scripts/saveProductBaseInfo";
-import { saveProductResource } from "../scripts/saveProductMaintainType";
+import { saveProductRichText } from "../scripts/savedescriptioninfo";
+import { savePriceInventory } from "../scripts/savePriceInventory";
+import { saveProductResource } from "../scripts/saveProductResource";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { saveTourDailyDetail } from "../scripts/saveTourDailyDetail";
 import { updateResourceActive } from "../scripts/updateResourceActive";
-import type { TourDay } from "./interface";
+import { createProduct, stepFns } from "../util";
 
 interface TourProps {
   productId: string;
@@ -35,7 +34,7 @@ const Tour = (props: TourProps) => {
       updateTourDayStatus(data.id, {
         currentStep: data.currentStep + 1,
         title: title,
-        productId: data.currentStep === 0 ? info.newProductId : data.productId,
+        productId: data.currentStep === 0 ? info?.newProductId : data.productId,
       });
       return info;
     } catch (error) {
@@ -88,9 +87,16 @@ const Tour = (props: TourProps) => {
       (data, productId) =>
         doJob(() => saveClauses(data.productId), data, "条款维护"),
       (data, productId) =>
-        doJob(() => saveLineInfo(data.productId), data, "线路及交通"),
+        doJob(() => updateResourceActive(data.productId), data, "激活母产品"),
+
+      // -------------------- 创建子产品 --------------------
       (data, productId) =>
-        doJob(() => updateResourceActive(data.productId), data, "激活产品"),
+        doJob(
+          () => createProduct(data, updateTourDayStatus),
+          data,
+          "创建子产品",
+        ),
+
       (data, productId) => finish(data),
     ];
 
@@ -104,6 +110,8 @@ const Tour = (props: TourProps) => {
     }
   }, [productId, data]);
 
+  if (!data) return null;
+  
   return (
     <div style={{ padding: "8px 16px" }}>
       <div>分裂顺序：{data?.id}</div>
@@ -111,6 +119,31 @@ const Tour = (props: TourProps) => {
         <div>
           {data?.productId ? data?.productId + " | " : ""}
           {data?.title}
+        </div>
+        <div style={{ fontSize: 11, marginTop: 10 }}>
+          <span style={{ fontWeight: "bold", fontSize: 13 }}>子产品：</span>
+          {data?.subProducts.map((pro) => {
+            return (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {pro.lineDescription} | &nbsp;
+                {pro.step === stepFns.length ? (
+                  <>
+                    <span style={{ marginRight: 10 }}>
+                      {pro.productId || ""}
+                    </span>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  </>
+                ) : (
+                  <Progress
+                    style={{ width: 120, display: "inline-block" }}
+                    size="small"
+                    percent={Math.floor((pro.step / stepFns.length) * 100)}
+                  />
+                )}
+                <br />
+              </div>
+            );
+          })}
         </div>
         <div>
           <Progress
