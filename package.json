@@ -1,7 +1,7 @@
 {
   "name": "tour-helper",
   "displayName": "Tour Helper",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Tour Helper Extension.",
   "author": "ansike. <ansike@qq.com>",
   "scripts": {

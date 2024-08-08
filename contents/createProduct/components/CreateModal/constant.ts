@@ -146,6 +146,134 @@ export const subProductCategories = [
   },
   {
     step: 0,
+    transitionType: 'hasAirport',
+    lineDescription: '单飞机进',
+    enter: { flight },
+    leave: {},
+    clauses: [
+      {
+        "clauseItemId": 3035,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "去程",
+            "elementCode": "C"
+          },
+          {
+            "componentCode": "traffic2",
+            "value": "经济舱机票",
+            "elementCode": "A"
+          },
+          {
+            "componentCode": "traffic3",
+            "value": "（已含机建、燃油税）"
+          }
+        ]
+      },
+    ]
+  },
+  {
+    step: 0,
+    transitionType: 'hasTrain',
+    lineDescription: '单火车进',
+    enter: { train },
+    leave: {},
+    clauses: [
+      {
+        "clauseItemId": 10081,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "去程",
+            "elementCode": "B"
+          },
+          {
+            "componentCode": "traffic1",
+            "value": "火车票",
+            "elementCode": "A"
+          }
+        ]
+      },
+      {
+        "clauseItemId": 10071,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "儿童是否含火车票，以您在填写订单时选择的儿童年龄为准"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    step: 0,
+    transitionType: 'hasAirport',
+    lineDescription: '单飞机出',
+    enter: {},
+    leave: { flight },
+    clauses: [
+      {
+        "clauseItemId": 3035,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "回程",
+            "elementCode": "D"
+          },
+          {
+            "componentCode": "traffic2",
+            "value": "经济舱机票",
+            "elementCode": "A"
+          },
+          {
+            "componentCode": "traffic3",
+            "value": "（已含机建、燃油税）"
+          }
+        ]
+      },
+    ]
+  },
+  {
+    step: 0,
+    transitionType: 'hasTrain',
+    lineDescription: '单火车出',
+    enter: {},
+    leave: { train },
+    clauses: [
+      {
+        "clauseItemId": 10081,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "回程",
+            "elementCode": "C"
+          },
+          {
+            "componentCode": "traffic1",
+            "value": "火车票",
+            "elementCode": "A"
+          }
+        ]
+      },
+      {
+        "clauseItemId": 10071,
+        "secondClassTypeId": 86,
+        "elementDtos": [
+          {
+            "componentCode": "traffic0",
+            "value": "儿童是否含火车票，以您在填写订单时选择的儿童年龄为准"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    step: 0,
     transitionType: 'both',
     lineDescription: '飞机进火车出',
     enter: { flight },
@@ -253,5 +381,5 @@ export const subProductCategories = [
         ]
       }
     ]
-  }
+  },
 ]

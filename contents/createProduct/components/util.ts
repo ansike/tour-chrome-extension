@@ -239,7 +239,7 @@ export async function createProduct(product: TourDay, updateTourDayStatus) {
   const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
   const mappedSubProducts = subProducts.map(sub => {
     if (existSubProductNames.includes(sub.lineDescription)) {
-      sub.productId = '已经存在';
+      sub.status = '已经存在';
       sub.step = stepFns.length;
     }
     return sub;
@@ -252,7 +252,7 @@ export async function createProduct(product: TourDay, updateTourDayStatus) {
 
   for (let i = 0; i < mappedSubProducts.length; i++) {
     const sub = mappedSubProducts[i];
-    if (sub.productId === '已经存在') continue;
+    if (sub.status === '已经存在') continue;
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
     sub.productId = subProductId;

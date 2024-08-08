@@ -12,16 +12,16 @@ export const saveSubProductResource = async (
 
   // 获取 segments
   const { draftProductSegments } = await getSegments(productId)
-  const destinyCity = draftProductSegments.segments[0].segmentBase.destinationCity;
-
-  console.log({ draftProductSegments })
+  const destinationCity = draftProductSegments.segments[0].segmentBase.departureCity;
+  const hasEnter = Object.keys(enter).length;
+  const hasLeave = Object.keys(leave).length;
   if (draftProductSegments.segments[0].segmentBase.departureCity.cityId !== 0) {
     // 在最前方增加一条行程
     await saveSegment({
       segmentBase: {
         departureAdjustDays: 0,
         departureCity: { cityId: 0, cityName: "多出发" },
-        destinationCity: destinyCity,
+        destinationCity: destinationCity,
         segmentNumber: 1
       },
       productId,
@@ -34,9 +34,9 @@ export const saveSubProductResource = async (
     await saveSegment({
       segmentBase: {
         departureAdjustDays: 0,
-        departureCity: destinyCity,
+        departureCity: draftProductSegments.segments[draftProductSegments.segments.length - 1].segmentBase.destinationCity,
         destinationCity: { cityId: 0, cityName: "多到达" },
-        segmentNumber: draftProductSegments.segments.length + 2
+        segmentNumber: draftProductSegments.segments.length + 2 
       },
       productId,
       segmentId: 0
@@ -46,15 +46,20 @@ export const saveSubProductResource = async (
   const { draftProductSegments: newSegments } = await getSegments(productId);
 
   // 去程
-  await saveSegment({
-    ...newSegments.segments[0],
-    ...enter,
-  })
+  if (hasEnter) {
+    await saveSegment({
+      ...newSegments.segments[0],
+      ...enter,
+    })
+  }
+
   // 回程
-  await saveSegment({
-    ...newSegments.segments[newSegments.segments.length - 1],
-    ...leave,
-  })
+  if (hasLeave) {
+    await saveSegment({
+      ...newSegments.segments[newSegments.segments.length - 1],
+      ...leave,
+    })
+  }
 
   async function setMutipleDepartureCities(productId: string) {
     // 获取所有的出发城市
@@ -64,7 +69,7 @@ export const saveSubProductResource = async (
     console.log({ transitionType })
 
     // 不包含当前的城市
-    let filteredCities = cities.filter(item => item.cityId !== destinyCity.cityId);
+    let filteredCities = cities.filter(item => item.cityId !== destinationCity.cityId);
     console.log({ filteredCities })
 
     // 保存当前城市
@@ -84,7 +89,7 @@ export const saveSubProductResource = async (
           await sleep(1000);
           console.log(productId, { filteredCities })
           // 检索到的城市无资源考虑重新设置出发城市
-          if(!filteredCities.length){
+          if (!filteredCities.length) {
             isChecking = false;
             return await setMutipleDepartureCities(productId);
           }
@@ -102,6 +107,7 @@ export const saveSubProductResource = async (
     await checkSegmentResultCities(productId);
 
   }
+
   await setMutipleDepartureCities(productId);
 
   return 'success'
