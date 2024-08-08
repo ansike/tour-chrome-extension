@@ -65,7 +65,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
       <div>
         <Drawer
           title="创建子产品"
-          width={800}
+          width={900}
           open={isModalOpen}
           onClose={handleCancel}
           maskClosable={false}
@@ -125,11 +125,18 @@ const CreateSubProduct = (props: CreateModalProps) => {
                         <CheckCircleTwoTone twoToneColor="#52c41a" />
                       </>
                     ) : (
-                      <Progress
-                        style={{ width: 120, display: "inline-block" }}
-                        size="small"
-                        percent={Math.floor((pro.step / stepFns.length) * 100)}
-                      />
+                      <>
+                        <span style={{ marginRight: 10 }}>
+                          {pro.productId || ""}
+                        </span>
+                        <Progress
+                          style={{ width: 120, display: "inline-block" }}
+                          size="small"
+                          percent={Math.floor(
+                            (pro.step / stepFns.length) * 100,
+                          )}
+                        />
+                      </>
                     )}
                     <br />
                   </div>

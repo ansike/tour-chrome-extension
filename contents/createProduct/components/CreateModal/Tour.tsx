@@ -1,18 +1,20 @@
 import { CheckCircleTwoTone } from "@ant-design/icons";
 import { Button, Progress } from "antd";
 import { useEffect, useState } from "react";
+
 import { productDuplicate } from "~contents/createProduct/components/scripts/productDuplicate";
-import type { TourDay } from "./interface";
+
 import { saveClauses } from "../scripts/saveClauses";
-import { savePackage } from "../scripts/savePackageItem";
-import { saveProduct } from "../scripts/saveProductBaseInfo";
 import { saveProductRichText } from "../scripts/savedescriptioninfo";
+import { savePackage } from "../scripts/savePackageItem";
 import { savePriceInventory } from "../scripts/savePriceInventory";
+import { saveProduct } from "../scripts/saveProductBaseInfo";
 import { saveProductResource } from "../scripts/saveProductResource";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { saveTourDailyDetail } from "../scripts/saveTourDailyDetail";
 import { updateResourceActive } from "../scripts/updateResourceActive";
 import { createProduct, stepFns } from "../util";
+import type { TourDay } from "./interface";
 
 interface TourProps {
   productId: string;
@@ -111,7 +113,7 @@ const Tour = (props: TourProps) => {
   }, [productId, data]);
 
   if (!data) return null;
-  
+
   return (
     <div style={{ padding: "8px 16px" }}>
       <div>分裂顺序：{data?.id}</div>
@@ -134,11 +136,16 @@ const Tour = (props: TourProps) => {
                     <CheckCircleTwoTone twoToneColor="#52c41a" />
                   </>
                 ) : (
-                  <Progress
-                    style={{ width: 120, display: "inline-block" }}
-                    size="small"
-                    percent={Math.floor((pro.step / stepFns.length) * 100)}
-                  />
+                  <>
+                    <span style={{ marginRight: 10 }}>
+                      {pro.productId || ""}
+                    </span>
+                    <Progress
+                      style={{ width: 120, display: "inline-block" }}
+                      size="small"
+                      percent={Math.floor((pro.step / stepFns.length) * 100)}
+                    />
+                  </>
                 )}
                 <br />
               </div>
