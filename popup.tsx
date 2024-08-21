@@ -26,7 +26,7 @@ function IndexPopup() {
       <h1>tour helper</h1>
       <div style={{ display: "flex", flexGrow: 1 }}>
         <br />
-        <a href="https://test-c2x1zzjx4rou.feishu.cn/docx/CHHVdMWPBorPDnxrLBDck6nanLd">
+        <a href="https://test-c2x1zzjx4rou.feishu.cn/docx/CHHVdMWPBorPDnxrLBDck6nanLd" target="__blank">
           Tour Helper 安装文档
         </a>
       </div>
