@@ -3,7 +3,7 @@ import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
 import { useState } from "react";
 
-import CreateModal from "./components/CreateModal";
+import CreateModal from "./components/SplitProduct";
 import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
 

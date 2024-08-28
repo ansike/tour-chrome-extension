@@ -2,7 +2,7 @@ import { CheckCircleTwoTone } from "@ant-design/icons";
 import { Button, Drawer, Flex, Input, message, Progress } from "antd";
 import React, { useState } from "react";
 
-import { subProductCategories } from "../CreateModal/constant";
+import { subProductCategories } from "../SplitProduct/constant";
 import { getProductDetail } from "../scripts/getProductDetail";
 import { createProduct, stepFns } from "../util";
 
