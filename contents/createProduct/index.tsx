@@ -4,6 +4,7 @@ import { type PlasmoCSConfig } from "plasmo";
 import { useState } from "react";
 import CreateModal from "./components/CreateModal";
 import CreateSubProduct from "./components/CreateSubProduct";
+import DuplicateProduct from "./components/DuplicateProduct";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -16,12 +17,16 @@ const CreateProduct = () => {
 
   const items: MenuProps["items"] = [
     {
-      key: "1",
+      key: "SPLIT_PRODUCT",
       label: <span onClick={() => setIsModalOpen(true)}>分裂产品</span>,
     },
     {
-      key: "2",
+      key: "CREATE_SUB_PRODUCT",
       label: <CreateSubProduct />,
+    },
+    {
+      key: "DUPLICATE_PRODUCT",
+      label: <DuplicateProduct />
     },
   ];
 

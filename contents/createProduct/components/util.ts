@@ -8,6 +8,15 @@ import { saveSubTourDailyDetail } from './scripts/saveSubTourDailyDetail'
 import { saveSubClauses } from './scripts/saveSubClauses'
 import { activeSubProduct, getPackageId } from './scripts/updateSubResourceActive'
 import { subProductCategories } from './CreateModal/constant'
+import { productDuplicate } from './scripts/productDuplicate'
+import { saveSaleControlInfo } from './scripts/saveSaleControlInfo'
+import { saveProduct } from './scripts/saveProductBaseInfo'
+import { saveTourDailyDetail } from './scripts/saveTourDailyDetail'
+import { savePackage } from './scripts/savePackageItem'
+import { savePriceInventory } from './scripts/savePriceInventory'
+import { saveProductResource } from './scripts/saveProductResource'
+import { saveClauses } from './scripts/saveClauses'
+import { updateResourceActive } from './scripts/updateResourceActive'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -194,7 +203,6 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
   const results: TourDailyDescription[][] = [];
 
   const permutations = generatePermutations(list);
-  console.log("=====", { permutations });
   results.push(...permutations);
 
   return results
@@ -224,7 +232,7 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
   }
 }
 
-export const stepFns = [
+export const createSubProductStepFns = [
   saveProductRichText,// 子产品富文本
   saveSubProductResource,// 子产品资源配置
   saveSubTourDailyDetail,// 子产品行程描述
@@ -240,7 +248,7 @@ export async function createProduct(product: TourDay, updateTourDayStatus) {
   const mappedSubProducts = subProducts.map(sub => {
     if (existSubProductNames.includes(sub.lineDescription)) {
       sub.status = '已经存在';
-      sub.step = stepFns.length;
+      sub.step = createSubProductStepFns.length;
     }
     return sub;
   })
@@ -256,8 +264,8 @@ export async function createProduct(product: TourDay, updateTourDayStatus) {
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
     sub.productId = subProductId;
-    for (let i = 0; i < stepFns.length; i++) {
-      const fn = stepFns[i];
+    for (let i = 0; i < createSubProductStepFns.length; i++) {
+      const fn = createSubProductStepFns[i];
       await fn(subProductId, sub);
       sub.step++;
       updateTourDayStatus(productId, {
@@ -271,5 +279,39 @@ export async function createProduct(product: TourDay, updateTourDayStatus) {
 
   return {
     mappedSubProducts
+  }
+}
+
+export async function duplicateProduct(product: TourDay, updateTourDayStatus) {
+  const { productId, routes } = product
+  const newProduct = await productDuplicate(productId);
+  const newProductId = newProduct.newProductId;
+
+  const duplicateProductStepFns = [
+    () => saveSaleControlInfo(newProductId),
+    () => saveProduct(newProductId),
+    () => saveProductRichText(newProductId),
+    () => saveTourDailyDetail(newProductId, routes),
+    () => savePackage(newProductId),
+    () => savePackage(newProductId),
+    () => savePriceInventory(productId, newProductId),
+    () => saveProductResource(productId, newProductId),
+    () => saveClauses(newProductId),
+    () => updateResourceActive(newProductId),
+  ]
+  const len = duplicateProductStepFns.length;
+  let i = 0
+  updateTourDayStatus({ newProductId, total: len, current: 0 })
+  try {
+    for (; i < len; i++) {
+      await duplicateProductStepFns[i]();
+      updateTourDayStatus({ newProductId, total: len, current: i + 1 })
+    }
+  } catch (error) {
+    updateTourDayStatus({ newProductId, total: len, current: i + 1, error: error.message })
+  }
+
+  return {
+    newProductId
   }
 }
