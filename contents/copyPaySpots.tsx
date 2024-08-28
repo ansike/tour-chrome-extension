@@ -5,6 +5,13 @@ import type {
   PlasmoGetInlineAnchor,
 } from "plasmo"
 import { useEffect } from "react"
+import cssText from "data-text:./style.css";
+
+export const getStyle = () => {
+  const style = document.createElement("style");
+  style.textContent = cssText;
+  return style;
+};
 
 function getAllSpots() {
   return Array.from(
