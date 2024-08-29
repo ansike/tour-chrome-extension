@@ -2,8 +2,12 @@ import { Dropdown, type MenuProps } from "antd";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
 import { useState } from "react";
-import CreateModal from "./components/CreateModal";
+
+import CreateModal from "./components/SplitProduct";
 import CreateSubProduct from "./components/CreateSubProduct";
+import DuplicateProduct from "./components/DuplicateProduct";
+
+const HOST_ID = "tour-helper-shadow-host";
 
 export const getStyle = () => {
   const style = document.createElement("style");
@@ -16,18 +20,24 @@ const CreateProduct = () => {
 
   const items: MenuProps["items"] = [
     {
-      key: "1",
+      key: "SPLIT_PRODUCT",
       label: <span onClick={() => setIsModalOpen(true)}>分裂产品</span>,
     },
     {
-      key: "2",
+      key: "CREATE_SUB_PRODUCT",
       label: <CreateSubProduct />,
+    },
+    {
+      key: "DUPLICATE_PRODUCT",
+      label: <DuplicateProduct />,
     },
   ];
 
   return (
-    <div id="plasmo-container">
-      <Dropdown menu={{ items }} placement="topRight">
+    <div id="tour-helper-container">
+      <Dropdown
+        menu={{ items }}
+        placement="topRight">
         <div
           className="p-8"
           style={{
@@ -61,6 +71,7 @@ const CreateProduct = () => {
 export const config: PlasmoCSConfig = {
   matches: ["https://vbooking.ctrip.com/*"],
 };
+export const getShadowHostId = () => HOST_ID;
 
 export const getPortalRoot = () => {
   return document.body;

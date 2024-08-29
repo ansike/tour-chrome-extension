@@ -29,12 +29,12 @@ const flight = {
     "flightLatestTime": "",
     "sameAirportTransferLimited": "F",
     "airRouteMode": "N",
-    "minTransitTimeHour": 1,
-    "maxTransitTimeHour": 4,
     "flightLatestTimeUnlimited": true,
-    "minTransitTime": "0100",
-    "maxTransitTime": "0400",
-    "details": []
+    "minTransitTime": "0000",
+    "maxTransitTime": "0000",
+    "details": [],
+    "arrivalAirport": "",
+    "departureAirport": "",
   },
   "autoMatch": false,
   "isIncludeManualFlight": "F",
@@ -56,7 +56,7 @@ const train = {
       "value": "不指定"
     },
     "destinationStations": [],
-    "grabTickets": "2,1",
+    "grabTickets": "2",
     "trainEarliesTimeUnlimited": true,
     "latestDepartureTimeUnlimited": true,
     "earliestArrivalUnlimited": true,
@@ -84,8 +84,8 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'hasAirport',
     lineDescription: '飞机往返',
-    enter: { flight },
-    leave: { flight },
+    enter: { flight: JSON.parse(JSON.stringify(flight)) },
+    leave: { flight: JSON.parse(JSON.stringify(flight)) },
     clauses: [
       {
         "clauseItemId": 3035,
@@ -98,8 +98,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -113,8 +113,8 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'hasTrain',
     lineDescription: '火车往返',
-    enter: { train },
-    leave: { train },
+    enter: { train: JSON.parse(JSON.stringify(train)) },
+    leave: { train: JSON.parse(JSON.stringify(train)) },
     clauses: [
       {
         "clauseItemId": 10081,
@@ -148,7 +148,7 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'hasAirport',
     lineDescription: '单飞机进',
-    enter: { flight },
+    enter: { flight: JSON.parse(JSON.stringify(flight)) },
     leave: {},
     clauses: [
       {
@@ -162,8 +162,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -177,7 +177,7 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'hasTrain',
     lineDescription: '单火车进',
-    enter: { train },
+    enter: { train: JSON.parse(JSON.stringify(train)) },
     leave: {},
     clauses: [
       {
@@ -213,7 +213,7 @@ export const subProductCategories = [
     transitionType: 'hasAirport',
     lineDescription: '单飞机出',
     enter: {},
-    leave: { flight },
+    leave: { flight: JSON.parse(JSON.stringify(flight)) },
     clauses: [
       {
         "clauseItemId": 3035,
@@ -226,8 +226,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -242,7 +242,7 @@ export const subProductCategories = [
     transitionType: 'hasTrain',
     lineDescription: '单火车出',
     enter: {},
-    leave: { train },
+    leave: { train: JSON.parse(JSON.stringify(train)) },
     clauses: [
       {
         "clauseItemId": 10081,
@@ -276,8 +276,8 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'both',
     lineDescription: '飞机进火车出',
-    enter: { flight },
-    leave: { train },
+    enter: { flight: JSON.parse(JSON.stringify(flight)) },
+    leave: { train: JSON.parse(JSON.stringify(train)) },
     clauses: [
       {
         "clauseItemId": 3035,
@@ -290,8 +290,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -331,8 +331,8 @@ export const subProductCategories = [
     step: 0,
     transitionType: 'both',
     lineDescription: '火车进飞机出',
-    enter: { train },
-    leave: { flight },
+    enter: { train: JSON.parse(JSON.stringify(train)) },
+    leave: { flight: JSON.parse(JSON.stringify(flight)) },
     clauses: [
       {
         "clauseItemId": 3035,
@@ -345,8 +345,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",

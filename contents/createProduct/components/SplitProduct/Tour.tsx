@@ -13,7 +13,7 @@ import { saveProductResource } from "../scripts/saveProductResource";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { saveTourDailyDetail } from "../scripts/saveTourDailyDetail";
 import { updateResourceActive } from "../scripts/updateResourceActive";
-import { createProduct, stepFns } from "../util";
+import { createSubProductFn, createSubProductStepFns } from "../util";
 import type { TourDay } from "./interface";
 
 interface TourProps {
@@ -94,7 +94,7 @@ const Tour = (props: TourProps) => {
       // -------------------- 创建子产品 --------------------
       (data, productId) =>
         doJob(
-          () => createProduct(data, updateTourDayStatus),
+          () => createSubProductFn(data, updateTourDayStatus),
           data,
           "创建子产品",
         ),
@@ -128,7 +128,7 @@ const Tour = (props: TourProps) => {
             return (
               <div style={{ display: "flex", alignItems: "center" }}>
                 {pro.lineDescription} | &nbsp;
-                {pro.step === stepFns.length ? (
+                {pro.step === createSubProductStepFns.length ? (
                   <>
                     <span style={{ marginRight: 10 }}>
                       {pro.productId || ""}
@@ -143,7 +143,7 @@ const Tour = (props: TourProps) => {
                     <Progress
                       style={{ width: 120, display: "inline-block" }}
                       size="small"
-                      percent={Math.floor((pro.step / stepFns.length) * 100)}
+                      percent={Math.floor((pro.step / createSubProductStepFns.length) * 100)}
                     />
                   </>
                 )}

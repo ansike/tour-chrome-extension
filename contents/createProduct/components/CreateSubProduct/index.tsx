@@ -1,10 +1,18 @@
 import { CheckCircleTwoTone } from "@ant-design/icons";
-import { Button, Drawer, Flex, Input, message, Progress } from "antd";
+import {
+  Button,
+  Drawer,
+  Flex,
+  Input,
+  message,
+  Progress,
+} from "antd";
 import React, { useState } from "react";
 
-import { subProductCategories } from "../CreateModal/constant";
 import { getProductDetail } from "../scripts/getProductDetail";
-import { createProduct, stepFns } from "../util";
+import { subProductCategories } from "../SplitProduct/constant";
+import { useAirportSelect } from "../useAirportSelect";
+import { createSubProductFn, createSubProductStepFns } from "../util";
 
 type CreateModalProps = {};
 message.config({
@@ -21,6 +29,8 @@ const CreateSubProduct = (props: CreateModalProps) => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { arrivalAirport, departureAirport, dom } = useAirportSelect();
+  
   const createSubProduct = async () => {
     if (!productId) {
       message.error("请输入产品ID");
@@ -35,7 +45,18 @@ const CreateSubProduct = (props: CreateModalProps) => {
         return message.error("当前的产品为子产品，请输入正确的母产品ID");
       }
 
-      await createProduct(
+      if (arrivalAirport) {
+        subProductCategories.forEach((item) => {
+          if (item.enter?.flight) {
+            item.enter.flight.systemFlight.arrivalAirport = arrivalAirport;
+          }
+          if (item.leave?.flight) {
+            item.leave.flight.systemFlight.departureAirport = departureAirport;
+          }
+        });
+      }
+
+      await createSubProductFn(
         {
           ...baseInfo,
           subProducts: JSON.parse(JSON.stringify(subProductCategories)),
@@ -69,7 +90,6 @@ const CreateSubProduct = (props: CreateModalProps) => {
           open={isModalOpen}
           onClose={handleCancel}
           maskClosable={false}
-          // zIndex={10000000000000}
           footer={
             <Flex justify="flex-end" gap={16}>
               <Button onClick={handleCancel}>取消</Button>
@@ -101,7 +121,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
                   "输入产品ID，点击【开始创建】按钮创建当前产品的子产品 "}
               </span>
             </div>
-
+            {dom}
             <div style={{ fontSize: 14, marginTop: 10 }}>
               <span
                 style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>
@@ -117,7 +137,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
                       marginBottom: 4,
                     }}>
                     {pro.lineDescription} | &nbsp;
-                    {pro.step === stepFns.length ? (
+                    {pro.step === createSubProductStepFns.length ? (
                       <>
                         <span style={{ marginRight: 10 }}>
                           {pro.productId || ""}
@@ -133,7 +153,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
                           style={{ width: 120, display: "inline-block" }}
                           size="small"
                           percent={Math.floor(
-                            (pro.step / stepFns.length) * 100,
+                            (pro.step / createSubProductStepFns.length) * 100,
                           )}
                         />
                       </>
