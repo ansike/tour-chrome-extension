@@ -7,7 +7,6 @@ import { saveSubProductResource } from './scripts/saveSubProductResource'
 import { saveSubTourDailyDetail } from './scripts/saveSubTourDailyDetail'
 import { saveSubClauses } from './scripts/saveSubClauses'
 import { activeSubProduct, getPackageId } from './scripts/updateSubResourceActive'
-import { subProductCategories } from './SplitProduct/constant'
 import { productDuplicate } from './scripts/productDuplicate'
 import { saveSaleControlInfo } from './scripts/saveSaleControlInfo'
 import { saveProduct } from './scripts/saveProductBaseInfo'
@@ -187,7 +186,7 @@ export function downloadXslx(routes: TourDay[], productId: string) {
  * @param arr
  * @returns
  */
-export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay[] {
+export function permuteWithDeletions(list: TourDailyDescription[] = [], subProducts): TourDay[] {
   if (list.length <= 3) {
     return [
       {
@@ -212,7 +211,7 @@ export function permuteWithDeletions(list: TourDailyDescription[] = []): TourDay
       status: "wait",
       routes: val.map((v, i) => ({ ...v, orderDay: i + 1 })),
       currentStep: 0,
-      subProducts: JSON.parse(JSON.stringify(subProductCategories)),
+      subProducts: JSON.parse(JSON.stringify(subProducts)),
     }));
 
   function generatePermutations(
@@ -240,7 +239,7 @@ export const createSubProductStepFns = [
 ];
 
 // 创建子产品
-export async function createProduct(product: TourDay, updateTourDayStatus) {
+export async function createSubProductFn(product: TourDay, updateTourDayStatus) {
   const { productId, subProducts = [] } = product
 
   const pkgObj = await getPackageId(productId);

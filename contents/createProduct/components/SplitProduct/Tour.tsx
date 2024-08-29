@@ -13,7 +13,7 @@ import { saveProductResource } from "../scripts/saveProductResource";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { saveTourDailyDetail } from "../scripts/saveTourDailyDetail";
 import { updateResourceActive } from "../scripts/updateResourceActive";
-import { createProduct, createSubProductStepFns } from "../util";
+import { createSubProductFn, createSubProductStepFns } from "../util";
 import type { TourDay } from "./interface";
 
 interface TourProps {
@@ -94,7 +94,7 @@ const Tour = (props: TourProps) => {
       // -------------------- 创建子产品 --------------------
       (data, productId) =>
         doJob(
-          () => createProduct(data, updateTourDayStatus),
+          () => createSubProductFn(data, updateTourDayStatus),
           data,
           "创建子产品",
         ),

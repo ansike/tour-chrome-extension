@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
+    "ahooks": "^3.8.1",
     "antd": "^5.13.2",
     "copy-to-clipboard": "^3.3.3",
     "js-xlsx": "^0.8.22",
+    "lodash": "^4.17.21",
     "plasmo": "0.84.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

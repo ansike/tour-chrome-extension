@@ -8,9 +8,11 @@ import {
 } from "~contents/createProduct/components/scripts/getProductBaseInfo";
 import { getProductDetail } from "~contents/createProduct/components/scripts/getProductDetail";
 
+import { useAirportSelect } from "../useAirportSelect";
 import { downloadXslx, permuteWithDeletions } from "../util";
 import type { TourDay } from "./interface";
 import Tour from "./Tour";
+import { subProductCategories } from "./constant";
 
 type CreateModalProps = {
   isModalOpen: boolean;
@@ -28,6 +30,8 @@ const CreateModal = (props: CreateModalProps) => {
   const [originRoute, setOriginRoute] = useState<TourDailyDescription[]>([]);
   const [routes, setRoutes] = useState<TourDay[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const { arrivalAirport, departureAirport, dom } = useAirportSelect();
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -51,7 +55,21 @@ const CreateModal = (props: CreateModalProps) => {
       setProductInfo(baseInfo);
       const _originRoutes = tourDaily.tourInfo.tourDailyDescriptions || [];
       setOriginRoute(_originRoutes);
-      const routes = permuteWithDeletions([..._originRoutes]);
+
+      let subProducts = subProductCategories;
+      if (arrivalAirport) {
+        subProducts = subProducts.map((item) => {
+          if (item.enter?.flight) {
+            item.enter.flight.systemFlight.arrivalAirport = arrivalAirport;
+          }
+          if (item.leave?.flight) {
+            item.leave.flight.systemFlight.departureAirport = departureAirport;
+          }
+          return item
+        });
+      }
+
+      const routes = permuteWithDeletions([..._originRoutes], subProducts);
       console.log("路线组合", routes);
       setRoutes(routes.slice(1));
     } catch (error) {
@@ -161,6 +179,7 @@ const CreateModal = (props: CreateModalProps) => {
                 "输入产品ID，点击【分裂当前产品】按钮分裂当前产品 "}
             </span>
           </div>
+          <div>{dom}</div>
           {originRoute.length > 0 && (
             <div>
               {originRoute.map((route) => {
