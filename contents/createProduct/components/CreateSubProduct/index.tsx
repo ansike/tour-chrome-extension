@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { subProductCategories } from "../SplitProduct/constant";
 import { getProductDetail } from "../scripts/getProductDetail";
-import { createProduct, stepFns } from "../util";
+import { createProduct, createSubProductStepFns } from "../util";
 
 type CreateModalProps = {};
 message.config({
@@ -117,7 +117,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
                       marginBottom: 4,
                     }}>
                     {pro.lineDescription} | &nbsp;
-                    {pro.step === stepFns.length ? (
+                    {pro.step === createSubProductStepFns.length ? (
                       <>
                         <span style={{ marginRight: 10 }}>
                           {pro.productId || ""}
@@ -133,7 +133,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
                           style={{ width: 120, display: "inline-block" }}
                           size="small"
                           percent={Math.floor(
-                            (pro.step / stepFns.length) * 100,
+                            (pro.step / createSubProductStepFns.length) * 100,
                           )}
                         />
                       </>

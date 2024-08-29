@@ -29,11 +29,9 @@ const flight = {
     "flightLatestTime": "",
     "sameAirportTransferLimited": "F",
     "airRouteMode": "N",
-    "minTransitTimeHour": 1,
-    "maxTransitTimeHour": 4,
     "flightLatestTimeUnlimited": true,
-    "minTransitTime": "0100",
-    "maxTransitTime": "0400",
+    "minTransitTime": "0000",
+    "maxTransitTime": "0000",
     "details": []
   },
   "autoMatch": false,
@@ -56,7 +54,7 @@ const train = {
       "value": "不指定"
     },
     "destinationStations": [],
-    "grabTickets": "2,1",
+    "grabTickets": "2",
     "trainEarliesTimeUnlimited": true,
     "latestDepartureTimeUnlimited": true,
     "earliestArrivalUnlimited": true,
@@ -98,8 +96,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -162,8 +160,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -226,8 +224,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -290,8 +288,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",
@@ -345,8 +343,8 @@ export const subProductCategories = [
           },
           {
             "componentCode": "traffic2",
-            "value": "经济舱机票",
-            "elementCode": "A"
+            "value": "机票",
+            "elementCode": "D"
           },
           {
             "componentCode": "traffic3",

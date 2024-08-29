@@ -36,9 +36,6 @@ const CreateProduct = () => {
   return (
     <div id="tour-helper-container">
       <Dropdown
-        // getPopupContainer={() => {
-        //   return document.querySelector(`#${HOST_ID}`).shadowRoot.querySelector("#plasmo-shadow-container");
-        // }}
         menu={{ items }}
         placement="topRight">
         <div
