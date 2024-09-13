@@ -1,11 +1,9 @@
 import { Dropdown, type MenuProps } from "antd";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
-import { useState } from "react";
-
-import CreateModal from "./components/SplitProduct";
 import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
+import SplitProduct from "./components/SplitProduct";
 
 const HOST_ID = "tour-helper-shadow-host";
 
@@ -16,12 +14,11 @@ export const getStyle = () => {
 };
 
 const CreateProduct = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const items: MenuProps["items"] = [
     {
       key: "SPLIT_PRODUCT",
-      label: <span onClick={() => setIsModalOpen(true)}>分裂产品</span>,
+      label: <SplitProduct />,
     },
     {
       key: "CREATE_SUB_PRODUCT",
@@ -57,13 +54,6 @@ const CreateProduct = () => {
           <span>Tour helper</span>
         </div>
       </Dropdown>
-
-      {isModalOpen && (
-        <CreateModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-        />
-      )}
     </div>
   );
 };

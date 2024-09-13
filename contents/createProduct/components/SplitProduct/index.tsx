@@ -10,21 +10,16 @@ import { getProductDetail } from "~contents/createProduct/components/scripts/get
 
 import { useAirportSelect } from "../useAirportSelect";
 import { downloadXslx, permuteWithDeletions } from "../util";
+import { subProductCategories } from "./constant";
 import type { TourDay } from "./interface";
 import Tour from "./Tour";
-import { subProductCategories } from "./constant";
 
-type CreateModalProps = {
-  isModalOpen: boolean;
-  setIsModalOpen: (bool: boolean) => void;
-};
-
-const CreateModal = (props: CreateModalProps) => {
-  const { isModalOpen, setIsModalOpen } = props;
+const SplitProduct = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const [productId, setProductId] = useState(
     queryParams.get("productid") || queryParams.get("productId"),
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [productInfo, setProductInfo] = useState<any>();
   const [originRoute, setOriginRoute] = useState<TourDailyDescription[]>([]);
@@ -65,7 +60,7 @@ const CreateModal = (props: CreateModalProps) => {
           if (item.leave?.flight) {
             item.leave.flight.systemFlight.departureAirport = departureAirport;
           }
-          return item
+          return item;
         });
       }
 
@@ -118,7 +113,8 @@ const CreateModal = (props: CreateModalProps) => {
   );
 
   return (
-    <div>
+    <>
+      <span onClick={() => setIsModalOpen(true)}>分裂产品</span>
       <Drawer
         title="分裂产品"
         width={900}
@@ -211,8 +207,8 @@ const CreateModal = (props: CreateModalProps) => {
           ) : null}
         </Flex>
       </Drawer>
-    </div>
+    </>
   );
 };
 
-export default CreateModal;
+export default SplitProduct;
