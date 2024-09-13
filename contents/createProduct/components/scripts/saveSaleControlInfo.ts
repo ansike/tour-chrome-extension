@@ -1,5 +1,20 @@
+const saleControlInfoDto = {
+  contractId: 648526,
+  saleMode: 'P',
+  productCategoryId: 9,
+  productPatternId: 4,
+  brandId: 91924,
+  brandName: 'N30旅行',
+  productBrandDto: {
+    brandId: 91924,
+    brandName: 'N30旅行',
+    brandNameEn: 'N30-Travel',
+    brandLocal: 'zh-CN'
+  },
+}
+
 export const saveSaleControlInfo = async (
-  productId: string
+  productId = ''
 ): Promise<{ productId: number }> => {
   const data = {
     contentType: 'json',
@@ -13,21 +28,9 @@ export const saveSaleControlInfo = async (
       auth: '',
       extension: []
     },
-    id: productId,
     idType: 'productId',
     saleControlInfoDto: {
-      contractId: 648526,
-      saleMode: 'P',
-      productCategoryId: 9,
-      productPatternId: 4,
-      brandId: 91924,
-      brandName: 'N30旅行',
-      productBrandDto: {
-        brandId: 91924,
-        brandName: 'N30旅行',
-        brandNameEn: 'N30-Travel',
-        brandLocal: 'zh-CN'
-      },
+      ...saleControlInfoDto,
       priceInputType: 1,
       distributionChannels: [
         'ctripshop',
@@ -56,6 +59,14 @@ export const saveSaleControlInfo = async (
       ],
       desCityDto: {}
     }
+  }
+  
+  if (productId) {
+    data['id'] = productId
+    data['idType'] = 'productId'
+  }else{
+    data['id'] = '1431565'
+    data['idType'] = 'providerId'
   }
 
   const res = await fetch(

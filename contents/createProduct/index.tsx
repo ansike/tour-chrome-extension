@@ -4,6 +4,7 @@ import { type PlasmoCSConfig } from "plasmo";
 import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
 import SplitProduct from "./components/SplitProduct";
+import CombinationProduct from "./components/CombinationProduct";
 
 const HOST_ID = "tour-helper-shadow-host";
 
@@ -19,6 +20,10 @@ const CreateProduct = () => {
     {
       key: "SPLIT_PRODUCT",
       label: <SplitProduct />,
+    },
+    {
+      key: "COMBINATION_PRODUCT",
+      label: <CombinationProduct />,
     },
     {
       key: "CREATE_SUB_PRODUCT",
