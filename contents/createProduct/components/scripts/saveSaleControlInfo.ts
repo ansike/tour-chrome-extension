@@ -1,21 +1,9 @@
-const saleControlInfoDto = {
-  contractId: 648526,
-  saleMode: 'P',
-  productCategoryId: 9,
-  productPatternId: 4,
-  brandId: 91924,
-  brandName: 'N30旅行',
-  productBrandDto: {
-    brandId: 91924,
-    brandName: 'N30旅行',
-    brandNameEn: 'N30-Travel',
-    brandLocal: 'zh-CN'
-  },
-}
+import { getSaleControlInfoDto } from "~contents/createProduct/constant"
 
 export const saveSaleControlInfo = async (
   productId = ''
 ): Promise<{ productId: number }> => {
+  const saleControlInfoDto = await getSaleControlInfoDto()
   const data = {
     contentType: 'json',
     head: {
@@ -60,11 +48,11 @@ export const saveSaleControlInfo = async (
       desCityDto: {}
     }
   }
-  
+
   if (productId) {
     data['id'] = productId
     data['idType'] = 'productId'
-  }else{
+  } else {
     data['id'] = '1431565'
     data['idType'] = 'providerId'
   }

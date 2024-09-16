@@ -166,7 +166,7 @@ export const saveSegment = async segment => {
 }
 
 // 获取前一个产品的segments
-export const createProductDraft = async (productId: string) => {
+export const createProductDraft = async (productId: string|number) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/createProductDraft?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {

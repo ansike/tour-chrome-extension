@@ -11,6 +11,7 @@ export const saveProduct = async (productId: string) => {
 export const saveProductBaseInfo = async (productInfo: any) => {
   console.log({ productInfo })
   const data = {
+    ...productInfo,
     contentType: 'json',
     head: {
       cid: '09031059218989378081',
@@ -23,7 +24,7 @@ export const saveProductBaseInfo = async (productInfo: any) => {
       extension: []
     },
     baseInfo: productInfo.baseInfo,
-    bookingControl: productInfo.bookingControls,
+    bookingControl: productInfo.bookingControl || productInfo.bookingControls,
     nameAreaRules: productInfo.nameAreaRules,
     meta: {
       auditStatus: 'N',
