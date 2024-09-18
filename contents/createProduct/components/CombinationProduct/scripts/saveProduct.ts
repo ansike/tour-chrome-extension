@@ -1,4 +1,4 @@
-import { getSaleControlInfoDto } from "~contents/createProduct/constant"
+import { getSaleControlInfoDto, venderId } from "~contents/createProduct/constant"
 import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
 import { createProductDraft } from "../../scripts/saveProductResource";
 
@@ -30,7 +30,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
         "phone400": "173874",
         "operationNote": "",
         "userGroupId": 1000335089,
-        "vendorId": 1431565,
+        "vendorId": venderId,
         "isSimpleTour": "",
         // "active": "F",
         active: "D",

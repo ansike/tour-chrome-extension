@@ -1,4 +1,4 @@
-import { getSaleControlInfoDto } from "~contents/createProduct/constant"
+import { getSaleControlInfoDto, venderId } from "~contents/createProduct/constant"
 
 export const saveSaleControlInfo = async (
   productId = ''
@@ -53,7 +53,7 @@ export const saveSaleControlInfo = async (
     data['id'] = productId
     data['idType'] = 'productId'
   } else {
-    data['id'] = '1431565'
+    data['id'] = venderId
     data['idType'] = 'providerId'
   }
 

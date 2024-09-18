@@ -15,3 +15,5 @@ export const getSaleControlInfoDto = async () => {
     },
   }
 }
+
+export const venderId = 1431565

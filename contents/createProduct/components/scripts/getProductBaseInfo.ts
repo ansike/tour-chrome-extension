@@ -9,7 +9,7 @@ export interface TourInfo {
   [key: string]: any;
 }
 
-const getProductTourInfoList = async (productId: string) => {
+const getProductTourInfoList = async (productId: string | number) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/getProductTourInfoList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {
@@ -29,8 +29,6 @@ const getProductTourInfoList = async (productId: string) => {
         'x-ctx-locale': 'zh-CN',
         'x-tt-core': '1'
       },
-      referrer:
-        'https://vbooking.ctrip.com/ivbk/vendor/tourdays?productid=48068703&istab=1&from=vbk',
       referrerPolicy: 'no-referrer-when-downgrade',
       body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031059218989378081\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\"}`,
       method: 'POST',
@@ -77,7 +75,7 @@ export const getTourDailyDetail = async (tourInfoId: string): Promise<{ tourInfo
   return JSON.parse(newText);
 }
 
-export const getTourDaily = async (productId: string, key = 'tourInfoId') => {
+export const getTourDaily = async (productId: string | number, key = 'tourInfoId') => {
   const { tourInfos } = await getProductTourInfoList(productId);
   const tourInfo = tourInfos[0];
   const id = tourInfo[key];

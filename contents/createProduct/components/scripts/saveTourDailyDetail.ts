@@ -1,7 +1,7 @@
 import { getTourDaily, type TourDailyDescription } from "./getProductBaseInfo";
 import { transformNumber2String } from "./util";
 
-const checkTourDaily = async (tourInfo: any, tourDaily: string, saveType: 8 | 3) => {
+export const checkTourDaily = async (productTourInfo: any, tourDaily: string, saveType: 8 | 3) => {
     const checkRes = await fetch("https://online.ctrip.com/restapi/soa2/15638/checkTourDaily?_fxpcqlniredt=09031178210202430147&_fxpcqlniredt=09031178210202430147", {
         "headers": {
             "accept": "*/*",
@@ -17,7 +17,6 @@ const checkTourDaily = async (tourInfo: any, tourDaily: string, saveType: 8 | 3)
             "sec-fetch-site": "same-site",
             "x-ctx-locale": "zh-CN"
         },
-        "referrer": "https://vbooking.ctrip.com/ivbk/vendor/tourdays?productid=48426233&from=vbk",
         "referrerPolicy": "no-referrer-when-downgrade",
         "body": JSON.stringify({
             contentType: "json",
@@ -31,7 +30,7 @@ const checkTourDaily = async (tourInfo: any, tourDaily: string, saveType: 8 | 3)
                 "auth": "",
                 "extension": []
             },
-            productTourInfo: tourInfo,
+            productTourInfo,
             saveType,
             tourDaily
         }),
@@ -99,7 +98,6 @@ export const saveTourDailyDetail = async (productId: string, tourDailyDescriptio
             "sec-fetch-site": "same-site",
             "x-ctx-locale": "zh-CN"
         },
-        "referrer": "https://vbooking.ctrip.com/ivbk/vendor/tourdays?productid=48466822&istab=1&from=vbk",
         "referrerPolicy": "no-referrer-when-downgrade",
         "body": JSON.stringify({
             "contentType": "json",
