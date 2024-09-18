@@ -11,6 +11,7 @@ export const savePriceInventory = async (
 
   const { optionalResourceId: prevOptionalResourceId, singleResourceId: prevSingleResourceId } = preResult.itemList[0]
   const { optionalResourceId, singleResourceId } = curResult.itemList[0]
+  
   // 获取前一个产品的价格+日期信息
   const dateArr = []
   let yearMonth = getCurrentYearMonth()
@@ -30,7 +31,7 @@ export const savePriceInventory = async (
     }
     yearMonth = getNextMonth(yearMonth)
   }
-  console.log({ dateArr })
+
   const groups = groupBy(dateArr, it => it.adultPrice.cost)
 
   // 将前一个产品的日期+价格 写入新的产品
