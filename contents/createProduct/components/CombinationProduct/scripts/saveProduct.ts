@@ -8,7 +8,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
     const saleControlInfoDto = await getSaleControlInfoDto();
 
     // 循环获取组合产品基础信息中的所有天数，增加前后两天的到达和返程
-    const travelDays = products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) + 2
+    const travelDays = getTravelDays(products)
     // 住宿晚数在天数上减少1
     const travelNights = travelDays - 1
     const cities = products.map((cur) => cur.nameAreas[0].pOIDistrictName).join("+")
@@ -94,15 +94,15 @@ export const saveProduct = async (productId: string | number, products: any[]) =
             "priceApproveStatus": "N",
             "inventoryApproveStatus": "N",
             "nameJoinRuleDto": {
-              "day": "%1$s日",
-              "days": "%1$s日",
-              "night": "%1$s晚",
-              "nights": "%1$s晚",
-              "pattern": "私家团",
-              "destinationJoiner": "+",
-              "diamonds": "(%1$s钻)",
-              "mainName": "%1$s%2$s%3$s%4$s%5$s",
-              "name": "%1$s·%2$s"
+                "day": "%1$s日",
+                "days": "%1$s日",
+                "night": "%1$s晚",
+                "nights": "%1$s晚",
+                "pattern": "私家团",
+                "destinationJoiner": "+",
+                "diamonds": "(%1$s钻)",
+                "mainName": "%1$s%2$s%3$s%4$s%5$s",
+                "name": "%1$s·%2$s"
             },
             "isProductLevelSwitched": "T",
             "canUserMoreLocale": "F",
@@ -114,14 +114,14 @@ export const saveProduct = async (productId: string | number, products: any[]) =
             "useNewTourDaily": true,
             "hiddenSkuInfo": false,
             "switches": {
-              "canEditPM": "F",
-              "productLevelAudit": "T",
-              "vendorContactMouldSwitch": "T",
-              "PoiInvalidIntercept": "F",
-              "PoiInvalidOpen": "T",
-              "nameAudit": "T",
-              "loanTerms": "F",
-              "goldTourGuide": "T"
+                "canEditPM": "F",
+                "productLevelAudit": "T",
+                "vendorContactMouldSwitch": "T",
+                "PoiInvalidIntercept": "F",
+                "PoiInvalidOpen": "T",
+                "nameAudit": "T",
+                "loanTerms": "F",
+                "goldTourGuide": "T"
             },
             "canSelfCheck": "F",
             "isIncludeFlight": false,
@@ -132,7 +132,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
             "isGeneralPackage": "F",
             "saveType": 2,
             "resizeTourDailyInfo": "F"
-          },
+        },
         "advancedSettings": {
             "pMEID": "l.chen37",
             "pAEID": "wangyongxiang",
@@ -146,14 +146,14 @@ export const saveProduct = async (productId: string | number, products: any[]) =
             "isAutoProcess": "T",
             "productDistributionChannals": [],
             "paymentTypes": [
-              1,
-              2,
-              4,
-              16,
-              64,
-              256,
-              512,
-              1024
+                1,
+                2,
+                4,
+                16,
+                64,
+                256,
+                512,
+                1024
             ],
             "distributionPriceWay": "C",
             "skuCommissionRate": 2.5,
@@ -161,7 +161,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
             "isAutoCalculatePrice": "T",
             "tags": [],
             "isVendorHasGoldGuide": "F"
-          },
+        },
         "scenicSpots": [],
         "resourceFields": {},
         "clause": {
@@ -709,3 +709,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
     console.log(res)
 }
 
+
+export const getTravelDays = (products) => {
+    return products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) + 2
+}

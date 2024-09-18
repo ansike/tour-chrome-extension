@@ -1,10 +1,10 @@
-export const savePackage = async (productId: string) => {
+export const savePackage = async (productId: string | number) => {
   const packages = await getPackageList(productId)
-  console.log({packages})
+  console.log({ packages })
   return await savePackageItem(productId, packages.itemList[0])
 }
 
-export const savePackageItem = async (productId: string, packageInfo: any) => {
+export const savePackageItem = async (productId: string | number, packageInfo: any) => {
   const body = {
     contentType: 'json',
     priceInputType: '1',
@@ -43,7 +43,7 @@ export const savePackageItem = async (productId: string, packageInfo: any) => {
   return await res.json()
 }
 
-export const getPackageList = async (productId: string) => {
+export const getPackageList = async (productId: string | number) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/getPackageList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {
