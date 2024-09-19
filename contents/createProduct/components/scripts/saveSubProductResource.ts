@@ -66,11 +66,9 @@ export const saveSubProductResource = async (
     const { multiDepartureCities } = await getMultiDepartureCities();
     // 拥有机场的城市
     const cities = getTransitionCitiesByType(multiDepartureCities, transitionType);
-    console.log({ transitionType })
 
     // 不包含当前的城市
     let filteredCities = cities.filter(item => item.cityId !== destinationCity.cityId);
-    console.log({ filteredCities })
 
     // 保存当前城市
     await saveSegmentCommonData(productId, filteredCities);

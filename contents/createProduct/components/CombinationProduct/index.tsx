@@ -1,18 +1,18 @@
 import { Button, Drawer, Flex, Form, Input, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { getProductsDetail } from "../scripts/getProductDetail";
+import Transmission from "./Transmission";
 import { combinationProduct } from "./util";
 
-type CreateModalProps = {};
 message.config({
   getContainer() {
     return document.getElementsByClassName("ant-drawer")[0] as HTMLElement;
   },
 });
 
-const CombinationProduct = (props: CreateModalProps) => {
+const CombinationProduct = () => {
   const [form] = useForm();
   const queryParams = new URLSearchParams(window.location.search);
   const [products, setProducts] = useState<any[]>([]);
@@ -20,20 +20,18 @@ const CombinationProduct = (props: CreateModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   const onFinish = async (value) => {
-    const { productIds } = value;
-    if (productIds.find((item) => item === "")) {
+    const { products } = value;
+    if (products.find((item) => item.productId === "")) {
       message.error("所有的产品ID都不能为空");
       return;
     }
-
+    const productIds = products.map((item) => item.productId);
     setLoading(true);
     try {
-      console.log(productIds);
-      const products = await getProductsDetail(productIds);
-      setProducts(products);
-      const d = await combinationProduct(products);
+      const productObjs = await getProductsDetail(productIds);
+      setProducts(productObjs);
+      const d = await combinationProduct(productObjs, products);
       console.log(d);
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -78,26 +76,29 @@ const CombinationProduct = (props: CreateModalProps) => {
               <Form
                 onFinish={onFinish}
                 form={form}
-                initialValues={{ productIds: ["51434908", "51393762"] }}>
-                <Form.List name="productIds">
+                initialValues={{
+                  products: [
+                    { productId: "51434908" },
+                    { productId: "51393762" },
+                  ],
+                }}>
+                <Form.List name="products">
                   {(fields, { add, remove }) => {
                     return (
                       <>
-                        {fields.map((field, idx) => {
+                        {fields.map(({ key, name }, idx) => {
                           return (
-                            <Form.Item
-                              {...field}
-                              label={`产品${idx + 1} ID`}
-                              required
-                              // rules={[
-                              //   {
-                              //     message: "请输入产品ID",
-                              //     required: true,
-                              //   },
-                              // ]}
-                              key={idx}>
-                              <Input placeholder="请输入产品ID" />
-                            </Form.Item>
+                            <div key={key}>
+                              <Form.Item
+                                name={[name, "productId"]}
+                                label={`产品${key} ID`}
+                                required>
+                                <Input placeholder="请输入产品ID" />
+                              </Form.Item>
+                              {idx !== fields.length - 1 && (
+                                <Transmission name={name} form={form} />
+                              )}
+                            </div>
                           );
                         })}
                         <Form.Item label="">
