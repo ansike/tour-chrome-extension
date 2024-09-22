@@ -1,7 +1,9 @@
 import { saveProductBaseInfo } from "../scripts/savedescriptioninfo";
 import { savePackage, savePackageItem } from "../scripts/savePackageItem";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
+import { updateResourceActive } from "../scripts/updateResourceActive";
 import { createPackageItem } from "./scripts/createPackageItem";
+import { saveClauses } from "./scripts/saveClauses";
 import { savePriceInventory } from "./scripts/savePriceInventory";
 import { saveProduct } from "./scripts/saveProduct";
 import { saveProductResource } from "./scripts/saveProductResource";
@@ -20,7 +22,9 @@ export const combinationProduct = async (productObjs: any[], products: any[]) =>
     // await saveTourDailyDetail(newProductId, productObjs)
     // await createPackageItem(newProductId, productObjs)
     // await savePriceInventory(newProductId, productObjs)
-    const res = await saveProductResource(newProductId, productObjs, products)
+    // await saveProductResource(newProductId, productObjs, products)
+    // await saveClauses(newProductId, products)
+    const res = await updateResourceActive(newProductId)
     console.log(res)
 
 

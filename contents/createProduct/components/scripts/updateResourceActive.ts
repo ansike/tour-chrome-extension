@@ -1,7 +1,7 @@
 import { setClausePackage } from "./saveClauses";
 
 
-export const updateResourceActive = async (productId: string) => {
+export const updateResourceActive = async (productId: string | number) => {
 
   const body = {
     "contentType": "json",
