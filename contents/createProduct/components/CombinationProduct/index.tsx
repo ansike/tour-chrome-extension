@@ -14,7 +14,6 @@ message.config({
 
 const CombinationProduct = () => {
   const [form] = useForm();
-  const queryParams = new URLSearchParams(window.location.search);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -30,8 +29,8 @@ const CombinationProduct = () => {
     try {
       const productObjs = await getProductsDetail(productIds);
       setProducts(productObjs);
-      const d = await combinationProduct(productObjs, products);
-      console.log(d);
+      await combinationProduct(productObjs, products);
+      console.log("组合成功");
     } catch (error) {
       console.log(error);
     } finally {

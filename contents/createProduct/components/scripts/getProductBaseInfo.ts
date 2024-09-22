@@ -9,7 +9,7 @@ export interface TourInfo {
   [key: string]: any;
 }
 
-const getProductTourInfoList = async (productId: string | number) => {
+export const getProductTourInfoList = async (productId: string | number) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/getProductTourInfoList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {
