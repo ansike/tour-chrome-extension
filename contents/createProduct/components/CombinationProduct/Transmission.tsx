@@ -34,7 +34,8 @@ const Transmission = (props: TransmissionProps) => {
         tooltip="交通类型必选，两个产品间必须有交通"
         style={{ marginBottom: "24px" }}
         required
-        rules={[{ required: true, message: "交通类型必选" }]}>
+        rules={[{ required: true, message: "交通类型必选" }]}
+        initialValue={TRANSTORT_TYPE.TRAIN}>
         <Select placeholder="请选择交通类型" options={options} />
       </Form.Item>
       {transmission === TRANSTORT_TYPE.CAR && (

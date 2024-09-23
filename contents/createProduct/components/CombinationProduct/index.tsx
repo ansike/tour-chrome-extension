@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { getProductsDetail } from "../scripts/getProductDetail";
 import Transmission from "./Transmission";
-import { combinationProduct, fns } from "./util";
+import { combinationProduct, fns, permutationProducts } from "./util";
 
 message.config({
   getContainer() {
@@ -14,20 +14,19 @@ message.config({
 
 const CombinationProduct = () => {
   const [form] = useForm();
-  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true);
-  const [data, setData] = useState<{ currentStep: number; productId?: string }>(
-    { currentStep: 0 },
-  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState<
+    { key: string; currentStep?: number; productId?: string }[]
+  >([]);
 
   const getProductsInfo = async () => {
     try {
       const { products } = await form.validateFields();
       const productIds = products.map((item) => item.productId);
       const productObjs = await getProductsDetail(productIds);
-      setProducts(productObjs);
-      return productObjs;
+      const allProducts = permutationProducts(productObjs);
+      return allProducts;
     } catch (error) {
       console.log(error);
       message.error(error.message);
@@ -39,15 +38,38 @@ const CombinationProduct = () => {
     setLoading(true);
     try {
       const productObjs = await getProductsInfo();
-      productObjs.forEach((item, idx) => {
-        item.transmission = products[idx].transmission;
-        item.productId = products[idx].productId;
-        item.price = products[idx].price;
+
+      productObjs.forEach((item) => {
+        item.forEach((element, idx) => {
+          element.transmission = products[idx].transmission;
+          element.productId = products[idx].productId;
+          element.price = products[idx].price;
+        });
       });
       console.log("组合中", productObjs);
-      await combinationProduct(productObjs, subTitle, (item) => {
-        setData((prev) => ({ ...prev, ...item }));
-      });
+      setData(
+        productObjs.map((product) => ({
+          currentStep: 0,
+          key: product.map((item) => item.productId).join("-"),
+        })),
+      );
+      await Promise.all(
+        productObjs.map((product, idx) =>
+          combinationProduct(product, subTitle, (item) => {
+            setData((d) => {
+              return d.map((i, j) => {
+                if (idx === j) {
+                  return {
+                    ...i,
+                    ...item,
+                  };
+                }
+                return i;
+              });
+            });
+          }),
+        ),
+      );
       console.log("组合成功");
     } catch (error) {
       console.log(error);
@@ -63,6 +85,8 @@ const CombinationProduct = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  console.log("data", data);
 
   return (
     <>
@@ -96,9 +120,12 @@ const CombinationProduct = () => {
                 form={form}
                 initialValues={{
                   products: [
-                    { productId: "51434908" },
-                    { productId: "51393762" },
+                    { productId: "" },
                   ],
+                  // products: [
+                  //   { productId: "51434908" },
+                  //   { productId: "51393762" },
+                  // ],
                 }}>
                 <Form.List name="products">
                   {(fields, { add, remove }) => {
@@ -174,30 +201,26 @@ const CombinationProduct = () => {
                 </Form.Item>
               </Form>
             </Flex>
-            {products.map((item, idx) => {
+            {data.map((product, idx) => {
               return (
-                <div key={item.baseInfo.productId}>
+                <div key={idx}>
                   <div>
                     <strong>
-                      产品{idx + 1}：{item.baseInfo.productId} &nbsp;
+                      产品{idx + 1}：{product?.productId} &nbsp;
                     </strong>
-                    <span>{item?.baseInfo.name}</span>
+                    <br />
+                    <span>{product?.key}</span>
+                    <br />
+                    <Progress
+                      percent={Math.floor(
+                        (product?.currentStep / fns.length) * 100,
+                      )}
+                      size="small"
+                    />
                   </div>
                 </div>
               );
             })}
-            {products.length > 0 ? (
-              <div>
-                <strong>新产品信息：</strong>
-                <br />
-                <span>产品ID：{data?.productId}</span>
-                <br />
-                <Progress
-                  percent={Math.floor((data?.currentStep / fns.length) * 100)}
-                  size="small"
-                />
-              </div>
-            ) : null}
           </Flex>
         </Drawer>
       </div>
