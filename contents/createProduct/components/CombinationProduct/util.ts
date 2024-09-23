@@ -8,18 +8,28 @@ import { saveProductResource } from "./scripts/saveProductResource";
 import { saveProductRichtext } from "./scripts/saveProductRichtext";
 import { saveTourDaily } from "./scripts/saveTourDailyDetail";
 
-export const combinationProduct = async (productObjs: any[], subTitle: string) => {
+export const fns = [
+    saveProduct,
+    saveProductRichtext,
+    saveTourDaily,
+    createPackageItem,
+    savePriceInventory,
+    saveProductResource,
+    saveClauses,
+    updateResourceActive
+]
+export const combinationProduct = async (productObjs: any[], subTitle: string, callback) => {
     const saleControlInfo = await saveSaleControlInfo()
     const newProductId = saleControlInfo.productId;
-    // const newProductId = 52731061;
-    console.log({ newProductId })
-    await saveProduct(newProductId, productObjs, subTitle)
-    await saveProductRichtext(newProductId, productObjs)
-    await saveTourDaily(newProductId, productObjs)
-    await createPackageItem(newProductId, productObjs)
-    await savePriceInventory(newProductId, productObjs)
-    await saveProductResource(newProductId, productObjs)
-    await saveClauses(newProductId, productObjs)
-    await updateResourceActive(newProductId)
-    return newProductId
+    // const newProductId = 52760960;
+    console.log("新产品ID：", newProductId)
+    callback({
+        productId: newProductId,
+    })
+    for (let i = 0; i < fns.length; i++) {
+        await fns[i](newProductId, productObjs, subTitle)
+        callback({
+            currentStep: i + 1,
+        })
+    }
 }

@@ -70,41 +70,29 @@ export const saveProductResource = async (
   // 产品级别的segments
   for (let i = 0; i < productsSegment.length; i++) {
     const seg = productsSegment[i]
-    const product = productObjs[i]
-    // 第一个涉及套餐的segment，不需要保存
-    for (let j = 1; j < seg.productSegments.segments.length; j++) {
-      const s = seg.productSegments.segments[j]
-      if (s.segmentBase.stayNights && (i === 0 || i === productsSegment.length - 1) && j === 1) {
-        s.segmentBase.maxStayNights += 1
-        s.segmentBase.minStayNights += 1
-        s.segmentBase.stayNights += 1
-      }
-      const draftSeg = draftProductSegments.segments[curIdx]
-      s.segmentBase.segmentNumber = curIdx + 1
-      await saveSegment({
-        ...s,
-        packages: [],
-        productId,
-        segmentId: draftSeg?.segmentId || 0
-      })
-      curIdx++
-    }
-
     // 增加一个流转segment
-    if (i !== productsSegment.length - 1) {
-      const prevSeg = seg.productSegments.segments[seg.productSegments.segments.length - 1]
-      const curSeg = productsSegment[i + 1].productSegments.segments[0]
+    if (i > 0) {
+      // 上一段行程的最后一个segment
+      const prevSeg = productsSegment[i - 1].productSegments.segments[productsSegment[i - 1].productSegments.segments.length - 1]
+      // 当前行程的第一个segment
+      const curSeg = productsSegment[i].productSegments.segments[0]
+      const hotel = productsSegment[i].productSegments.segments.find(s => s.hotel).hotel
       const draftSeg = draftProductSegments.segments[curIdx]
       const segment: any = {
+        hotel,
         segmentBase: {
           departureCity: prevSeg.segmentBase.destinationCity,
           destinationCity: curSeg.segmentBase.departureCity,
-          segmentNumber: curIdx + 1
+          segmentNumber: curIdx + 1,
+          maxStayNights: 1,
+          minStayNights: 1,
+          stayNights: 1,
         },
         packages: [],
         productId,
         segmentId: draftSeg?.segmentId || 0
       }
+      const product = productObjs[i - 1]
       switch (product.transmission) {
         case TRANSTORT_TYPE.FLIGHT:
           segment.flight = JSON.parse(JSON.stringify(flight))
@@ -124,6 +112,25 @@ export const saveProductResource = async (
       }
 
       await saveSegment(segment)
+      curIdx++
+    }
+    // 第一个涉及套餐的segment，不需要保存
+    for (let j = 1; j < seg.productSegments.segments.length; j++) {
+      const s = seg.productSegments.segments[j]
+      // 第一晚需要加1，增加抵达目的地的住宿天数
+      if (s.segmentBase.stayNights && i === 0 && j === 1) {
+        s.segmentBase.maxStayNights += 1
+        s.segmentBase.minStayNights += 1
+        s.segmentBase.stayNights += 1
+      }
+      const draftSeg = draftProductSegments.segments[curIdx]
+      s.segmentBase.segmentNumber = curIdx + 1
+      await saveSegment({
+        ...s,
+        packages: [],
+        productId,
+        segmentId: draftSeg?.segmentId || 0
+      })
       curIdx++
     }
   }

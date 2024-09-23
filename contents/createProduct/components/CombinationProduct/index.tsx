@@ -1,10 +1,10 @@
-import { Button, Drawer, Flex, Form, Input, message } from "antd";
+import { Button, Drawer, Flex, Form, Input, message, Progress } from "antd";
 import { useForm } from "antd/es/form/Form";
 import React, { useState } from "react";
 
 import { getProductsDetail } from "../scripts/getProductDetail";
 import Transmission from "./Transmission";
-import { combinationProduct } from "./util";
+import { combinationProduct, fns } from "./util";
 
 message.config({
   getContainer() {
@@ -17,6 +17,9 @@ const CombinationProduct = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [data, setData] = useState<{ currentStep: number; productId?: string }>(
+    { currentStep: 0 },
+  );
 
   const getProductsInfo = async () => {
     try {
@@ -39,8 +42,12 @@ const CombinationProduct = () => {
       productObjs.forEach((item, idx) => {
         item.transmission = products[idx].transmission;
         item.productId = products[idx].productId;
+        item.price = products[idx].price;
       });
-      await combinationProduct(productObjs, subTitle);
+      console.log("组合中", productObjs);
+      await combinationProduct(productObjs, subTitle, (item) => {
+        setData((prev) => ({ ...prev, ...item }));
+      });
       console.log("组合成功");
     } catch (error) {
       console.log(error);
@@ -176,13 +183,21 @@ const CombinationProduct = () => {
                     </strong>
                     <span>{item?.baseInfo.name}</span>
                   </div>
-                  <div>
-                    <strong>产品信息：</strong>
-                    <span></span>
-                  </div>
                 </div>
               );
             })}
+            {products.length > 0 ? (
+              <div>
+                <strong>新产品信息：</strong>
+                <br />
+                <span>产品ID：{data?.productId}</span>
+                <br />
+                <Progress
+                  percent={Math.floor((data?.currentStep / fns.length) * 100)}
+                  size="small"
+                />
+              </div>
+            ) : null}
           </Flex>
         </Drawer>
       </div>

@@ -77,3 +77,27 @@ export const train = {
   },
   "isIncludeSystemTrain": "T"
 }
+
+export const pmRcmdItems = [
+  {
+      "id": 813966091,
+      "pmRcmdCategoryId": 7,
+      "rcmdDesc": "从古老的文化遗产到现代的艺术中心，让你的旅程充满发现与惊喜。专车服务，让旅途更加轻松自在",
+      "url": "",
+      "addInfoDetailCode": "1603698211541024829"
+  },
+  {
+      "id": 813966092,
+      "pmRcmdCategoryId": 9,
+      "rcmdDesc": "畅享当地特色美食，感受味蕾的奇妙之旅。传统与现代交织的商圈，独特设计与多样风格。",
+      "url": "",
+      "addInfoDetailCode": "1603698211541024830"
+  },
+  {
+      "id": 813966093,
+      "pmRcmdCategoryId": 6,
+      "rcmdDesc": "全程专车服务，从接站入住到每日的旅行安排，无需担心交通问题，专注享受每一处的美景与趣味。",
+      "url": "",
+      "addInfoDetailCode": "1603698211541090411"
+  }
+]

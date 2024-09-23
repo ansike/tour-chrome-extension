@@ -711,5 +711,7 @@ export const saveProduct = async (productId: string | number, products: any[], s
 
 
 export const getTravelDays = (products) => {
-    return products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) + 2
+    // 1. 首末两天的行程
+    // 2. 中间段的行程
+    return products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) + 2 + products.length - 1
 }
