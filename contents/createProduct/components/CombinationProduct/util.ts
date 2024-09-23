@@ -1,5 +1,3 @@
-import { saveProductBaseInfo } from "../scripts/savedescriptioninfo";
-import { savePackage, savePackageItem } from "../scripts/savePackageItem";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { updateResourceActive } from "../scripts/updateResourceActive";
 import { createPackageItem } from "./scripts/createPackageItem";
@@ -10,20 +8,18 @@ import { saveProductResource } from "./scripts/saveProductResource";
 import { saveProductRichtext } from "./scripts/saveProductRichtext";
 import { saveTourDaily } from "./scripts/saveTourDailyDetail";
 
-export const combinationProduct = async (productObjs: any[], products: any[]) => {
+export const combinationProduct = async (productObjs: any[], subTitle: string) => {
     const saleControlInfo = await saveSaleControlInfo()
-    console.log(saleControlInfo)
     const newProductId = saleControlInfo.productId;
-    // const newProductId = 52348901;
+    // const newProductId = 52731061;
     console.log({ newProductId })
-    await saveProduct(newProductId, productObjs)
+    await saveProduct(newProductId, productObjs, subTitle)
     await saveProductRichtext(newProductId, productObjs)
     await saveTourDaily(newProductId, productObjs)
     await createPackageItem(newProductId, productObjs)
     await savePriceInventory(newProductId, productObjs)
-    await saveProductResource(newProductId, productObjs, products)
-    await saveClauses(newProductId, products)
-    const res = await updateResourceActive(newProductId)
-    console.log(res)
-    return []
+    await saveProductResource(newProductId, productObjs)
+    await saveClauses(newProductId, productObjs)
+    await updateResourceActive(newProductId)
+    return newProductId
 }

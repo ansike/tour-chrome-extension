@@ -18,7 +18,7 @@ const options = [
 ];
 
 type TransmissionProps = {
-  name: string;
+  name: number;
   form: any;
 };
 
@@ -31,14 +31,18 @@ const Transmission = (props: TransmissionProps) => {
       <Form.Item
         name={[name, "transmission"]}
         label="交通"
+        tooltip="交通类型必选，两个产品间必须有交通"
+        style={{ marginBottom: "24px" }}
         required
         rules={[{ required: true, message: "交通类型必选" }]}>
-        <Select options={options} />
+        <Select placeholder="请选择交通类型" options={options} />
       </Form.Item>
       {transmission === TRANSTORT_TYPE.CAR && (
         <Form.Item
           name={[name, "price"]}
           label="用车价格"
+          tooltip="用车价格必须填写，价格步长为50，向上取整"
+          style={{ marginBottom: "24px" }}
           required
           rules={[{ required: true, message: "用车价格必填" }]}>
           <InputNumber

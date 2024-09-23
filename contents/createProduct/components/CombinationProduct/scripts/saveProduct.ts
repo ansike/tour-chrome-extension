@@ -3,7 +3,7 @@ import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
 import { createProductDraft } from "../../scripts/saveProductResource";
 
 // TODO 获取当前用户
-export const saveProduct = async (productId: string | number, products: any[]) => {
+export const saveProduct = async (productId: string | number, products: any[], subTitle: string) => {
 
     const saleControlInfoDto = await getSaleControlInfoDto();
 
@@ -13,7 +13,7 @@ export const saveProduct = async (productId: string | number, products: any[]) =
     const travelNights = travelDays - 1
     const cities = products.map((cur) => cur.nameAreas[0].pOIDistrictName).join("+")
     const mainName = `${cities}${travelDays}日${travelNights}晚私家团`
-    const subName = products[0].baseInfo.subName;
+    const subName = subTitle
     const name = `${mainName}·${subName}`
     const providerProductName = 'TEST-安思科'
     const baseInfo = {

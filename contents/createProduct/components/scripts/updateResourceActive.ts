@@ -46,8 +46,12 @@ export const updateResourceActive = async (productId: string | number) => {
 
   const resJson = await res.json()
   // 单房差条款没有勾选
-  if (resJson.ResponseStatus.Ack === 'Failure' && resJson.ResponseStatus.Errors[0].Message.includes('单房差条款')) {
-    setClausePackage(productId, 3)
+  if (resJson.ResponseStatus.Ack === 'Failure') {
+    if (resJson.ResponseStatus.Errors[0].Message.includes('单房差条款')) {
+      setClausePackage(productId, 3)
+      return
+    }
+    console.error(resJson.ResponseStatus.Errors)
   }
   return resJson
 

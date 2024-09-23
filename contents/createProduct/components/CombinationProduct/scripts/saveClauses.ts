@@ -2,10 +2,10 @@ import { TRANSTORT_TYPE } from "~contents/createProduct/constant";
 import { flightClause, TAB_CLAUSE, trainClause } from "./constant";
 import { getTourDaily } from "../../scripts/getProductBaseInfo";
 
-export const saveClauses = async (productId: string | number, products: any[]) => {
+export const saveClauses = async (productId: string | number, productObjs: any[]) => {
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
-      await setClause1(productId, products, tabEnum);
+      await setClause1(productId, productObjs, tabEnum);
     }
     return 'success'
   } catch (error) {
@@ -14,13 +14,13 @@ export const saveClauses = async (productId: string | number, products: any[]) =
 }
 
 
-export const setClause1 = async (productId, products: any[], tabEnum) => {
+export const setClause1 = async (productId, productObjs: any[], tabEnum) => {
   const productClause = await listProductClauses(productId, tabEnum)
   const clausePackageItemDtos = JSON.parse(JSON.stringify(TAB_CLAUSE[`tab${tabEnum}BaseClause`]))
 
   if (tabEnum === 1) {
     // 1. 根据日程中的设置，自动设置成人和儿童门票
-    const productTours = await Promise.all(products.map(pro => getTourDaily(pro.productId)))
+    const productTours = await Promise.all(productObjs.map(pro => getTourDaily(pro.productId)))
     const pois = productTours.map(tour => {
       return tour.tourDaily.tourInfo.tourDailyDescriptions.map(tourDaily => {
         // 过滤景点
@@ -37,7 +37,7 @@ export const setClause1 = async (productId, products: any[], tabEnum) => {
     }
 
     // 2. 处理中间段火车/飞机条款
-    for (const product of products) {
+    for (const product of productObjs) {
       switch (product.transmission) {
         case TRANSTORT_TYPE.FLIGHT:
           clausePackageItemDtos.push(...flightClause)

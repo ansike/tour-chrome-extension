@@ -8,7 +8,6 @@ import { searchResourceGroup } from "../../scripts/searchResourceGroup"
 export const saveProductResource = async (
   productId: string | number,
   productObjs: any[],
-  products: any[],
 ) => {
 
   // 使用携程资源
@@ -71,7 +70,7 @@ export const saveProductResource = async (
   // 产品级别的segments
   for (let i = 0; i < productsSegment.length; i++) {
     const seg = productsSegment[i]
-    const product = products[i]
+    const product = productObjs[i]
     // 第一个涉及套餐的segment，不需要保存
     for (let j = 1; j < seg.productSegments.segments.length; j++) {
       const s = seg.productSegments.segments[j]
@@ -91,7 +90,6 @@ export const saveProductResource = async (
       curIdx++
     }
 
-    console.log(seg, product)
     // 增加一个流转segment
     if (i !== productsSegment.length - 1) {
       const prevSeg = seg.productSegments.segments[seg.productSegments.segments.length - 1]
@@ -203,7 +201,6 @@ export const getSegments = async (productId: string | number) => {
 
 // 获取前一个产品的segments
 export const saveSegment = async segment => {
-  console.log({ segment })
   const data = {
     contentType: 'json',
     head: {
