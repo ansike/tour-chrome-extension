@@ -1,10 +1,12 @@
 import { Dropdown, type MenuProps } from "antd";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
+
+import CombinationProduct from "./components/CombinationProduct";
+import CreateCarResource from "./components/CreateCarResource";
 import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
 import SplitProduct from "./components/SplitProduct";
-import CombinationProduct from "./components/CombinationProduct";
 
 const HOST_ID = "tour-helper-shadow-host";
 
@@ -15,7 +17,8 @@ export const getStyle = () => {
 };
 
 const CreateProduct = () => {
-
+  const queryParams = new URLSearchParams(window.location.search);
+  const isAdmin = queryParams.get("admin");
   const items: MenuProps["items"] = [
     {
       key: "SPLIT_PRODUCT",
@@ -33,13 +36,19 @@ const CreateProduct = () => {
       key: "DUPLICATE_PRODUCT",
       label: <DuplicateProduct />,
     },
+    ...(isAdmin === "1"
+      ? [
+          {
+            key: "CREATE_CAR_RESOURCE",
+            label: <CreateCarResource />,
+          },
+        ]
+      : []),
   ];
 
   return (
     <div id="tour-helper-container">
-      <Dropdown
-        menu={{ items }}
-        placement="topRight">
+      <Dropdown menu={{ items }} placement="topRight">
         <div
           className="p-8"
           style={{

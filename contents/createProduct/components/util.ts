@@ -314,3 +314,4 @@ export async function duplicateProduct(product: TourDay, updateTourDayStatus) {
     newProductId
   }
 }
+
