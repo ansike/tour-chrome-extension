@@ -25,8 +25,8 @@ export const setClause1 = async (productId, productObjs: any[], tabEnum) => {
       return tour.tourDaily.tourInfo.tourDailyDescriptions.map(tourDaily => {
         // 过滤景点
         return tourDaily.tourDailyInfos.filter((tourDailyInfo) => tourDailyInfo.activeType.key === 3).map((tourDailyInfo) => {
-          // 含门票
-          return tourDailyInfo.tourDailyPois.filter(poi => poi.suffixName.key === 5).map(poiIt => poiIt.poi.poiName)
+          // 含门票: 5是首道大门票，6是已含门票
+          return tourDailyInfo.tourDailyPois.filter(poi => poi.suffixName.key === 5|| poi.suffixName.key === 6).map(poiIt => poiIt.poi.poiName)
         }).reduce((acc, cur) => acc.concat(cur), [])
       }).reduce((acc, cur) => acc.concat(cur), [])
     }).reduce((acc, cur) => acc.concat(cur), []).join(',')
