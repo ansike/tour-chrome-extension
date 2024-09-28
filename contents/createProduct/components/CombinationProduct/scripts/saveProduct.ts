@@ -1,11 +1,14 @@
 import { getSaleControlInfoDto, venderId } from "~contents/createProduct/constant"
 import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
 import { createProductDraft } from "../../scripts/saveProductResource";
+import { getCurrentUserInfo } from "../../scripts/getCurrentUserInfo";
+import { searchProviderContactCardList } from "../../CreateCarResource/utils/searchProviderContactCardList";
 
 // TODO 获取当前用户
 export const saveProduct = async (productId: string | number, products: any[], subTitle: string) => {
 
-    const saleControlInfoDto = await getSaleControlInfoDto();
+    const [saleControlInfoDto, userInfo] = await Promise.all([getSaleControlInfoDto(), getCurrentUserInfo()]);
+    const { contactCardList } = await searchProviderContactCardList(userInfo.user.name, userInfo.user.partyId);
 
     // 循环获取组合产品基础信息中的所有天数，增加前后两天的到达和返程
     const travelDays = getTravelDays(products)
@@ -15,7 +18,7 @@ export const saveProduct = async (productId: string | number, products: any[], s
     const mainName = `${cities}${travelDays}日${travelNights}晚私家团`
     const subName = subTitle
     const name = `${mainName}·${subName}`
-    const providerProductName = 'TEST-安思科'
+    const providerProductName = `TOUR-${userInfo.user.name}`
     const baseInfo = {
         productId,
         travelDays,
@@ -66,6 +69,21 @@ export const saveProduct = async (productId: string | number, products: any[], s
     }
 
     const nameAreaRules = products.map((cur) => cur.nameAreas[0])
+    let bookingControl = products[0].bookingControls;
+    if (contactCardList.length) {
+        const curUser = contactCardList[0]
+        bookingControl = {
+            ...products[0].bookingControls,
+            vendorBookingContact: curUser.name,
+            vendorBookingContactId: curUser.contactCardId,
+            bookingEmail: curUser.email,
+            vendorBookingPhone: {
+                areaCode: curUser.mobileNoCountryCode,
+                phone: curUser.mobileNo,
+                phoneNoFull: curUser.mobileNoFull
+            }
+        }
+    }
     const product = {
         "contentType": "json",
         "head": {
@@ -79,7 +97,7 @@ export const saveProduct = async (productId: string | number, products: any[], s
             "extension": []
         },
         baseInfo,
-        "bookingControl": products[0].bookingControls,
+        "bookingControl": bookingControl,
         "nameAreaRules": nameAreaRules,
         "meta": {
             "auditStatus": "N",

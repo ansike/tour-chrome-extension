@@ -1,6 +1,8 @@
-export async function searchProviderContactCardList(searchKeyWord) {
+import { venderId } from "~contents/createProduct/constant";
+
+export async function searchProviderContactCardList(searchKeyWord, providerId = venderId) {
   const body = {
-    "providerId": 1393638,
+    "providerId": providerId,
     "contactType": 0,
     "selectedContactCardIdList": [],
     searchKeyWord: searchKeyWord,
