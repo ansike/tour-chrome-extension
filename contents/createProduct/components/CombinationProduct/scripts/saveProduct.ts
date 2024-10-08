@@ -14,19 +14,20 @@ export const saveProduct = async (productId: string | number, products: any[], s
     const travelDays = getTravelDays(products)
     // 住宿晚数在天数上减少1
     const travelNights = travelDays - 1
-    const cities = products.map((cur) => cur.nameAreas[0].pOIDistrictName).join("+")
+    const cities = Array.from(new Set(products.map((cur) => cur.nameAreas[0].pOIDistrictName))).join("+")
     const mainName = `${cities}${travelDays}日${travelNights}晚私家团`
     const subName = subTitle
     const name = `${mainName}·${subName}`
     const providerProductName = `TOUR-${userInfo.user.name}`
+    const cityId = products[0].nameAreas[0].pOIDistrictID;
     const baseInfo = {
         productId,
         travelDays,
         "maxTravelDays": travelDays,
         "productLevel": 0,
         name,
-        "masterDepartureCityId": 4,
-        "destinationCityID": 4,
+        "masterDepartureCityId": cityId,
+        "destinationCityID": cityId,
         "brandId": saleControlInfoDto.brandId,
         "vendorProductCode": "",
         providerProductName,
