@@ -1,5 +1,6 @@
 
 export const saveResource = async (car, user) => {
+    // TODO 资源信息改成接口获取不要写死
     const { price, carName, maxPersonQuantity, carIds } = car;
     const body = {
         "contentType": "json",

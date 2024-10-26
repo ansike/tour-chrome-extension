@@ -1,11 +1,12 @@
-import { venderId } from "~contents/createProduct/constant"
+import { getVendorId } from "../../scripts/getVendorId"
 import { saveCustomerCpntTemplateInfo } from "../../scripts/saveCustomerCpntTemplateInfo"
 import { savePackageItem } from "../../scripts/savePackageItem"
 import { getTravelDays } from "./saveProduct"
 
 export const createPackageItem = async (productId: string | number, products: any[]) => {
+    const vendorId = await getVendorId()
     const travelDays = getTravelDays(products)
-    const template = await saveCustomerCpntTemplateInfo({ resourceVendorId: venderId, resourceId: 0, piCustomerInfoTemplateId: 0 })
+    const template = await saveCustomerCpntTemplateInfo({ resourceVendorId: vendorId, resourceId: 0, piCustomerInfoTemplateId: 0 })
     const res = await savePackageItem(productId, {
         "name": `${travelDays}日套餐`,
         "needShuttle": "F",
