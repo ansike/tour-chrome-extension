@@ -1,5 +1,5 @@
 
-export const bindProductImage = async (productId: string | number, productImages: any[]) => {
+export const bindProductImage = async (productId: string | number, productImages: any[], isCover=false) => {
     const data = {
         // isCover: true,
         "contentType": "json",
@@ -21,6 +21,9 @@ export const bindProductImage = async (productId: string | number, productImages
         //         "sortNum": 17
         //     }
         // ]
+    }
+    if(isCover) {
+        data["isCover"] = true
     }
     const res = await fetch("https://online.ctrip.com/restapi/soa2/12719/bindProductImage.json?_fxpcqlniredt=09031056310749994837&_fxpcqlniredt=09031056310749994837", {
         "headers": {

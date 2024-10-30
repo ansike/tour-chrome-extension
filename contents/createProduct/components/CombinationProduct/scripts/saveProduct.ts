@@ -26,37 +26,32 @@ export const saveProduct = async (
   const subName = subTitle;
   const name = `${mainName}·${subName}`;
   const providerProductName = `TOUR-${userInfo.user.name}`;
-  const cityId = products[0].nameAreas[0].pOIDistrictID;
+  const firstBaseInfo = products[0].baseInfo;
   const baseInfo = {
+    ...firstBaseInfo,
+    active: "F",
+    // active: "D",
+    brandId: saleControlInfoDto.brandId,
+    businessOwner: "VBK",
+    categoryPropertyPkgId: 0,
+    defaultServiceLanguages: [1],
     productId,
     travelDays,
     maxTravelDays: travelDays,
-    productLevel: 0,
     name,
-    masterDepartureCityId: cityId,
-    destinationCityID: cityId,
-    brandId: saleControlInfoDto.brandId,
-    vendorProductCode: "",
     providerProductName,
-    phone400: phone400,
+    phone400: phone400 + "",
     operationNote: "",
     userGroupId: 1000335089,
     vendorId: vendorId,
     isSimpleTour: "",
-    // "active": "F",
-    active: "D",
-    businessOwner: "VBK",
     serviceLanguages: [1],
-    defaultServiceLanguages: [1],
-    isServiceLanguageInput: false,
     isCityManage: "F",
     priceCurrency: "RMB",
     isExtendToStay: "F",
     priceDescription: "",
     price: 0,
     isAutoCalculateProductLevel: "T",
-    productLevelSwitch: "T",
-    categoryPropertyPkgId: 0,
     useTripResource: "T",
     distributionChannels: [
       "ctripshop",
@@ -72,6 +67,9 @@ export const saveProduct = async (
     subName,
   };
 
+  // if(){
+  //   baseInfo['active'] = 'F'
+  // }
   const nameAreaRules = products.map((cur) => cur.nameAreas[0]);
   let bookingControl = products[0].bookingControls;
   if (contactCardList.length) {

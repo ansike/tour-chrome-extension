@@ -17,7 +17,7 @@ const CombinationProduct = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<
-    { key: string; currentStep?: number; productId?: string }[]
+    { key: string; currentStep?: number; productId?: string, error?: string }[]
   >([]);
 
   const getProductsInfo = async () => {
@@ -54,7 +54,8 @@ const CombinationProduct = () => {
         })),
       );
       await Promise.all(
-        productObjs.map((product, idx) =>
+        // productObjs.map((product, idx) =>
+        productObjs.slice(0,1).map((product, idx) =>
           combinationProduct(product, subTitle, (item) => {
             setData((d) => {
               return d.map((i, j) => {
@@ -119,13 +120,13 @@ const CombinationProduct = () => {
                 onFinish={onFinish}
                 form={form}
                 initialValues={{
-                  products: [
-                    { productId: "" },
-                  ],
                   // products: [
-                  //   { productId: "51434908" },
-                  //   { productId: "51393762" },
+                  //   { productId: "" },
                   // ],
+                  products: [
+                    { productId: "51544372" },
+                    { productId: "51682534" },
+                  ],
                 }}>
                 <Form.List name="products">
                   {(fields, { add, remove }) => {
@@ -217,6 +218,7 @@ const CombinationProduct = () => {
                       )}
                       size="small"
                     />
+                    <div style={{color: "red"}}>{product?.error}</div>
                   </div>
                 </div>
               );

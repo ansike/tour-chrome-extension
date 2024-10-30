@@ -11,7 +11,7 @@ export const AccountConfMap = {
   1431565: {
     vendorId: 1431565,
     // 电话ID
-    phone400: 173874,
+    phone400: "173874",
     saleControlInfoDto: {
       contractId: 648526,
       saleMode: "P",
@@ -31,7 +31,7 @@ export const AccountConfMap = {
   // 安徽账号
   1393638: {
     vendorId: 1393638,
-    phone400: 287358,
+    phone400: "287358",
     saleControlInfoDto: {
       contractId: 1962892,
       saleMode: "P",

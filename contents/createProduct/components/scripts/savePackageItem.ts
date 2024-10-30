@@ -71,5 +71,10 @@ export const getPackageList = async (productId: string | number) => {
     }
   )
 
-  return await res.json()
+  const data = await res.json()
+  // if(data.status !== 200) {
+
+  // }
+  return data
+  
 }

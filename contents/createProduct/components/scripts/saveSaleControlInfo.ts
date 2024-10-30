@@ -3,7 +3,8 @@ import { getAccountConf } from "~contents/createProduct/constant";
 export const saveSaleControlInfo = async (
   productId = "",
 ): Promise<{ productId: number }> => {
-  const { saleControlInfoDto } = await getAccountConf();
+  const { vendorId, saleControlInfoDto } = await getAccountConf();
+  console.log({ saleControlInfoDto });
   const data = {
     contentType: "json",
     head: {
@@ -53,10 +54,9 @@ export const saveSaleControlInfo = async (
     data["id"] = productId;
     data["idType"] = "productId";
   } else {
-    data["id"] = saleControlInfoDto.vendorId;
+    data["id"] = vendorId;
     data["idType"] = "providerId";
   }
-
   const res = await fetch(
     "https://online.ctrip.com/restapi/soa2/15638/saveSaleControlInfo?_fxpcqlniredt=09031111115146167449&_fxpcqlniredt=09031111115146167449",
     {
