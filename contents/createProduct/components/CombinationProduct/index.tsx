@@ -3,6 +3,7 @@ import { useForm } from "antd/es/form/Form";
 import React, { useState } from "react";
 
 import { getProductsDetail } from "../scripts/getProductDetail";
+import Hotel from "./Hotel";
 import Transmission from "./Transmission";
 import { combinationProduct, fns, permutationProducts } from "./util";
 
@@ -17,7 +18,7 @@ const CombinationProduct = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<
-    { key: string; currentStep?: number; productId?: string, error?: string }[]
+    { key: string; currentStep?: number; productId?: string; error?: string }[]
   >([]);
 
   const getProductsInfo = async () => {
@@ -36,14 +37,17 @@ const CombinationProduct = () => {
   const onFinish = async (value) => {
     const { products, subTitle } = value;
     setLoading(true);
+    console.log("products",products)
     try {
       const productObjs = await getProductsInfo();
 
       productObjs.forEach((item) => {
         item.forEach((element, idx) => {
-          element.transmission = products[idx].transmission;
-          element.productId = products[idx].productId;
-          element.price = products[idx].price;
+          const keys = Object.keys(products[0]);
+          for (let i = 0; i < keys.length; i++) {
+            console.log(keys[i], products[idx][keys[i]]);
+            element[keys[i]] = products[idx][keys[i]];
+          }
         });
       });
       console.log("组合中", productObjs);
@@ -54,8 +58,8 @@ const CombinationProduct = () => {
         })),
       );
       await Promise.all(
-        // productObjs.map((product, idx) =>
-        productObjs.slice(0,1).map((product, idx) =>
+        productObjs.map((product, idx) =>
+        // productObjs.slice(0, 1).map((product, idx) =>
           combinationProduct(product, subTitle, (item) => {
             setData((d) => {
               return d.map((i, j) => {
@@ -120,13 +124,13 @@ const CombinationProduct = () => {
                 onFinish={onFinish}
                 form={form}
                 initialValues={{
-                  // products: [
-                  //   { productId: "" },
-                  // ],
                   products: [
-                    { productId: "51544372" },
-                    { productId: "51682534" },
+                    { productId: "", sameHotel: true },
                   ],
+                  // products: [
+                  //   { productId: "51747913", sameHotel: true },
+                  //   { productId: "51772506", sameHotel: true },
+                  // ],
                 }}>
                 <Form.List name="products">
                   {(fields, { add, remove }) => {
@@ -148,6 +152,7 @@ const CombinationProduct = () => {
                                 ]}>
                                 <Input placeholder="请输入产品ID" />
                               </Form.Item>
+                              <Hotel name={name} form={form} />
                               {idx !== fields.length - 1 && (
                                 <Transmission name={name} form={form} />
                               )}
@@ -180,6 +185,8 @@ const CombinationProduct = () => {
                   label="副标题"
                   style={{ marginBottom: "24px" }}
                   required
+                  initialValue={"xx"}
+
                   rules={[
                     {
                       required: true,
@@ -218,7 +225,7 @@ const CombinationProduct = () => {
                       )}
                       size="small"
                     />
-                    <div style={{color: "red"}}>{product?.error}</div>
+                    <div style={{ color: "red" }}>{product?.error}</div>
                   </div>
                 </div>
               );

@@ -20,14 +20,15 @@ export const fns = [
   autoSaveRequiredTextClause,
   updateResourceActive,
 ];
+
 export const combinationProduct = async (
   productObjs: any[],
   subTitle: string,
   callback,
 ) => {
-    const saleControlInfo = await saveSaleControlInfo()
-    const newProductId = saleControlInfo.productId;
-//   const newProductId = 54559942;
+  const saleControlInfo = await saveSaleControlInfo()
+  const newProductId = saleControlInfo.productId;
+  // const newProductId = 54588968  ;
   console.log("新产品ID：", newProductId);
   callback({
     productId: newProductId,
@@ -39,9 +40,10 @@ export const combinationProduct = async (
         currentStep: i + 1,
       });
     } catch (error) {
+      console.error(error);
       callback({
         currentStep: i + 1,
-        error: error?.message || "Error",
+        error: fns[i].name+":"+error?.message || "Error",
       });
       break;
     }

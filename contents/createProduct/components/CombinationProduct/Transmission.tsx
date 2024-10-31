@@ -25,7 +25,6 @@ type TransmissionProps = {
 const Transmission = (props: TransmissionProps) => {
   const { name, form } = props;
   const transmission = Form.useWatch(["products", name, "transmission"], form);
-  console.log("transmission", transmission);
   return (
     <div style={{ marginLeft: 40 }}>
       <Form.Item
