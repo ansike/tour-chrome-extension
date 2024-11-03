@@ -124,13 +124,13 @@ const CombinationProduct = () => {
                 onFinish={onFinish}
                 form={form}
                 initialValues={{
-                  products: [
-                    { productId: "", sameHotel: true },
-                  ],
                   // products: [
-                  //   { productId: "51747913", sameHotel: true },
-                  //   { productId: "51772506", sameHotel: true },
+                  //   { productId: "", sameHotel: true },
                   // ],
+                  products: [
+                    { productId: "51747913", sameHotel: true },
+                    { productId: "51772506", sameHotel: true },
+                  ],
                 }}>
                 <Form.List name="products">
                   {(fields, { add, remove }) => {
@@ -196,9 +196,6 @@ const CombinationProduct = () => {
                   <Input placeholder="请输入新产品的副标题" />
                 </Form.Item>
                 <Form.Item>
-                  <Button type="primary" onClick={getProductsInfo}>
-                    获取产品信息
-                  </Button>
                   <Button
                     style={{ marginLeft: 20 }}
                     loading={loading}

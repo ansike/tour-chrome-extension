@@ -3,6 +3,7 @@ import { getAccountConf } from "~contents/createProduct/constant";
 import { searchProviderContactCardList } from "../../CreateCarResource/utils/searchProviderContactCardList";
 import { getCurrentUserInfo } from "../../scripts/getCurrentUserInfo";
 import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
+import { groupBy } from "./savePriceInventory";
 
 export const saveProduct = async (
   productId: string | number,
@@ -722,11 +723,13 @@ export const saveProduct = async (
 
 export const getTravelDays = (products) => {
   // 1. 首末两天的行程
-  // 2. 中间段的行程
+  // 2. 中间段的行程(如果存在相同目的地 要减去中间段)
+  const cityIds = products.map(pro=>pro.baseInfo.destinationCityID)
+  const cityGroup = groupBy(cityIds, (k)=>k)
   return (
     products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) +
     2 +
-    products.length -
+    Object.keys(cityGroup).length -
     1
   );
 };

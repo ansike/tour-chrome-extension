@@ -79,55 +79,60 @@ export const saveProductResource = async (
   for (let i = 0; i < productsSegment.length; i++) {
     const seg = productsSegment[i];
     const product = productObjs[i];
-    // 增加一个流转segment
+    // 从第二个行程开始，只要和前一个行程的目的地ID不同，需要增加一个流转segment
     if (i > 0) {
-      // 上一段行程的最后一个segment
-      const prevSeg =
-        productsSegment[i - 1].productSegments.segments[
-          productsSegment[i - 1].productSegments.segments.length - 1
-        ];
-      // 当前行程的第一个segment
-      const curSeg = productsSegment[i].productSegments.segments[0];
-      const hotel = productsSegment[i].productSegments.segments.find(
-        (s) => s.hotel,
-      ).hotel;
-      const draftSeg = draftProductSegments.segments[curIdx];
-      const segment: any = {
-        hotel,
-        segmentBase: {
-          departureCity: prevSeg.segmentBase.destinationCity,
-          destinationCity: curSeg.segmentBase.departureCity,
-          segmentNumber: curIdx + 1,
-          maxStayNights: 1,
-          minStayNights: 1,
-          stayNights: 1,
-        },
-        packages: [],
-        productId,
-        segmentId: draftSeg?.segmentId || 0,
-      };
       const prevProduct = productObjs[i - 1];
-
-      switch (prevProduct.transmission) {
-        case TRANSTORT_TYPE.FLIGHT:
-          segment.flight = JSON.parse(JSON.stringify(flight));
-          break;
-        case TRANSTORT_TYPE.TRAIN:
-          segment.train = JSON.parse(JSON.stringify(train));
-          break;
-        case TRANSTORT_TYPE.CAR:
-          const group = await searchResourceGroup(`经济${product.price}`);
-          segment.segmentResourceGroups = [
-            {
-              resourceGroupId: group.resourceGroupDtos[0].resourceGroupId,
-              sort: 0,
-            },
+      if (
+        product.baseInfo.destinationCityID !==
+        prevProduct.baseInfo.destinationCityID
+      ) {
+        // 上一段行程的最后一个segment
+        const prevSeg =
+          productsSegment[i - 1].productSegments.segments[
+            productsSegment[i - 1].productSegments.segments.length - 1
           ];
-          break;
-      }
+        // 当前行程的第一个segment
+        const curSeg = productsSegment[i].productSegments.segments[0];
+        const hotel = productsSegment[i].productSegments.segments.find(
+          (s) => s.hotel,
+        ).hotel;
+        const draftSeg = draftProductSegments.segments[curIdx];
+        const segment: any = {
+          hotel,
+          segmentBase: {
+            departureCity: prevSeg.segmentBase.destinationCity,
+            destinationCity: curSeg.segmentBase.departureCity,
+            segmentNumber: curIdx + 1,
+            maxStayNights: 1,
+            minStayNights: 1,
+            stayNights: 1,
+          },
+          packages: [],
+          productId,
+          segmentId: draftSeg?.segmentId || 0,
+        };
 
-      await saveSegment(segment);
-      curIdx++;
+        switch (prevProduct.transmission) {
+          case TRANSTORT_TYPE.FLIGHT:
+            segment.flight = JSON.parse(JSON.stringify(flight));
+            break;
+          case TRANSTORT_TYPE.TRAIN:
+            segment.train = JSON.parse(JSON.stringify(train));
+            break;
+          case TRANSTORT_TYPE.CAR:
+            const group = await searchResourceGroup(`经济${product.price}`);
+            segment.segmentResourceGroups = [
+              {
+                resourceGroupId: group.resourceGroupDtos[0].resourceGroupId,
+                sort: 0,
+              },
+            ];
+            break;
+        }
+
+        await saveSegment(segment);
+        curIdx++;
+      }
     }
 
     console.log("product", product);
@@ -166,7 +171,6 @@ export const saveProductResource = async (
       //   productId,
       //   segmentId: draftSeg?.segmentId || 0,
       // };
-
       // await saveSegment(segment);
       // curIdx++;
     }
