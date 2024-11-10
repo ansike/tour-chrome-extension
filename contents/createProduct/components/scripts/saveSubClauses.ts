@@ -10,6 +10,7 @@ export const saveSubClauses = async (productId: string, sub: any) => {
       const clausePackageItemDtos = formatProductClauses(
         clausePackage.clauseTypeDtos
       )
+      // 写死 3035 是什么意思
       if (tabEnum === 1 && !clausePackageItemDtos.find(it => it.clauseItemId === 3035)) {
         // 插入飞机
         clausePackageItemDtos.unshift(

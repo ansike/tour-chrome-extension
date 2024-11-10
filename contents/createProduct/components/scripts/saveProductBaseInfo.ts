@@ -9,8 +9,8 @@ export const saveProduct = async (productId: string) => {
 }
 
 export const saveProductBaseInfo = async (productInfo: any) => {
-  console.log({ productInfo })
-  const data = {
+  const body = {
+    ...productInfo,
     contentType: 'json',
     head: {
       cid: '09031059218989378081',
@@ -23,7 +23,7 @@ export const saveProductBaseInfo = async (productInfo: any) => {
       extension: []
     },
     baseInfo: productInfo.baseInfo,
-    bookingControl: productInfo.bookingControls,
+    bookingControl: productInfo.bookingControl || productInfo.bookingControls,
     nameAreaRules: productInfo.nameAreaRules,
     meta: {
       auditStatus: 'N',
@@ -101,13 +101,17 @@ export const saveProductBaseInfo = async (productInfo: any) => {
         'x-tt-core': '1'
       },
       referrerPolicy: 'no-referrer-when-downgrade',
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
       method: 'POST',
       mode: 'cors',
       credentials: 'include'
     }
   )
-  return await res.json()
+  const data = await res.json()
+  if(data.ResponseStatus.Errors.length > 0) {
+    throw new Error(data.ResponseStatus.Errors.map((item: any) => item.Message).join(','))
+  }
+  return data
 }
 
 export const getProductBaseInfo = async (productId: string) => {

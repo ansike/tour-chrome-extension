@@ -104,6 +104,11 @@ const DuplicateProduct = (props: DuplicateProductProps) => {
                 size="small"
               />
             </div>
+            <div>
+              <div style={{ color: "red" }}>
+                {productInfo?.error ? "Error: " + productInfo.error : ""}
+              </div>
+            </div>
           </div>
         </Flex>
       </Drawer>

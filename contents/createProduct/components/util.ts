@@ -16,6 +16,7 @@ import { savePriceInventory } from './scripts/savePriceInventory'
 import { saveProductResource } from './scripts/saveProductResource'
 import { saveClauses } from './scripts/saveClauses'
 import { updateResourceActive } from './scripts/updateResourceActive'
+import { autoSaveRequiredTextClause } from './scripts/autoSaveRequiredTextClause'
 
 export const parseHtmlToObj = (html: string) => {
   const match = html.match(/<script>([\s\S]*?)<\/script>/)
@@ -281,10 +282,12 @@ export async function createSubProductFn(product: TourDay, updateTourDayStatus) 
   }
 }
 
+// 复制产品
 export async function duplicateProduct(product: TourDay, updateTourDayStatus) {
   const { productId, routes } = product
   const newProduct = await productDuplicate(productId);
   const newProductId = newProduct.newProductId;
+  // const newProductId = "54301197";
 
   const duplicateProductStepFns = [
     () => saveSaleControlInfo(newProductId),
@@ -292,10 +295,10 @@ export async function duplicateProduct(product: TourDay, updateTourDayStatus) {
     () => saveProductRichText(newProductId),
     () => saveTourDailyDetail(newProductId, routes),
     () => savePackage(newProductId),
-    () => savePackage(newProductId),
     () => savePriceInventory(productId, newProductId),
     () => saveProductResource(productId, newProductId),
     () => saveClauses(newProductId),
+    () => autoSaveRequiredTextClause(newProductId),
     () => updateResourceActive(newProductId),
   ]
   const len = duplicateProductStepFns.length;
@@ -314,3 +317,4 @@ export async function duplicateProduct(product: TourDay, updateTourDayStatus) {
     newProductId
   }
 }
+

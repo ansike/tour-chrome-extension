@@ -1,4 +1,5 @@
 import type { StepProps } from "antd"
+import { flight, train } from "~contents/createProduct/constant"
 
 // 创建步骤配置常量
 export const CreateStepConstant = {
@@ -22,61 +23,6 @@ export const StepsConfMap: StepProps[] = Object.keys(CreateStepConstant).map(it 
     description: ''
   }
 })
-
-const flight = {
-  "systemFlight": {
-    "flightEarliesTimeUnlimited": true,
-    "flightLatestTime": "",
-    "sameAirportTransferLimited": "F",
-    "airRouteMode": "N",
-    "flightLatestTimeUnlimited": true,
-    "minTransitTime": "0000",
-    "maxTransitTime": "0000",
-    "details": [],
-    "arrivalAirport": "",
-    "departureAirport": "",
-  },
-  "autoMatch": false,
-  "isIncludeManualFlight": "F",
-  "isIncludeSystemFlight": "T",
-  "isAutoMatchingManualFlight": "T"
-}
-
-const train = {
-  "systemTrain": {
-    "trainType": "1,2",
-    "trainCabinClass": "商务座,特等座,一等座,二等座,动卧,高级软卧,软卧,硬卧,一等卧,二等卧,软座,硬座",
-    "startStation": {
-      "key": "0",
-      "value": "不指定"
-    },
-    "startStations": [],
-    "destinationStation": {
-      "key": "0",
-      "value": "不指定"
-    },
-    "destinationStations": [],
-    "grabTickets": "2",
-    "trainEarliesTimeUnlimited": true,
-    "latestDepartureTimeUnlimited": true,
-    "earliestArrivalUnlimited": true,
-    "trainLatestTimeUnlimited": true,
-    "trainLatestDays": null,
-    "trainLatestTime": "",
-    "details": [
-      {
-        "trips": "",
-        "ruleType": "I"
-      },
-      {
-        "trips": "",
-        "ruleType": "E"
-      }
-    ]
-  },
-  "isIncludeSystemTrain": "T"
-}
-
 
 // 子产品线路分类
 export const subProductCategories = [

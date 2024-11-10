@@ -1,3 +1,9 @@
+// 批量获取产品详情
+export const getProductsDetail = async (productIds: string[]) => {
+  return Promise.all(productIds.map(getProductDetail))
+}
+
+// 获取单个产品详情
 export const getProductDetail = async (productId: string) => {
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/getProductBaseInfo?_fxpcqlniredt=09031072216594047056&_fxpcqlniredt=09031072216594047056',
