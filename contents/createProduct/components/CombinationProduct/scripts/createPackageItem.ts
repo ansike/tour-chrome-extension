@@ -1,7 +1,7 @@
 import { getVendorId } from "../../scripts/getVendorId"
 import { saveCustomerCpntTemplateInfo } from "../../scripts/saveCustomerCpntTemplateInfo"
 import { savePackageItem } from "../../scripts/savePackageItem"
-import { getTravelDays } from "./saveProduct"
+import { getTravelDays } from "./util"
 
 export const createPackageItem = async (productId: string | number, products: any[]) => {
     const vendorId = await getVendorId()

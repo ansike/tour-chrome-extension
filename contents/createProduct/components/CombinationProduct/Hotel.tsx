@@ -5,10 +5,10 @@ const options = [
     label: "相同",
     value: true,
   },
-  {
-    label: "不同",
-    value: false,
-  },
+  // {
+  //   label: "不同",
+  //   value: false,
+  // },
 ];
 
 type HotelProps = {

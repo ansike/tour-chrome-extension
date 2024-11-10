@@ -3,7 +3,7 @@ import { getAccountConf } from "~contents/createProduct/constant";
 import { searchProviderContactCardList } from "../../CreateCarResource/utils/searchProviderContactCardList";
 import { getCurrentUserInfo } from "../../scripts/getCurrentUserInfo";
 import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
-import { groupBy } from "./savePriceInventory";
+import { getTravelDays } from "./util";
 
 export const saveProduct = async (
   productId: string | number,
@@ -18,6 +18,7 @@ export const saveProduct = async (
 
   // 循环获取组合产品基础信息中的所有天数，增加前后两天的到达和返程
   const travelDays = getTravelDays(products);
+  console.log("travelDays", travelDays);
   // 住宿晚数在天数上减少1
   const travelNights = travelDays - 1;
   const cities = Array.from(
@@ -719,17 +720,4 @@ export const saveProduct = async (
   // console.log(craft)
   const res = await saveProductBaseInfo(product);
   console.log(res);
-};
-
-export const getTravelDays = (products) => {
-  // 1. 首末两天的行程
-  // 2. 中间段的行程(如果存在相同目的地 要减去中间段)
-  const cityIds = products.map(pro=>pro.baseInfo.destinationCityID)
-  const cityGroup = groupBy(cityIds, (k)=>k)
-  return (
-    products.reduce((acc, cur) => acc + cur.baseInfo.travelDays, 0) +
-    2 +
-    Object.keys(cityGroup).length -
-    1
-  );
 };

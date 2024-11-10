@@ -1,97 +1,97 @@
-import { Button, Drawer, Flex, Form, Input, message, Progress } from "antd";
-import { useForm } from "antd/es/form/Form";
-import React, { useState } from "react";
+import { Button, Drawer, Flex, Form, Input, message, Progress } from "antd"
+import { useForm } from "antd/es/form/Form"
+import React, { useState } from "react"
 
-import { getProductsDetail } from "../scripts/getProductDetail";
-import Hotel from "./Hotel";
-import Transmission from "./Transmission";
-import { combinationProduct, fns, permutationProducts } from "./util";
+import { getProductsDetail } from "../scripts/getProductDetail"
+import Hotel from "./Hotel"
+import Transmission from "./Transmission"
+import { combinationProduct, fns, permutationProducts } from "./util"
 
 message.config({
   getContainer() {
-    return document.getElementsByClassName("ant-drawer")[0] as HTMLElement;
-  },
-});
+    return document.getElementsByClassName("ant-drawer")[0] as HTMLElement
+  }
+})
 
 const CombinationProduct = () => {
-  const [form] = useForm();
-  const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = useForm()
+  const [loading, setLoading] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [data, setData] = useState<
     { key: string; currentStep?: number; productId?: string; error?: string }[]
-  >([]);
+  >([])
 
   const getProductsInfo = async () => {
     try {
-      const { products } = await form.validateFields();
-      const productIds = products.map((item) => item.productId);
-      const productObjs = await getProductsDetail(productIds);
-      const allProducts = permutationProducts(productObjs);
-      return allProducts;
+      const { products } = await form.validateFields()
+      const productIds = products.map((item) => item.productId)
+      const productObjs = await getProductsDetail(productIds)
+      const allProducts = permutationProducts(productObjs)
+      return allProducts
     } catch (error) {
-      console.log(error);
-      message.error(error.message);
+      console.log(error)
+      message.error(error.message)
     }
-  };
+  }
 
   const onFinish = async (value) => {
-    const { products, subTitle } = value;
-    setLoading(true);
-    console.log("products",products)
+    const { products, subTitle } = value
+    setLoading(true)
+    console.log("products", products)
     try {
-      const productObjs = await getProductsInfo();
+      const productObjs = await getProductsInfo()
 
       productObjs.forEach((item) => {
         item.forEach((element, idx) => {
-          const keys = Object.keys(products[0]);
+          const keys = Object.keys(products[0])
           for (let i = 0; i < keys.length; i++) {
-            console.log(keys[i], products[idx][keys[i]]);
-            element[keys[i]] = products[idx][keys[i]];
+            console.log(keys[i], products[idx][keys[i]])
+            element[keys[i]] = products[idx][keys[i]]
           }
-        });
-      });
-      console.log("组合中", productObjs);
+        })
+      })
+      console.log("组合中", productObjs)
       setData(
         productObjs.map((product) => ({
           currentStep: 0,
-          key: product.map((item) => item.productId).join("-"),
-        })),
-      );
+          key: product.map((item) => item.productId).join("-")
+        }))
+      )
       await Promise.all(
-        productObjs.map((product, idx) =>
-        // productObjs.slice(0, 1).map((product, idx) =>
+        // productObjs.map((product, idx) =>
+          productObjs.slice(0, 1).map((product, idx) =>
           combinationProduct(product, subTitle, (item) => {
             setData((d) => {
               return d.map((i, j) => {
                 if (idx === j) {
                   return {
                     ...i,
-                    ...item,
-                  };
+                    ...item
+                  }
                 }
-                return i;
-              });
-            });
-          }),
-        ),
-      );
-      console.log("组合成功");
+                return i
+              })
+            })
+          })
+        )
+      )
+      console.log("组合成功")
     } catch (error) {
-      console.log(error);
+      console.log(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleOk = () => {
-    setIsModalOpen(false);
-  };
+    setIsModalOpen(false)
+  }
 
   const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+    setIsModalOpen(false)
+  }
 
-  console.log("data", data);
+  console.log("data", data)
 
   return (
     <>
@@ -129,8 +129,8 @@ const CombinationProduct = () => {
                   // ],
                   products: [
                     { productId: "51747913", sameHotel: true },
-                    { productId: "51772506", sameHotel: true },
-                  ],
+                    { productId: "51772506", sameHotel: true }
+                  ]
                 }}>
                 <Form.List name="products">
                   {(fields, { add, remove }) => {
@@ -147,8 +147,8 @@ const CombinationProduct = () => {
                                 rules={[
                                   {
                                     required: true,
-                                    message: "产品ID必填",
-                                  },
+                                    message: "产品ID必填"
+                                  }
                                 ]}>
                                 <Input placeholder="请输入产品ID" />
                               </Form.Item>
@@ -157,12 +157,12 @@ const CombinationProduct = () => {
                                 <Transmission name={name} form={form} />
                               )}
                             </div>
-                          );
+                          )
                         })}
                         <Form.Item label="">
                           <Button
                             onClick={() => {
-                              add("");
+                              add("")
                             }}
                             type="dashed">
                             增加产品
@@ -170,14 +170,14 @@ const CombinationProduct = () => {
                           <Button
                             style={{ marginLeft: 20 }}
                             onClick={() => {
-                              remove(fields.length - 1);
+                              remove(fields.length - 1)
                             }}
                             type="dashed">
                             删除产品
                           </Button>
                         </Form.Item>
                       </>
-                    );
+                    )
                   }}
                 </Form.List>
                 <Form.Item
@@ -186,12 +186,11 @@ const CombinationProduct = () => {
                   style={{ marginBottom: "24px" }}
                   required
                   initialValue={"xx"}
-
                   rules={[
                     {
                       required: true,
-                      message: "新产品副标题必填",
-                    },
+                      message: "新产品副标题必填"
+                    }
                   ]}>
                   <Input placeholder="请输入新产品的副标题" />
                 </Form.Item>
@@ -218,20 +217,20 @@ const CombinationProduct = () => {
                     <br />
                     <Progress
                       percent={Math.floor(
-                        (product?.currentStep / fns.length) * 100,
+                        (product?.currentStep / fns.length) * 100
                       )}
                       size="small"
                     />
                     <div style={{ color: "red" }}>{product?.error}</div>
                   </div>
                 </div>
-              );
+              )
             })}
           </Flex>
         </Drawer>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default CombinationProduct;
+export default CombinationProduct
