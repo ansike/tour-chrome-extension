@@ -74,7 +74,6 @@ export const saveProductResource = async (
     segmentId: firstSegment.segmentId,
   });
   curIdx++;
-
   // 产品级别的segments
   for (let i = 0; i < productsSegment.length; i++) {
     const seg = productsSegment[i];
@@ -135,7 +134,6 @@ export const saveProductResource = async (
       }
     }
 
-    console.log("product", product);
     if (product?.sameHotel) {
       // 如果当前行程 最后一天住宿是同一个酒店，当前行程段的最后一晚要加一天
       // 从后往前找第一个有酒店的segment，在住宿天数+1
@@ -177,7 +175,7 @@ export const saveProductResource = async (
     // 从第二个开始，因为第一个涉及套餐的segment，不需要保存
     for (let j = 1; j < seg.productSegments.segments.length; j++) {
       const s = seg.productSegments.segments[j];
-      // 第一晚需要加1，增加抵达目的地的住宿天数
+      // 只有第一个产品的第一晚需要加1，增加抵达目的地的住宿天数
       if (s.segmentBase.stayNights && i === 0 && j === 1) {
         s.segmentBase.maxStayNights += 1;
         s.segmentBase.minStayNights += 1;
@@ -185,6 +183,7 @@ export const saveProductResource = async (
       }
       const draftSeg = draftProductSegments.segments[curIdx];
       s.segmentBase.segmentNumber = curIdx + 1;
+      console.log(i, j, s.segmentBase);
       await saveSegment({
         ...s,
         packages: [],
