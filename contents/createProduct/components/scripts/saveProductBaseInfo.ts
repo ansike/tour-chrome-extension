@@ -24,7 +24,13 @@ export const saveProductBaseInfo = async (productInfo: any) => {
     },
     baseInfo: productInfo.baseInfo,
     bookingControl: productInfo.bookingControl || productInfo.bookingControls,
-    nameAreaRules: productInfo.nameAreaRules,
+    nameAreaRules: productInfo.nameAreaRules.map(it=>{
+      return {
+        pOIDistrictName: it.pOIDistrictName,
+        pOIScenicSpotID: it.pOIScenicSpotID,
+        parentInfo: it.parentInfo
+      }
+    }),
     meta: {
       auditStatus: 'N',
       canEditSubName: 'T',
