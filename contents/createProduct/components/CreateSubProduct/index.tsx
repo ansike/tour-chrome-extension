@@ -13,6 +13,8 @@ import { getProductDetail } from "../scripts/getProductDetail";
 import { subProductCategories } from "../SplitProduct/constant";
 import { useAirportSelect } from "../useAirportSelect";
 import { createSubProductFn, createSubProductStepFns } from "../util";
+import { suggestDepartureCity } from "../scripts/suggestDepartureCity";
+import { getMultiDepartureCities } from "../scripts/getMultiDepartureCities";
 
 type CreateModalProps = {};
 message.config({
@@ -56,10 +58,37 @@ const CreateSubProduct = (props: CreateModalProps) => {
         });
       }
 
+      const {multiDepartureCities} = await getMultiDepartureCities();
+      let city = null
+      multiDepartureCities.slice(1).find((item) => {
+        city = item.departureCities.find((it) => it.cityName === baseInfo.destinationCityName)
+        return city
+      })
+
+      console.log({baseInfo, city})
+      let filteredSubProducts = subProductCategories
+      if(city){
+        filteredSubProducts = subProductCategories.filter((item) => {
+          if(item.enter.flight && !city.hasAirport){
+            return false
+          }
+          if(item.enter.train && !city.hasTrain){
+            return false
+          }
+          if(item.leave.flight && !city.hasAirport){
+            return false
+          }
+          if(item.leave.train && !city.hasTrain){
+            return false
+          }
+          return true
+        })
+      }
+
       await createSubProductFn(
         {
           ...baseInfo,
-          subProducts: JSON.parse(JSON.stringify(subProductCategories)),
+          subProducts: JSON.parse(JSON.stringify(filteredSubProducts)),
         },
         (_, product) => {
           setProductInfo((prev) => ({ ...prev, ...baseInfo, ...product }));
