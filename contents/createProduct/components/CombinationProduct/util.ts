@@ -1,6 +1,7 @@
 import { autoSaveRequiredTextClause } from "../scripts/autoSaveRequiredTextClause";
 import { saveSaleControlInfo } from "../scripts/saveSaleControlInfo";
 import { updateResourceActive } from "../scripts/updateResourceActive";
+import { sleep } from "../util";
 import { createPackageItem } from "./scripts/createPackageItem";
 import { saveClauses } from "./scripts/saveClauses";
 import { savePriceInventory } from "./scripts/savePriceInventory";
