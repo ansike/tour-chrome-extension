@@ -18,6 +18,8 @@ export const createPackageItem = async (productId: string | number, products: an
         "vendorResourceCode": "",
         "isSmsVBKNotice": "T",
         "isMainPackage": "T",
+        // 携程要求默认为 false
+        // "isHotelResource": "F",
         "isHotelResource": "T",
         "piCustomerInfoTemplateId": template.cpntTemplateInfoId,
         "resourceNameRule": {

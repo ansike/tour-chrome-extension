@@ -11,12 +11,15 @@ export const savePriceInventory = async (
 
     const dateArrs = await Promise.all(products.map(pro => getPriceArr(pro.baseInfo.productId)))
 
-    console.log(dateArrs)
+    console.log("dateArrs", dateArrs)
     // 获取前一个产品的价格+日期信息
     const dateArr = mergeDateArr(dateArrs);
+    console.log("dateArr", dateArr)
+
     // console.log(dateArr)
     const groups = groupBy(dateArr, it => it.adultPrice.cost)
 
+    console.log("groups", groups)
     // 将前一个产品的日期+价格 写入新的产品
     const res = await Promise.all(
         Object.keys(groups).map(async price => {
@@ -178,6 +181,22 @@ export const getBatchOperateSchedule = async props => {
 
 const mergeDateArr = (dateArrs: any[]) => {
     const dateArr = []
+
+    // 日期左端对齐
+    let maxStartDate = new Date(dateArrs[0][0]?.adultPrice?.date).getTime()
+    for(let i = 0; i < dateArrs.length; i++) {
+        const start = new Date(dateArrs[i][0]?.adultPrice?.date).getTime()
+        maxStartDate = Math.max(maxStartDate, start)
+    }
+    for(let i = 0; i < dateArrs.length; i++) {
+        for(let j = 0; j < dateArrs[i].length; j++) {
+            if (new Date(dateArrs[i][j]?.adultPrice?.date).getTime() === maxStartDate) {
+                dateArrs[i] = dateArrs[i].slice(j)
+                break;
+            }
+        }
+    }
+
     const min = Math.min(...dateArrs.map(arr => arr.length))
     for (let i = 0; i < min; i++) {
         let flag = false

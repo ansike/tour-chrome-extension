@@ -58,8 +58,8 @@ const CombinationProduct = () => {
         }))
       )
       await Promise.all(
-        // productObjs.map((product, idx) =>
-          productObjs.slice(0, 1).map((product, idx) =>
+        productObjs.map((product, idx) =>
+          // productObjs.slice(0, 1).map((product, idx) =>
           combinationProduct(product, subTitle, (item) => {
             setData((d) => {
               return d.map((i, j) => {
@@ -128,8 +128,10 @@ const CombinationProduct = () => {
                   //   { productId: "", sameHotel: true },
                   // ],
                   products: [
-                    { productId: "51747913", sameHotel: true },
-                    { productId: "51772506", sameHotel: true }
+                    { productId: "55835543", sameHotel: true },
+                    { productId: "55772276", sameHotel: true }
+                    // { productId: "51784854", sameHotel: true },
+                    // { productId: "51779580", sameHotel: true }
                   ]
                 }}>
                 <Form.List name="products">
