@@ -29,7 +29,7 @@ export const combinationProduct = async (
 ) => {
   const saleControlInfo = await saveSaleControlInfo()
   const newProductId = saleControlInfo.productId;
-  // const newProductId = 55588212    ;
+  // const newProductId = 56476804;
   console.log("新产品ID：", newProductId);
   callback({
     productId: newProductId,

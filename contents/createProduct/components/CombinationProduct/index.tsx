@@ -128,8 +128,10 @@ const CombinationProduct = () => {
                   //   { productId: "", sameHotel: true },
                   // ],
                   products: [
-                    { productId: "55835543", sameHotel: true },
-                    { productId: "55772276", sameHotel: true }
+                    { productId: "55772276", sameHotel: true },
+                    { productId: "55835543", sameHotel: true }
+                    // { productId: "55835543", sameHotel: true },
+                    // { productId: "55772276", sameHotel: true }
                     // { productId: "51784854", sameHotel: true },
                     // { productId: "51779580", sameHotel: true }
                   ]

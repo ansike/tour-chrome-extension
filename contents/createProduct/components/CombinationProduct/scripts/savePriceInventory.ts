@@ -1,4 +1,5 @@
 import { getPackageList } from "../../scripts/savePackageItem"
+import { sleep } from "../../util"
 
 export const savePriceInventory = async (
     productId: string | number,
@@ -113,8 +114,6 @@ export const savePriceInventoryFetch = async props => {
                 'sec-fetch-site': 'same-site',
                 'x-ctx-locale': 'zh-CN'
             },
-            referrer:
-                'https://vbooking.ctrip.com/ivbk/vendor/priceInventory?productid=48465278&istab=1&from=vbk',
             referrerPolicy: 'no-referrer-when-downgrade',
             body: JSON.stringify(saveBody),
             method: 'POST',
@@ -123,8 +122,16 @@ export const savePriceInventoryFetch = async props => {
         }
     )
 
-    return await dateRes.json()
+    const res = await dateRes.json()
+    console.log("savePriceInventoryFetch", res)
+    // 操作过于频繁
+    if(res.ResponseStatus?.Errors[0]?.ErrorCode === "20013021") {
+        await sleep(4000)
+        return await savePriceInventoryFetch(props)
+    }
+    return res
 }
+
 export const getBatchOperateSchedule = async props => {
     const { productId, yearMonth, singleResourceId, optionalResourceId } = props
     const body = {
@@ -174,8 +181,12 @@ export const getBatchOperateSchedule = async props => {
             credentials: 'include'
         }
     )
-
-    return await dateRes.json()
+    const res = await dateRes.json()
+    // 操作过于频繁
+    if(res.ResponseStatus?.Errors[0]?.ErrorCode === "20013021") {
+        return await getBatchOperateSchedule(props)
+    }
+    return res
 }
 
 
@@ -231,7 +242,7 @@ const getPriceArr = async (productId: string | number) => {
     // prev product
     const preResult = await getPackageList(productId)
     const { optionalResourceId: prevOptionalResourceId, singleResourceId: prevSingleResourceId } = preResult.itemList[0]
-
+    
     // 获取前一个产品的价格+日期信息
     const dateArr = []
     let yearMonth = getCurrentYearMonth()
@@ -242,6 +253,7 @@ const getPriceArr = async (productId: string | number) => {
             singleResourceId: prevSingleResourceId,
             optionalResourceId: prevOptionalResourceId
         })
+        await sleep(300)
         const filteredData = res.dates.filter(date => date.adultPrice)
         dateArr.push(...filteredData)
         const lastDate = res.dates[res.dates.length - 1]
