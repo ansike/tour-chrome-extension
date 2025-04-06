@@ -18,16 +18,25 @@ import { saveClauses } from './scripts/saveClauses'
 import { updateResourceActive } from './scripts/updateResourceActive'
 import { autoSaveRequiredTextClause } from './scripts/autoSaveRequiredTextClause'
 
+// get __INITIAL_STATE__ object
 export const parseHtmlToObj = (html: string) => {
-  const match = html.match(/<script>([\s\S]*?)<\/script>/)
+  // 使用正则表达式查找匹配项
+  const match = html.match(/window.__INITIAL_STATE__\s*=\s*(.*)/)
+
   if (match) {
-    // TODO 换一个方法获取 product 基础数据
-    const str = match[1].split(' = ')[2].split('\n')[0]
-    // const obj = JSON.parse(str)
-    return JSON.parse(str)
+      // 提取 JSON 字符串
+      const jsonStr = match[1];
+      try {
+          // 将 JSON 字符串转换为 JavaScript 对象
+          const initialState = JSON.parse(jsonStr);
+        return initialState;
+      } catch (error) {
+          console.error('JSON 解析错误:', error);
+          return null;
+      }
   } else {
-    console.log('Unable to find __INITIAL_STATE__ object in the input string.')
-    return
+      console.log('未找到 window.__INITIAL_STATE__ 对象');
+      return null;
   }
 }
 
@@ -243,6 +252,7 @@ export const createSubProductStepFns = [
 export async function createSubProductFn(product: TourDay, updateTourDayStatus) {
   const { productId, subProducts = [] } = product
 
+  // 获取子产品列表
   const pkgObj = await getPackageId(productId);
   const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
   const mappedSubProducts = subProducts.map(sub => {
@@ -260,7 +270,10 @@ export async function createSubProductFn(product: TourDay, updateTourDayStatus) 
 
   for (let i = 0; i < mappedSubProducts.length; i++) {
     const sub = mappedSubProducts[i];
-    if (sub.status === '已经存在') continue;
+    if (sub.status === '已经存在') {
+      console.log('已经存在', sub.lineDescription)
+      continue
+    };
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
     sub.productId = subProductId;

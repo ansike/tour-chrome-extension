@@ -40,6 +40,7 @@ export const updatePackageStatus = async (packageId: string) => {
 
 }
 
+// 获取子产品列表
 export const getPackageId = async (parentProductId: string) => {
   const res = await fetch(`https://vbooking.ctrip.com/ivbk/vendor/trafficLineEdit?productid=${parentProductId}&istab=1&from=vbk`, {
     "headers": {
