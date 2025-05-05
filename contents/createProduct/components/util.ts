@@ -18,16 +18,25 @@ import { saveClauses } from './scripts/saveClauses'
 import { updateResourceActive } from './scripts/updateResourceActive'
 import { autoSaveRequiredTextClause } from './scripts/autoSaveRequiredTextClause'
 
+// get __INITIAL_STATE__ object
 export const parseHtmlToObj = (html: string) => {
-  const match = html.match(/<script>([\s\S]*?)<\/script>/)
+  // 使用正则表达式查找匹配项
+  const match = html.match(/window.__INITIAL_STATE__\s*=\s*(.*)/)
+
   if (match) {
-    // TODO 换一个方法获取 product 基础数据
-    const str = match[1].split(' = ')[2].split('\n')[0]
-    // const obj = JSON.parse(str)
-    return JSON.parse(str)
+      // 提取 JSON 字符串
+      const jsonStr = match[1];
+      try {
+          // 将 JSON 字符串转换为 JavaScript 对象
+          const initialState = JSON.parse(jsonStr);
+        return initialState;
+      } catch (error) {
+          console.error('JSON 解析错误:', error);
+          return null;
+      }
   } else {
-    console.log('Unable to find __INITIAL_STATE__ object in the input string.')
-    return
+      console.log('未找到 window.__INITIAL_STATE__ 对象');
+      return null;
   }
 }
 
@@ -243,11 +252,19 @@ export const createSubProductStepFns = [
 export async function createSubProductFn(product: TourDay, updateTourDayStatus) {
   const { productId, subProducts = [] } = product
 
+  // 获取子产品列表
   const pkgObj = await getPackageId(productId);
-  const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
+  const productsMap = new Map();
+  pkgObj.childList.forEach(it => {
+    productsMap.set(it.lineDescription, it)
+  });
+
   const mappedSubProducts = subProducts.map(sub => {
-    if (existSubProductNames.includes(sub.lineDescription)) {
+    if (productsMap.has(sub.lineDescription)) {
       sub.status = '已经存在';
+      const subProduct = productsMap.get(sub.lineDescription);
+      sub.productId = subProduct.subProductId;
+      sub.product = subProduct;
       sub.step = createSubProductStepFns.length;
     }
     return sub;
@@ -259,22 +276,46 @@ export async function createSubProductFn(product: TourDay, updateTourDayStatus) 
   });
 
   for (let i = 0; i < mappedSubProducts.length; i++) {
+    const pkg = productsMap.get(mappedSubProducts[i].lineDescription);
     const sub = mappedSubProducts[i];
-    if (sub.status === '已经存在') continue;
+    console.log("sub", sub)
+    // if (sub.status === '已经存在' && pkg.subProductId !== 61112295) {
+    if (sub.status === '已经存在') {
+      console.log('已经存在', sub.lineDescription)
+      continue
+    } else {
+      console.log('不存在', sub.lineDescription)
+    }
+    // 母产品 44586330
+    // 创建子产品
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
+    // const subProductId = "61112295";
     sub.productId = subProductId;
     for (let i = 0; i < createSubProductStepFns.length; i++) {
       const fn = createSubProductStepFns[i];
-      await fn(subProductId, sub);
+      try {
+        await fn(subProductId, sub);
+      } catch (error) {
+        sub.stepStatus = error.message;
+      }
       sub.step++;
       updateTourDayStatus(productId, {
         subProducts: mappedSubProducts
       });
     }
 
-    // 子产品激活
-    await activeSubProduct(productId, subProductId)
+    try {
+      // 子产品激活
+      await activeSubProduct(productId, subProductId)
+      sub.activeStatus = "success";
+    } catch (error) {
+      console.log("error", error)
+      sub.activeStatus = error.message;
+    }
+    updateTourDayStatus(productId, {
+      subProducts: mappedSubProducts
+    });
   }
 
   return {

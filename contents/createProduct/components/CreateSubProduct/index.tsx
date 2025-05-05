@@ -109,6 +109,7 @@ const CreateSubProduct = (props: CreateModalProps) => {
     setIsModalOpen(false);
   };
 
+  console.log('createSubProduct', productInfo)
   return (
     <>
       <span onClick={() => setIsModalOpen(true)}>创建子产品</span>

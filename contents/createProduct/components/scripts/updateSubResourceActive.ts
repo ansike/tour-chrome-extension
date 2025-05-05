@@ -36,10 +36,17 @@ export const updatePackageStatus = async (packageId: string) => {
     "credentials": "include"
   });
 
-  return await res.json()
+  const { ResponseStatus } = await res.json()
+  if (ResponseStatus.Ack === "Failure") {
+    const errStr = ResponseStatus.Errors.map(it => it.Message).join("\n")
+    throw new Error(errStr)
+  } else {
+    return "success"
+  }
 
 }
 
+// 获取子产品列表
 export const getPackageId = async (parentProductId: string) => {
   const res = await fetch(`https://vbooking.ctrip.com/ivbk/vendor/trafficLineEdit?productid=${parentProductId}&istab=1&from=vbk`, {
     "headers": {

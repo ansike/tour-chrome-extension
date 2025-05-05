@@ -266,3 +266,8 @@ export const carType = [
 //     end: 70000
 //   },
 // ];
+
+
+// template
+// 子产品 增加火车 交通工具
+
