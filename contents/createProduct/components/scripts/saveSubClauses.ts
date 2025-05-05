@@ -1,153 +1,187 @@
-import { sleep } from "../util"
+import { tab1BaseClause } from "../CombinationProduct/scripts/constant";
+import { sleep } from "../util";
 
 export const saveSubClauses = async (productId: string, sub: any) => {
   const { clauses } = sub;
   try {
     for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
-      const productClause = await listProductClauses(productId, tabEnum)
-      await sleep(300)
-      const clausePackage = await getClausePackage(productClause)
+      const productClause = await listProductClauses(productId, tabEnum);
+      await sleep(300);
+      const clausePackage = await getClausePackage(productClause);
       const clausePackageItemDtos = formatProductClauses(
-        clausePackage.clauseTypeDtos
-      )
-      // 写死 3035 是什么意思
-      if (tabEnum === 1 && !clausePackageItemDtos.find(it => it.clauseItemId === 3035)) {
-        // 插入飞机
-        clausePackageItemDtos.unshift(
-          ...clauses
-        )
+        clausePackage.clauseTypeDtos,
+      );
+
+      // 第一个条款
+      if (tabEnum === 1) {
+        // 写死 3035 是什么意思
+        if (!clausePackageItemDtos.find((it) => it.clauseItemId === 3035)) {
+          // 插入飞机
+          clausePackageItemDtos.unshift(...clauses);
+        }
+
+        // 行程首末日的目的地专车
+        if (!clausePackageItemDtos.find((it) => it.clauseItemId === 33006)) {
+          clausePackageItemDtos.push(
+            tab1BaseClause.find((it) => it.clauseItemId === 33006),
+          );
+        }
+        if (!clausePackageItemDtos.find((it) => it.clauseItemId === 38725)) {
+          clausePackageItemDtos.push({
+            clauseItemId: 38725,
+            secondClassTypeId: 86,
+            elementDtos: [
+              {
+                componentCode: "28974-2018029271",
+                value: "xxx",
+              },
+            ],
+          });
+        }
+        if (!clausePackageItemDtos.find((it) => it.clauseItemId === 38739)) {
+          clausePackageItemDtos.push({
+            clauseItemId: 38739,
+            secondClassTypeId: 86,
+            elementDtos: [
+              {
+                componentCode: "28974-2042072739",
+                value: "xxx",
+              },
+            ],
+          });
+        }
       }
-      await sleep(300)
+      await sleep(300);
       await saveClausePackage({
         productClause,
-        clausePackageItemDtos
-      })
+        clausePackageItemDtos,
+      });
       await saveProductClauses(
         productId,
         productClause.centralDataDto.clausePackageId,
-        tabEnum
-      )
+        tabEnum,
+      );
       // 随机休眠 1s - 4s
-      await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000)
+      await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000);
     }
-    return 'success'
+    return "success";
   } catch (error) {
-    return error
+    return error;
   }
-}
+};
 
 export const getClausePackage = async (productClause: any) => {
   const body = {
     ...productClause.centralDataDto,
     clauseFilterConditionDto: productClause.centralDataDto?.filterConditionDto,
     firstClassClauseTypeIds:
-      productClause.centralDataDto.additionalInfoDto.firstClassTypeIds
-  }
-  delete body.filterConditionDto
+      productClause.centralDataDto.additionalInfoDto.firstClassTypeIds,
+  };
+  delete body.filterConditionDto;
   body.additionalInfoDto = {
     ...body.additionalInfoDto,
-    isTra: 'F',
-    isChildrenToNew: 'T'
-  }
+    isTra: "F",
+    isChildrenToNew: "T",
+  };
   const res = await fetch(
-    'https://online.ctrip.com/restapi/soa2/20046/getClausePackage?',
+    "https://online.ctrip.com/restapi/soa2/20046/getClausePackage?",
     {
       headers: {
-        accept: '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9',
-        'content-type': 'text/plain;charset=UTF-8',
-        cookieorigin: 'https://vbooking.ctrip.com',
-        priority: 'u=1, i',
-        'sec-ch-ua':
+        accept: "*/*",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "content-type": "text/plain;charset=UTF-8",
+        cookieorigin: "https://vbooking.ctrip.com",
+        priority: "u=1, i",
+        "sec-ch-ua":
           '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'x-tt-core': '1'
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-tt-core": "1",
       },
-      referrerPolicy: 'no-referrer-when-downgrade',
+      referrerPolicy: "no-referrer-when-downgrade",
       body: JSON.stringify(body),
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include'
-    }
-  )
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    },
+  );
 
-  return await res.json()
-}
+  return await res.json();
+};
 
 export const listProductClauses = async (
   productId: string,
-  tabEnum: number
+  tabEnum: number,
 ) => {
   const res = await fetch(
-    'https://online.ctrip.com/restapi/soa2/15638/listProductClauses?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
+    "https://online.ctrip.com/restapi/soa2/15638/listProductClauses?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081",
     {
       headers: {
-        accept: '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9',
-        'content-type': 'application/json',
-        cookieorigin: 'https://vbooking.ctrip.com',
-        priority: 'u=1, i',
-        'sec-ch-ua':
+        accept: "*/*",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "content-type": "application/json",
+        cookieorigin: "https://vbooking.ctrip.com",
+        priority: "u=1, i",
+        "sec-ch-ua":
           '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'x-ctx-locale': 'zh-CN',
-        'x-tt-core': '1'
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-ctx-locale": "zh-CN",
+        "x-tt-core": "1",
       },
       referrer:
-        'https://vbooking.ctrip.com/ivbk/vendor/newResourceClause?productid=48464967&istab=1&from=vbk',
-      referrerPolicy: 'no-referrer-when-downgrade',
+        "https://vbooking.ctrip.com/ivbk/vendor/newResourceClause?productid=48464967&istab=1&from=vbk",
+      referrerPolicy: "no-referrer-when-downgrade",
       body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031059218989378081\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\",\"tabEnum\":${tabEnum}}`,
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include'
-    }
-  )
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    },
+  );
 
-  return await res.json()
-}
+  return await res.json();
+};
 
 export const getPackageList = async (productId: string) => {
   const res = await fetch(
-    'https://online.ctrip.com/restapi/soa2/15638/getPackageList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
+    "https://online.ctrip.com/restapi/soa2/15638/getPackageList?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081",
     {
       headers: {
-        accept: '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9',
-        'content-type': 'application/json',
-        cookieorigin: 'https://vbooking.ctrip.com',
-        priority: 'u=1, i',
-        'sec-ch-ua':
+        accept: "*/*",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "content-type": "application/json",
+        cookieorigin: "https://vbooking.ctrip.com",
+        priority: "u=1, i",
+        "sec-ch-ua":
           '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'x-ctx-locale': 'zh-CN',
-        'x-tt-core': '1'
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-ctx-locale": "zh-CN",
+        "x-tt-core": "1",
       },
-      referrerPolicy: 'no-referrer-when-downgrade',
+      referrerPolicy: "no-referrer-when-downgrade",
       body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031059218989378081\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\",\"priceInputType\":1}`,
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include'
-    }
-  )
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    },
+  );
 
-  return await res.json()
-}
+  return await res.json();
+};
 
 export const saveClausePackage = async ({
   productClause,
-  clausePackageItemDtos
+  clausePackageItemDtos,
 }) => {
   try {
     const body = {
@@ -155,81 +189,81 @@ export const saveClausePackage = async ({
       firstClassClauseTypeIds:
         productClause.centralDataDto.additionalInfoDto.firstClassTypeIds,
       clausePackageItemDtos,
-      pICategoryId: productClause.centralDataDto.filterConditionDto.pICategoryId
-    }
+      pICategoryId:
+        productClause.centralDataDto.filterConditionDto.pICategoryId,
+    };
 
     const res = await fetch(
-      'https://online.ctrip.com/restapi/soa2/20046/saveClausePackage',
+      "https://online.ctrip.com/restapi/soa2/20046/saveClausePackage",
       {
         headers: {
-          accept: '*/*',
-          'accept-language': 'zh-CN,zh;q=0.9',
-          'content-type': 'text/plain;charset=UTF-8',
-          cookieorigin: 'https://vbooking.ctrip.com',
-          priority: 'u=1, i',
-          'sec-ch-ua':
+          accept: "*/*",
+          "accept-language": "zh-CN,zh;q=0.9",
+          "content-type": "text/plain;charset=UTF-8",
+          cookieorigin: "https://vbooking.ctrip.com",
+          priority: "u=1, i",
+          "sec-ch-ua":
             '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-          'sec-ch-ua-mobile': '?0',
-          'sec-ch-ua-platform': '"macOS"',
-          'sec-fetch-dest': 'empty',
-          'sec-fetch-mode': 'cors',
-          'sec-fetch-site': 'same-site',
-          'x-tt-core': '1'
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "x-tt-core": "1",
         },
-        referrerPolicy: 'no-referrer-when-downgrade',
+        referrerPolicy: "no-referrer-when-downgrade",
         body: JSON.stringify(body),
-        method: 'POST',
-        mode: 'cors',
-        credentials: 'include'
-      }
-    )
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+      },
+    );
 
-    return await res.json()
+    return await res.json();
   } catch (error) {
     return await saveClausePackage({
       productClause,
-      clausePackageItemDtos
+      clausePackageItemDtos,
     });
   }
-
-}
+};
 
 export const saveProductClauses = async (
   productId: string,
   packageId: string,
-  tabEnum: number
+  tabEnum: number,
 ) => {
   const res = await fetch(
-    'https://online.ctrip.com/restapi/soa2/15638/saveProductClauses.json?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
+    "https://online.ctrip.com/restapi/soa2/15638/saveProductClauses.json?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081",
     {
       headers: {
-        accept: '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9',
-        'content-type': 'application/json',
-        cookieorigin: 'https://vbooking.ctrip.com',
-        priority: 'u=1, i',
-        'sec-ch-ua':
+        accept: "*/*",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "content-type": "application/json",
+        cookieorigin: "https://vbooking.ctrip.com",
+        priority: "u=1, i",
+        "sec-ch-ua":
           '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'x-ctx-locale': 'zh-CN',
-        'x-tt-core': '1'
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-ctx-locale": "zh-CN",
+        "x-tt-core": "1",
       },
       referrer:
-        'https://vbooking.ctrip.com/ivbk/vendor/newResourceClause?productid=48464967&istab=1&from=vbk',
-      referrerPolicy: 'no-referrer-when-downgrade',
+        "https://vbooking.ctrip.com/ivbk/vendor/newResourceClause?productid=48464967&istab=1&from=vbk",
+      referrerPolicy: "no-referrer-when-downgrade",
       body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031059218989378081\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"packageId\":${packageId},\"saveType\":3,\"productId\":\"${productId}\",\"tabEnum\":${tabEnum},\"clauseEditDtos\":[],\"unBookingRuleDtos\":[]}`,
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include'
-    }
-  )
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    },
+  );
 
-  return await res.json()
-}
+  return await res.json();
+};
 
 function formatProductClauses(clause) {
   return (
@@ -237,67 +271,67 @@ function formatProductClauses(clause) {
       // .filter(clause => clause.clauseTypeName !== '餐食')
       .reduce((prev, it) => {
         const d1 = it.clauseItemDtos
-          .filter(item => item.selected === 'T')
-          .map(item => {
+          .filter((item) => item.selected === "T")
+          .map((item) => {
             return {
               clauseItemId: item.clauseItemId,
               secondClassTypeId: it.clauseTypeId,
-              elementDtos: item.clauseComponentDtos.map(dto => {
+              elementDtos: item.clauseComponentDtos.map((dto) => {
                 const res = {
                   componentCode: dto.componentCode,
-                  value: dto.value
-                }
+                  value: dto.value,
+                };
 
                 if (dto.componentElementDtos) {
                   const ele = dto.componentElementDtos.find(
-                    dto2 => dto2.elementCode === dto.value
-                  )
+                    (dto2) => dto2.elementCode === dto.value,
+                  );
                   if (ele) {
-                    res.value = ele.elementValue
-                    res.elementCode = ele.elementCode
+                    res.value = ele.elementValue;
+                    res.elementCode = ele.elementCode;
                   }
                 }
 
-                return res
-              })
-            }
-          })
-        const d2 = []
+                return res;
+              }),
+            };
+          });
+        const d2 = [];
         it.containers
-          .filter(i => i.selected === 'T')
-          .forEach(container => {
+          .filter((i) => i.selected === "T")
+          .forEach((container) => {
             container.clauseItemDtos
-              .filter(item => item.selected === 'T')
-              .forEach(item => {
+              .filter((item) => item.selected === "T")
+              .forEach((item) => {
                 d2.push({
                   clauseItemId: item.clauseItemId,
                   secondClassTypeId: it.clauseTypeId,
-                  elementDtos: item.clauseComponentDtos.map(dto => {
+                  elementDtos: item.clauseComponentDtos.map((dto) => {
                     const res = {
                       componentCode: dto.componentCode,
-                      value: dto.value
-                    }
+                      value: dto.value,
+                    };
 
                     if (dto.componentElementDtos) {
                       const ele = dto.componentElementDtos.find(
-                        dto2 => dto2.elementCode === dto.value
-                      )
+                        (dto2) => dto2.elementCode === dto.value,
+                      );
                       if (ele) {
-                        res.value = ele.elementValue
-                        res.elementCode = ele.elementCode
+                        res.value = ele.elementValue;
+                        res.elementCode = ele.elementCode;
                       }
                     }
 
-                    return res
-                  })
-                })
-              })
-          })
-        prev.push(...d1)
-        prev.push(...d2)
-        return prev
+                    return res;
+                  }),
+                });
+              });
+          });
+        prev.push(...d1);
+        prev.push(...d2);
+        return prev;
       }, [])
-  )
+  );
 }
 
 // formatProductClauses(data)

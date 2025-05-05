@@ -36,7 +36,13 @@ export const updatePackageStatus = async (packageId: string) => {
     "credentials": "include"
   });
 
-  return await res.json()
+  const { ResponseStatus } = await res.json()
+  if (ResponseStatus.Ack === "Failure") {
+    const errStr = ResponseStatus.Errors.map(it => it.Message).join("\n")
+    throw new Error(errStr)
+  } else {
+    return "success"
+  }
 
 }
 

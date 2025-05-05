@@ -254,10 +254,17 @@ export async function createSubProductFn(product: TourDay, updateTourDayStatus) 
 
   // 获取子产品列表
   const pkgObj = await getPackageId(productId);
-  const existSubProductNames = pkgObj.childList.map(it => it.lineDescription);
+  const productsMap = new Map();
+  pkgObj.childList.forEach(it => {
+    productsMap.set(it.lineDescription, it)
+  });
+
   const mappedSubProducts = subProducts.map(sub => {
-    if (existSubProductNames.includes(sub.lineDescription)) {
+    if (productsMap.has(sub.lineDescription)) {
       sub.status = '已经存在';
+      const subProduct = productsMap.get(sub.lineDescription);
+      sub.productId = subProduct.subProductId;
+      sub.product = subProduct;
       sub.step = createSubProductStepFns.length;
     }
     return sub;
@@ -269,25 +276,46 @@ export async function createSubProductFn(product: TourDay, updateTourDayStatus) 
   });
 
   for (let i = 0; i < mappedSubProducts.length; i++) {
+    const pkg = productsMap.get(mappedSubProducts[i].lineDescription);
     const sub = mappedSubProducts[i];
+    console.log("sub", sub)
+    // if (sub.status === '已经存在' && pkg.subProductId !== 61112295) {
     if (sub.status === '已经存在') {
       console.log('已经存在', sub.lineDescription)
       continue
-    };
+    } else {
+      console.log('不存在', sub.lineDescription)
+    }
+    // 母产品 44586330
+    // 创建子产品
     // 创建子产品
     const subProductId = await createSubProduct(productId, sub.lineDescription);
+    // const subProductId = "61112295";
     sub.productId = subProductId;
     for (let i = 0; i < createSubProductStepFns.length; i++) {
       const fn = createSubProductStepFns[i];
-      await fn(subProductId, sub);
+      try {
+        await fn(subProductId, sub);
+      } catch (error) {
+        sub.stepStatus = error.message;
+      }
       sub.step++;
       updateTourDayStatus(productId, {
         subProducts: mappedSubProducts
       });
     }
 
-    // 子产品激活
-    await activeSubProduct(productId, subProductId)
+    try {
+      // 子产品激活
+      await activeSubProduct(productId, subProductId)
+      sub.activeStatus = "success";
+    } catch (error) {
+      console.log("error", error)
+      sub.activeStatus = error.message;
+    }
+    updateTourDayStatus(productId, {
+      subProducts: mappedSubProducts
+    });
   }
 
   return {

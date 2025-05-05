@@ -162,6 +162,131 @@ export const tab1BaseClause = [
       },
     ],
   },
+  {
+    clauseItemId: 38725,
+    secondClassTypeId: 86,
+    elementDtos: [
+      {
+        componentCode: "28974-2018029271",
+        value: "去程从行程描述出发地到西安火车票(G/C高铁/D动车)",
+      },
+    ],
+  },
+  {
+    clauseItemId: 38739,
+    secondClassTypeId: 86,
+    elementDtos: [
+      {
+        componentCode: "28974-2042072739",
+        value: "返程从西安到行程描述到达地火车票(G/C高铁/D动车)",
+      },
+    ],
+  },
+  {
+    clauseItemId: 134,
+    secondClassTypeId: 86,
+    elementDtos: [
+      {
+        componentCode: "landtraffictxt",
+        value:
+          "安排当地专属用车（特殊路段因当地规定及安全考量会派遣小型车提供服务）",
+      },
+    ],
+  },
+  {
+    clauseItemId: 33006,
+    secondClassTypeId: 86,
+    elementDtos: [
+      {
+        componentCode: "23479-1956500364",
+        value: "行程首末日的目的地专车",
+      },
+      {
+        componentCode: "23479-1833544069",
+        value: "接送机（站/指定点）",
+        elementCode: "0ce9ccefbe6ce3c65d295c85cb5079996066616b",
+      },
+      {
+        componentCode: "23479-1835361474",
+        value: "服务",
+      },
+    ],
+  },
+  {
+    clauseItemId: 10095,
+    secondClassTypeId: 2,
+    elementDtos: [
+      {
+        componentCode: "hotal0",
+        value: "行程所列酒店住宿费用",
+      },
+    ],
+  },
+  {
+    clauseItemId: 10090,
+    secondClassTypeId: 2,
+    elementDtos: [
+      {
+        componentCode: "hotal0",
+        value: "行程所列酒店住宿费用",
+      },
+    ],
+  },
+  {
+    clauseItemId: 13,
+    secondClassTypeId: 6,
+    elementDtos: [
+      {
+        componentCode: "landtickettxt",
+        value: "行程中所列景点/场馆首道大门票",
+      },
+      {
+        componentCode: "landticketremarks",
+        value: "西安城墙+秦始皇帝陵博物院(兵马俑)+华清宫+书院门步行街+青龙寺",
+      },
+      {
+        componentCode: "20011-1507558141",
+        value: "。",
+      },
+    ],
+  },
+  {
+    clauseItemId: 10087,
+    secondClassTypeId: 6,
+    elementDtos: [
+      {
+        componentCode: "landticket1",
+        value: "行程中所列景点/场馆首道大门票",
+      },
+      {
+        componentCode: "landticket2",
+        value: "西安城墙+秦始皇帝陵博物院(兵马俑)+华清宫+书院门步行街+青龙寺",
+      },
+      {
+        componentCode: "21071-764236086",
+        value: "。",
+      },
+    ],
+  },
+  {
+    clauseItemId: 3018,
+    secondClassTypeId: 4,
+    elementDtos: [
+      {
+        componentCode: "landservice15",
+        value: "仅安排中文司机负责行程活动中接待服务",
+      },
+      {
+        componentCode: "21062-1674826380",
+        value: "不提供",
+        elementCode: "1744a0f06e9d42fa8ce8af75ccaa4642553b3572",
+      },
+      {
+        componentCode: "21062-1671250683",
+        value: "景区/场馆讲解",
+      },
+    ],
+  },
 ];
 
 export const tab2BaseClause = [
@@ -5324,5 +5449,3 @@ export const sensitiveWords = [
   "仅此一次",
   "最后一波",
 ];
-
-
