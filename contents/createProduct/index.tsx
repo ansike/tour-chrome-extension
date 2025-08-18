@@ -7,6 +7,7 @@ import CreateCarResource from "./components/CreateCarResource";
 import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
 import SplitProduct from "./components/SplitProduct";
+import DumpProduct from "./components/DumpProduct";
 
 const HOST_ID = "tour-helper-shadow-host";
 
@@ -35,6 +36,10 @@ const CreateProduct = () => {
     {
       key: "DUPLICATE_PRODUCT",
       label: <DuplicateProduct />,
+    },
+    {
+      key: "DUMP_PRODUCT",
+      label: <DumpProduct />,
     },
     ...(isAdmin === "1"
       ? [
