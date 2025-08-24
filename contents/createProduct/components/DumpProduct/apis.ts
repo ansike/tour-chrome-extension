@@ -56,3 +56,10 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp }) => {
   );
   return res.json();
 };
+
+export const getRegionList = async (regionType: string) => {
+  const res = await fetch(
+    `https://www.n30trip.com/api/region/list?regionType=${regionType}`,
+  );
+  return res.json();
+};

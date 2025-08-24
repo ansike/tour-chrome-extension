@@ -1,14 +1,7 @@
-import {
-  Button,
-  Checkbox,
-  Drawer,
-  Flex,
-  message,
-  Progress,
-  Radio,
-} from "antd";
-import React, { useState } from "react";
+import { Button, Checkbox, Drawer, Flex, message, Progress, Radio } from "antd";
+import React, { useEffect, useState } from "react";
 
+import { getRegionList } from "./apis";
 import { dataType, regions } from "./constant";
 import { dumpData } from "./utils";
 
@@ -20,18 +13,22 @@ message.config({
 });
 
 const DumpProduct = (props: DumpProductProps) => {
+  const [selectedRegionType, setSelectedRegionType] = useState<string>("china");
+  const [regionList, setRegionList] = useState<string[]>(regions);
   const [selectedRegions, setSelectedRegions] = useState<string[]>(["河南"]);
   const [selectedDataTypes, setSelectedDataTypes] = useState<string[]>([
     "飙升",
     "最高",
   ]);
   const [selectedType, setSelectedType] = useState<string>("part");
-  const [dumpDataList, setDumpDataList] = useState<{
-    idx: number;
-    region: string;
-    dataType: string;
-    status: string;
-  }[]>([]);
+  const [dumpDataList, setDumpDataList] = useState<
+    {
+      idx: number;
+      region: string;
+      dataType: string;
+      status: string;
+    }[]
+  >([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,7 +48,16 @@ const DumpProduct = (props: DumpProductProps) => {
     });
   };
 
-  console.log("dumpDataList", dumpDataList);
+  useEffect(() => {
+    if (selectedRegionType) {
+      getRegionList(selectedRegionType).then((res) => {
+        if (res.code === 200 && res.data.length > 0) {
+          setRegionList(res.data);
+        }
+      });
+    }
+  }, [selectedRegionType]);
+
   return (
     <>
       <span onClick={() => setIsModalOpen(true)}>导出产品数据</span>
@@ -74,6 +80,19 @@ const DumpProduct = (props: DumpProductProps) => {
           <Flex gap={16}>
             <span>选择区域：</span>
             <Radio.Group
+              value={selectedRegionType}
+              options={[
+                { label: "国内", value: "china" },
+                { label: "国外", value: "nation" },
+              ]}
+              onChange={(e) => {
+                setSelectedRegionType(e.target.value);
+              }}
+            />
+          </Flex>
+          <Flex gap={16}>
+            <span>选择范围：</span>
+            <Radio.Group
               value={selectedType}
               options={[
                 { label: "全部", value: "all" },
@@ -82,7 +101,7 @@ const DumpProduct = (props: DumpProductProps) => {
               onChange={(e) => {
                 setSelectedType(e.target.value);
                 if (e.target.value === "all") {
-                  setSelectedRegions(regions);
+                  setSelectedRegions(regionList);
                 } else {
                   setSelectedRegions([]);
                 }
@@ -93,7 +112,7 @@ const DumpProduct = (props: DumpProductProps) => {
             <Checkbox.Group
               value={selectedRegions}
               onChange={(v) => setSelectedRegions(v)}
-              options={regions.map((region) => ({
+              options={regionList.map((region) => ({
                 label: region,
                 value: region,
               }))}
