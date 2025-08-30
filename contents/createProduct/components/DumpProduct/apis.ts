@@ -1,5 +1,5 @@
 // 获取排名数据
-export const getTourMarketQuotationsRanking = async ({ region, isUp }) => {
+export const getTourMarketQuotationsRanking = async ({ region, isUp, productType }) => {
   const date = new Date().toISOString().split("T")[0];
   const body = {
     baseParam: {
@@ -8,7 +8,7 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp }) => {
     queryParam: {
       inMap: {
         dest_region_name: region,
-        prd_pat_name: "不限",
+        prd_pat_name: productType,
       },
       startDate: date,
       endDate: date,
@@ -57,9 +57,9 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp }) => {
   return res.json();
 };
 
-export const getRegionList = async (regionType: string) => {
+export const getProductDumpConfig = async (regionType: string) => {
   const res = await fetch(
-    `https://www.n30trip.com/api/region/list?regionType=${regionType}`,
+    `https://www.n30trip.com/api/product/dump/config?regionType=${regionType}`,
   );
   return res.json();
 };

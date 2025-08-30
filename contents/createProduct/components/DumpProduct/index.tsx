@@ -1,7 +1,7 @@
 import { Button, Checkbox, Drawer, Flex, message, Progress, Radio } from "antd";
 import React, { useEffect, useState } from "react";
 
-import { getRegionList } from "./apis";
+import { getProductDumpConfig } from "./apis";
 import { dataType, regions } from "./constant";
 import { dumpData } from "./utils";
 
@@ -16,6 +16,7 @@ const DumpProduct = (props: DumpProductProps) => {
   const [selectedRegionType, setSelectedRegionType] = useState<string>("china");
   const [regionList, setRegionList] = useState<string[]>(regions);
   const [selectedRegions, setSelectedRegions] = useState<string[]>(["河南"]);
+  const [productTypeList, setProductTypeList] = useState<string[]>([]);
   const [selectedDataTypes, setSelectedDataTypes] = useState<string[]>([
     "飙升",
     "最高",
@@ -26,6 +27,7 @@ const DumpProduct = (props: DumpProductProps) => {
       idx: number;
       region: string;
       dataType: string;
+      productType: string;
       status: string;
     }[]
   >([]);
@@ -42,17 +44,17 @@ const DumpProduct = (props: DumpProductProps) => {
 
   const handleDump = async () => {
     console.log("selectedRegions", selectedRegions);
-    console.log("selectedDataTypes", selectedDataTypes);
-    await dumpData(selectedRegions, selectedDataTypes, (data) => {
+    await dumpData(selectedRegions, selectedDataTypes, productTypeList, (data) => {
       setDumpDataList([...data]);
     });
   };
 
   useEffect(() => {
     if (selectedRegionType) {
-      getRegionList(selectedRegionType).then((res) => {
-        if (res.code === 200 && res.data.length > 0) {
-          setRegionList(res.data);
+      getProductDumpConfig(selectedRegionType).then((res) => {
+        if (res.code === 200) {
+          setProductTypeList(res.data.productType);
+          setRegionList(res.data.region);
         }
       });
     }
@@ -119,6 +121,7 @@ const DumpProduct = (props: DumpProductProps) => {
             />
           </Flex>
           <Flex gap={16}>
+            <span>销量排行：</span>
             <Checkbox.Group
               value={selectedDataTypes}
               onChange={(v) => setSelectedDataTypes(v)}
@@ -137,7 +140,7 @@ const DumpProduct = (props: DumpProductProps) => {
           <Flex gap={16} vertical>
             {dumpDataList.map((item) => (
               <div key={item.idx}>
-                {item.region}-{item.dataType}: {item.status}
+                {item.region}-{item.dataType}-{item.productType}: {item.status}
               </div>
             ))}
           </Flex>

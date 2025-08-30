@@ -3,19 +3,23 @@ import { getTourMarketQuotationsRanking } from "./apis";
 export const dumpData = async (
   selectedRegions: string[],
   selectedDataTypes: string[],
+  selectedProductType: string[],
   callback: (data: any) => void,
 ) => {
   const data = [];
   let idx = 0;
   for (const region of selectedRegions) {
     for (const dataType of selectedDataTypes) {
-      data.push({
-        idx,
-        region,
-        dataType,
-        status: "pending",
-      });
-      idx++;
+      for (const productType of selectedProductType) {
+        data.push({
+          idx,
+          region,
+          dataType,
+          productType,
+          status: "pending",
+        });
+        idx++;
+      }
     }
   }
 
@@ -25,9 +29,10 @@ export const dumpData = async (
     const res = await getTourMarketQuotationsRanking({
       region: item.region,
       isUp: item.dataType === "飙升",
+      productType: item.productType,
     });
     if (res?.tableDataItemList) {
-      exportCSV(item.region, item.dataType, formatData(res.tableDataItemList));
+      exportCSV(item.region, item.dataType, item.productType, formatData(res.tableDataItemList));
       item.status = "success";
     } else {
       item.status = "error";
@@ -60,6 +65,7 @@ export const formatData = (data: tableDataItem[]) => {
 export const exportCSV = (
   region: string,
   dataType: string,
+  productType: string,
   data: tableDataItem["dimMap"][],
 ) => {
   const csv = data.map((item) => Object.values(item).join(",")).join("\n");
@@ -68,6 +74,6 @@ export const exportCSV = (
   const a = document.createElement("a");
   a.href = url;
   const date = new Date().toISOString().split("T")[0];
-  a.download = `${region}_${dataType}_${date}.csv`;
+  a.download = `${region}_${dataType}_${productType}_${date}.csv`;
   a.click();
 };
