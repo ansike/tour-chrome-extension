@@ -59,7 +59,7 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp, productType
 
 export const getProductDumpConfig = async (regionType: string) => {
   const res = await fetch(
-    `https://www.n30trip.com/api/product/dump/config?regionType=${regionType}`,
+    `https://www.askfuture.online/api/product/dump/config?regionType=${regionType}`,
   );
   return res.json();
 };
