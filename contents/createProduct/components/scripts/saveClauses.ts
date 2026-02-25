@@ -11,6 +11,34 @@ export const saveClauses = async (productId: string) => {
   }
 }
 
+/**
+ * 从导入的条款数据填充到新产品
+ * @param productId 新产品 ID
+ * @param clauses 导入的条款数据，格式为 [{ tabEnum, clause }, ...]，与 extractClauses 导出格式一致
+ */
+export const saveClausesFromData = async (
+  productId: string,
+  clauses: Array<{ tabEnum: number; clause: any }>
+) => {
+  if (!clauses || clauses.length === 0) {
+    return saveClauses(productId);
+  }
+
+  const clauseMap = new Map(
+    clauses.map((c) => [c.tabEnum, c.clause])
+  );
+
+  for (let tabEnum = 1; tabEnum <= 4; tabEnum++) {
+    const importedClause = clauseMap.get(tabEnum);
+    if (importedClause) {
+      await setClausePackageFromImported(productId, tabEnum, importedClause);
+    } else {
+      await setClausePackage(productId, tabEnum);
+    }
+  }
+  return 'success';
+}
+
 
 export const setClausePackage = async (productId, tabEnum) => {
   const productClause = await listProductClauses(productId, tabEnum)
@@ -49,6 +77,47 @@ export const setClausePackage = async (productId, tabEnum) => {
   )
   // // 随机休眠 1s - 4s
   // await sleep(Math.floor(Math.random() * (4000 - 1000 + 1)) + 1000)
+}
+
+/** 使用导入的条款数据保存到新产品（需拉取新产品的 productClause 作为保存目标） */
+async function setClausePackageFromImported(
+  productId: string,
+  tabEnum: number,
+  importedClause: any
+) {
+  const productClause = await listProductClauses(productId, tabEnum)
+  const clausePackage = await getClausePackage(importedClause)
+  const clausePackageItemDtos = formatProductClauses(
+    clausePackage.clauseTypeDtos ?? []
+  )
+  if (tabEnum === 3) {
+    const hasSingle = clausePackageItemDtos.find(it => it.clauseItemId === 3010);
+    if (!hasSingle) {
+      clausePackageItemDtos.push(
+        {
+          clauseItemId: 3010,
+          secondClassTypeId: 25,
+          elementDtos: [
+            {
+              componentCode: "singlepricetype32",
+              value: "综合考量目前常规团队出行人群结构并考虑实际入住体验等因素，本产品暂时无法提供拼房。报价是按照2成人入住1间房计算的价格，请在页面中选择所需房间数或单人房差选项"
+            }
+          ]
+        }
+      )
+    }
+  }
+
+  await saveClausePackage({
+    productClause,
+    clausePackageItemDtos
+  })
+
+  await saveProductClauses(
+    productId,
+    productClause.centralDataDto.clausePackageId,
+    tabEnum
+  )
 }
 
 export const getClausePackage = async (productClause: any) => {
@@ -93,10 +162,39 @@ export const getClausePackage = async (productClause: any) => {
   return await res.json()
 }
 
+const CLAUSE_HEAD = {
+  cid: '09031059218989378081',
+  ctok: '',
+  cver: '1.0',
+  lang: '01',
+  sid: '8888',
+  syscode: '09',
+  auth: '',
+  extension: []
+}
+
+function checkClauseApiResponse(resData: any, context: string): void {
+  const status = resData?.ResponseStatus
+  const ack = status?.Ack
+  const errors = status?.Errors
+  if (ack === 'Failure' || ack === 'Warning' || (Array.isArray(errors) && errors.length > 0)) {
+    const msg = Array.isArray(errors) && errors.length > 0
+      ? errors.map((e: any) => e.Message ?? e.ErrorCode).join(', ')
+      : `API 返回异常: ${ack ?? 'Unknown'}`
+    throw new Error(`${context}: ${msg}`)
+  }
+}
+
 export const listProductClauses = async (
   productId: string,
   tabEnum: number
 ) => {
+  const body = {
+    contentType: 'json',
+    head: CLAUSE_HEAD,
+    productId: String(productId),
+    tabEnum: Number(tabEnum)
+  }
   const res = await fetch(
     'https://online.ctrip.com/restapi/soa2/15638/listProductClauses?_fxpcqlniredt=09031059218989378081&_fxpcqlniredt=09031059218989378081',
     {
@@ -119,14 +217,16 @@ export const listProductClauses = async (
       referrer:
         'https://vbooking.ctrip.com/ivbk/vendor/newResourceClause?productid=48464967&istab=1&from=vbk',
       referrerPolicy: 'no-referrer-when-downgrade',
-      body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031059218989378081\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"productId\":\"${productId}\",\"tabEnum\":${tabEnum}}`,
+      body: JSON.stringify(body),
       method: 'POST',
       mode: 'cors',
       credentials: 'include'
     }
   )
 
-  return await res.json()
+  const resData = await res.json()
+  checkClauseApiResponse(resData, 'listProductClauses')
+  return resData
 }
 
 export const getPackageList = async (productId: string) => {

@@ -1,12 +1,16 @@
 import { getVendorId } from "../../scripts/getVendorId";
 
-export async function searchProviderContactCardList(searchKeyWord) {
+/** contactType: 0=全部, 1=投诉, 2=预订, 3=紧急, 4=管家 */
+export async function searchProviderContactCardList(
+  searchKeyWord: string = "",
+  contactType: number = 0
+) {
   const vendorId = await getVendorId();
   const body = {
     providerId: vendorId,
-    contactType: 0,
+    contactType,
     selectedContactCardIdList: [],
-    searchKeyWord: searchKeyWord,
+    searchKeyWord,
     version: "v0.4",
     pageIndex: 1,
     pageSize: 10,

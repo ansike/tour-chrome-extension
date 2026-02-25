@@ -1,10 +1,33 @@
 import { getVendorId } from "./components/scripts/getVendorId";
 
+/** 调试模式：URL 含 ?debug=1 或 ?importDebug=1 时，导入弹窗默认打开并切到导入 tab */
+export const isImportDebugMode = () =>
+  typeof window !== "undefined" &&
+  /[?&](debug|importDebug)=1/.test(window.location.search);
+
+/** 调试时默认加载的 CSV：扩展内 assets 路径，或留空用内置小样本 */
+export const DEBUG_IMPORT_FILE_URL =
+  typeof chrome !== "undefined" && chrome.runtime?.getURL
+    ? chrome.runtime.getURL("assets/products_export_20260224_0941.csv")
+    : "";
+
 // 价格间隔
 export const PRICE_STEP = 50;
 
 // 携程价格的比率
 export const PRICE_RATE = 1.087083333333;
+
+/** 联系人配置：可指定各类型的 contactCardId，不配置则默认取 contactCardList[0] */
+export type ContactCardIds = {
+  /** 投诉联系人 */
+  complaint?: number;
+  /** 预订联系人 */
+  booking?: number;
+  /** 紧急联系人 */
+  emergency?: number;
+  /** 管家联系人 */
+  seneschal?: number;
+};
 
 export const AccountConfMap = {
   // 西藏账号
@@ -12,6 +35,8 @@ export const AccountConfMap = {
     vendorId: 1431565,
     // 电话ID
     phone400: "173874",
+    // 可选：指定各类型联系人 contactCardId，不配置则默认取 contactCardList[0]
+    // contactCardIds: { booking: 123, complaint: 123, emergency: 123, seneschal: 123 },
     saleControlInfoDto: {
       contractId: 648526,
       saleMode: "P",
@@ -31,6 +56,7 @@ export const AccountConfMap = {
   // 安徽账号
   1393638: {
     vendorId: 1393638,
+    // 电话ID
     phone400: "287358",
     saleControlInfoDto: {
       contractId: 1962892,
@@ -43,6 +69,47 @@ export const AccountConfMap = {
         brandId: 148156,
         brandName: "皖美畅行",
         brandNameEn: "",
+        brandLocal: "zh-CN",
+      },
+    },
+  },
+  // vbk_2405770
+  2806511: {
+    vendorId: 2806511,
+    // 电话ID TODO 换成ID
+    phone400: "0609068",
+    saleControlInfoDto: {
+      contractId: 4925635,
+      saleMode: "P",
+      productCategoryId: 26,
+      productPatternId: 4,
+      brandId: 184766,
+      brandName: "广信国旅",
+      productBrandDto: {
+        brandId: 184766,
+        brandName: "广信国旅",
+        brandNameEn: "",
+        brandLocal: "zh-CN",
+      },
+    },
+  },
+  // 127243
+  // 狄梅英-云婷婷-邢世伟
+  1279416: {
+    vendorId: 1279416,
+    // 电话ID
+    phone400: "129470",
+    saleControlInfoDto: {
+      contractId: 5097849,
+      saleMode: "P",
+      productCategoryId: 9,
+      productPatternId: 4,
+      brandId: 86490,
+      brandName: "宾茂旅业",
+      productBrandDto: {
+        brandId: 86490,
+        brandName: "宾茂旅业",
+        brandNameEn: "binmaolvye",
         brandLocal: "zh-CN",
       },
     },

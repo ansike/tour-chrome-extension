@@ -1,10 +1,30 @@
 import { getAccountConf } from "~contents/createProduct/constant";
 
+import type { ProductData } from "../ProductTransfer/types";
+
+const defaultDistributionChannels = [
+  "ctripshop",
+  "bestone",
+  "youtripshop",
+  "bestoneb2b",
+  "tripsystem",
+  "ctrip",
+];
+
 export const saveSaleControlInfo = async (
   productId = "",
+  product: ProductData = {} as ProductData,
 ): Promise<{ productId: number }> => {
   const { vendorId, saleControlInfoDto } = await getAccountConf();
-  console.log({ saleControlInfoDto });
+  const distributionChannels = product?.saleControl?.distributionChannels || [];
+
+  const channelList = distributionChannels || defaultDistributionChannels;
+  const channelObj = channelList.map((channel) => ({
+    channelName: channel,
+    isChecked: "T",
+  }));
+
+  console.log({ channelList, channelObj });
   const data = {
     contentType: "json",
     head: {
@@ -21,14 +41,7 @@ export const saveSaleControlInfo = async (
     saleControlInfoDto: {
       ...saleControlInfoDto,
       priceInputType: 1,
-      distributionChannels: [
-        "ctripshop",
-        "bestone",
-        "youtripshop",
-        "bestoneb2b",
-        "tripsystem",
-        "ctrip",
-      ],
+      distributionChannels: channelList,
       maintainType: "S",
       inputLocale: "zh-CN",
       regionDistributionChannelDtos: [
@@ -36,14 +49,7 @@ export const saveSaleControlInfo = async (
           region: "CN",
           isChecked: "T",
           locales: ["zh-CN"],
-          distributionChannels: [
-            { channelName: "ctripshop", isChecked: "T" },
-            { channelName: "bestone", isChecked: "T" },
-            { channelName: "youtripshop", isChecked: "T" },
-            { channelName: "bestoneb2b", isChecked: "T" },
-            { channelName: "ctrip", isChecked: "T" },
-            { channelName: "tripsystem", isChecked: "T" },
-          ],
+          distributionChannels: channelObj,
         },
       ],
       desCityDto: {},
@@ -57,6 +63,7 @@ export const saveSaleControlInfo = async (
     data["id"] = vendorId;
     data["idType"] = "providerId";
   }
+  console.log("data", data);
   const res = await fetch(
     "https://online.ctrip.com/restapi/soa2/15638/saveSaleControlInfo?_fxpcqlniredt=09031111115146167449&_fxpcqlniredt=09031111115146167449",
     {

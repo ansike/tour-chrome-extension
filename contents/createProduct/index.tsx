@@ -8,6 +8,7 @@ import CreateSubProduct from "./components/CreateSubProduct";
 import DuplicateProduct from "./components/DuplicateProduct";
 import SplitProduct from "./components/SplitProduct";
 import DumpProduct from "./components/DumpProduct";
+import ProductTransfer from "./components/ProductTransfer";
 
 const HOST_ID = "tour-helper-shadow-host";
 
@@ -40,6 +41,10 @@ const CreateProduct = () => {
     {
       key: "DUMP_PRODUCT",
       label: <DumpProduct />,
+    },
+    {
+      key: "PRODUCT_TRANSFER",
+      label: <ProductTransfer />,
     },
     ...(isAdmin === "1"
       ? [

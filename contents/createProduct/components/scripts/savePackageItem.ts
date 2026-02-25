@@ -30,8 +30,6 @@ export const savePackageItem = async (productId: string | number, packageInfo: a
         'sec-fetch-site': 'same-site',
         'x-ctx-locale': 'zh-CN'
       },
-      referrer:
-        'https://vbooking.ctrip.com/ivbk/vendor/packageManage?productid=48399524&istab=1&from=vbk',
       referrerPolicy: 'no-referrer-when-downgrade',
       body: JSON.stringify(body),
       method: 'POST',

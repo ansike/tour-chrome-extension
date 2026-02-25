@@ -77,8 +77,14 @@ export const getTourDailyDetail = async (tourInfoId: string): Promise<{ tourInfo
 
 export const getTourDaily = async (productId: string | number, key = 'tourInfoId') => {
   const { tourInfos } = await getProductTourInfoList(productId);
-  const tourInfo = tourInfos[0];
+  const tourInfo = tourInfos?.[0];
+  if (!tourInfo) {
+    throw new Error(`产品 ${productId} 暂无行程信息，请先在产品编辑页配置行程后再导入`);
+  }
   const id = tourInfo[key];
+  if (!id) {
+    throw new Error(`产品 ${productId} 的行程信息缺少 ${key}，无法获取行程详情`);
+  }
   const tourDaily = await getTourDailyDetail(id);
-  return { tourInfo, tourDaily }
+  return { tourInfo, tourDaily };
 }
