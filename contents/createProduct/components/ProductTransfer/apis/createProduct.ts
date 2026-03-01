@@ -195,10 +195,9 @@ export async function createProductFromData(
           optionalResourceId,
           singleResourceId,
           childOccupationBedResourceId,
+          productId: _productId,
           ...rest
         } = importedPkg;
-        console.log("importedPkg", importedPkg);
-        console.log("rest", rest);
         await savePackageItem(newProductId, rest);
       }
     } catch (e) {
@@ -209,7 +208,12 @@ export async function createProductFromData(
     onProgress?.("保存价格库存班期...");
     try {
       if (data.priceInventory?.dates?.length > 0) {
-        const curPackages = await getPackageList(newProductId);
+        // 套餐可能刚通过 savePackageItem 创建，后端需要短暂时间同步，重试获取
+        let curPackages = await getPackageList(newProductId);
+        for (let retry = 0; !curPackages.itemList?.[0] && retry < 3; retry++) {
+          await new Promise((r) => setTimeout(r, 800 + retry * 400));
+          curPackages = await getPackageList(newProductId);
+        }
         if (curPackages.itemList?.[0]) {
           const { optionalResourceId, singleResourceId } =
             curPackages.itemList[0];
@@ -243,6 +247,10 @@ export async function createProductFromData(
               }
             }
           }
+        } else {
+          console.warn(
+            `savePriceInventory: 产品 ${newProductId} 无法获取套餐，跳过价格库存班期保存`
+          );
         }
       }
     } catch (e) {
