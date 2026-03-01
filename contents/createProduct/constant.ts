@@ -1,4 +1,4 @@
-import { getVendorId } from "./components/scripts/getVendorId";
+import { getAccountConfFromCtrip } from "./components/scripts/getAccountConfFromCtrip";
 
 /** 调试模式：URL 含 ?debug=1 或 ?importDebug=1 时，导入弹窗默认打开并切到导入 tab */
 export const isImportDebugMode = () =>
@@ -29,108 +29,21 @@ export type ContactCardIds = {
   seneschal?: number;
 };
 
-export const AccountConfMap = {
-  // 西藏账号
-  1431565: {
-    vendorId: 1431565,
-    // 电话ID
-    phone400: "173874",
-    // 可选：指定各类型联系人 contactCardId，不配置则默认取 contactCardList[0]
-    // contactCardIds: { booking: 123, complaint: 123, emergency: 123, seneschal: 123 },
-    saleControlInfoDto: {
-      contractId: 648526,
-      saleMode: "P",
-      // 产品类型根据实际情况走
-      productCategoryId: 9,
-      productPatternId: 4,
-      brandId: 91924,
-      brandName: "N30旅行",
-      productBrandDto: {
-        brandId: 91924,
-        brandName: "N30旅行",
-        brandNameEn: "N30-Travel",
-        brandLocal: "zh-CN",
-      },
-    },
-  },
-  // 安徽账号
-  1393638: {
-    vendorId: 1393638,
-    // 电话ID
-    phone400: "287358",
-    saleControlInfoDto: {
-      contractId: 1962892,
-      saleMode: "P",
-      productCategoryId: 9,
-      productPatternId: 2,
-      brandId: 148156,
-      brandName: "皖美畅行",
-      productBrandDto: {
-        brandId: 148156,
-        brandName: "皖美畅行",
-        brandNameEn: "",
-        brandLocal: "zh-CN",
-      },
-    },
-  },
-  // vbk_2405770
-  2806511: {
-    vendorId: 2806511,
-    // 电话ID TODO 换成ID
-    phone400: "0609068",
-    saleControlInfoDto: {
-      contractId: 4925635,
-      saleMode: "P",
-      productCategoryId: 26,
-      productPatternId: 4,
-      brandId: 184766,
-      brandName: "广信国旅",
-      productBrandDto: {
-        brandId: 184766,
-        brandName: "广信国旅",
-        brandNameEn: "",
-        brandLocal: "zh-CN",
-      },
-    },
-  },
-  // 127243
-  // 狄梅英-云婷婷-邢世伟
-  1279416: {
-    vendorId: 1279416,
-    // 电话ID
-    phone400: "129470",
-    saleControlInfoDto: {
-      contractId: 5097849,
-      saleMode: "P",
-      productCategoryId: 9,
-      productPatternId: 4,
-      brandId: 86490,
-      brandName: "宾茂旅业",
-      productBrandDto: {
-        brandId: 86490,
-        brandName: "宾茂旅业",
-        brandNameEn: "binmaolvye",
-        brandLocal: "zh-CN",
-      },
-    },
-  },
-};
-
-export const getAccountConf = async (vendorId?: string) => {
-  if (!vendorId) {
-    vendorId = await getVendorId();
-  }
-  if (AccountConfMap[vendorId]) {
-    return AccountConfMap[vendorId];
-  } else {
-    throw new Error(`未知账户: ${vendorId}`);
-  }
-};
+/** 向后兼容：getAccountConf 为 getAccountConfFromCtrip 的别名 */
+export const getAccountConf = getAccountConfFromCtrip;
 
 export const TRANSTORT_TYPE = {
   FLIGHT: "1",
   TRAIN: "2",
   CAR: "3",
+};
+
+/** 产品形态 productPatternId 与名称后缀的映射（用于 nameJoinRuleDto.pattern） */
+export const PRODUCT_PATTERN_MAP: Record<number, string> = {
+  1: "跟团游",
+  2: "自由行",
+  3: "半自助游",
+  4: "私家团",
 };
 
 export const vendorId = 1431565;

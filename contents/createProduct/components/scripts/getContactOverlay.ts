@@ -1,4 +1,4 @@
-import { getAccountConf } from '../../constant';
+import { getAccountConfFromCtrip } from './getAccountConfFromCtrip';
 import { searchProviderContactCardList } from '../CreateCarResource/utils/searchProviderContactCardList';
 
 /** contactCardList 中单个联系人的结构 */
@@ -85,7 +85,7 @@ function contactCardToOverlay(card: ContactCard, type: 'booking' | 'complaint' |
 export async function getContactOverlay(): Promise<ContactOverlay | null> {
   try {
     const [accountConf, apiRes] = await Promise.all([
-      getAccountConf(),
+      getAccountConfFromCtrip(),
       searchProviderContactCardList('', 0),
     ]);
     const contactCardList: ContactCard[] = apiRes?.contactCardList ?? [];

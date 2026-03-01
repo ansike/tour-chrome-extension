@@ -1,4 +1,4 @@
-import { getAccountConf } from "~contents/createProduct/constant";
+import { getAccountConfFromCtrip } from "~contents/createProduct/components/scripts/getAccountConfFromCtrip";
 
 import { searchProviderContactCardList } from "../../CreateCarResource/utils/searchProviderContactCardList";
 import { getCurrentUserInfo } from "../../scripts/getCurrentUserInfo";
@@ -11,7 +11,7 @@ export const saveProduct = async (
   subTitle: string,
 ) => {
   const [{ saleControlInfoDto, phone400, vendorId }, userInfo] =
-    await Promise.all([getAccountConf(), getCurrentUserInfo()]);
+    await Promise.all([getAccountConfFromCtrip(), getCurrentUserInfo()]);
   const { contactCardList } = await searchProviderContactCardList(
     userInfo.user.name,
   );

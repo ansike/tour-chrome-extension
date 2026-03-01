@@ -1,4 +1,4 @@
-import { getAccountConf } from "~contents/createProduct/constant";
+import { getAccountConfFromCtrip } from "./getAccountConfFromCtrip";
 
 import type { ProductData } from "../ProductTransfer/types";
 
@@ -15,8 +15,15 @@ export const saveSaleControlInfo = async (
   productId = "",
   product: ProductData = {} as ProductData,
 ): Promise<{ productId: number }> => {
-  const { vendorId, saleControlInfoDto } = await getAccountConf();
-  const distributionChannels = product?.saleControl?.distributionChannels || [];
+  const { vendorId, saleControlInfoDto } = await getAccountConfFromCtrip();
+  const saleControl = product?.saleControl ?? {};
+  const distributionChannels = saleControl.distributionChannels || [];
+
+  // 导入时继承源产品的 productPatternId、productCategoryId（兼容 productPatternID/productCategoryID 写法）
+  const productPatternId =
+    saleControl.productPatternID ?? saleControl.productPatternId;
+  const productCategoryId =
+    saleControl.productCategoryID ?? saleControl.productCategoryId;
 
   const channelList = distributionChannels || defaultDistributionChannels;
   const channelObj = channelList.map((channel) => ({
@@ -40,6 +47,8 @@ export const saveSaleControlInfo = async (
     idType: "productId",
     saleControlInfoDto: {
       ...saleControlInfoDto,
+      ...(productPatternId != null && { productPatternId }),
+      ...(productCategoryId != null && { productCategoryId }),
       priceInputType: 1,
       distributionChannels: channelList,
       maintainType: "S",

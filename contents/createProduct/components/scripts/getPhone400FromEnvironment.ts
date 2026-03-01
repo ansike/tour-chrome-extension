@@ -1,4 +1,3 @@
-import { getAccountConf } from "../../constant";
 import { parseHtmlToObj } from "../util";
 
 const GET_EXT_NUMBER_LIST_URL =
@@ -160,7 +159,7 @@ async function fetchBaseInfoFromMerge(productId: string): Promise<any> {
   return pb?.baseInfo ?? pb;
 }
 
-/** 从 getResourceInfoList 响应中查找与导入产品形态相同的母产品 ID */
+/** 从 getResourceInfoList 响应中查找母产品 ID（优先非子产品） */
 function findMotherProductId(data: any): number | undefined {
   const list = data?.resourceInfoList ?? [];
   const arr = Array.isArray(list) ? list : [];
@@ -173,6 +172,20 @@ function findMotherProductId(data: any): number | undefined {
     if (pid != null) return Number(pid);
   }
   return arr[0]?.productId ?? arr[0]?.productID ?? arr[0]?.resourceId;
+}
+
+/** 获取当前账号默认的 400 电话（从第一个母产品的 baseInfo 中取） */
+export async function getDefaultPhone400(): Promise<string | undefined> {
+  try {
+    const data = await fetchResourceInfoList();
+    const refProductId = findMotherProductId(data);
+    if (refProductId == null) return undefined;
+    const baseInfoData = await fetchBaseInfoFromMerge(String(refProductId));
+    const phone400 = baseInfoData?.phone400;
+    return phone400 != null ? String(phone400) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export interface Phone400EnvResult {

@@ -8,6 +8,7 @@
 .history
 # testing
 /coverage
+/tmp
 
 # misc
 .DS_Store

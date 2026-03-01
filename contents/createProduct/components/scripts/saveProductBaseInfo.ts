@@ -1,10 +1,10 @@
 // 无须过多的参数，可以固定
 
 import { parseHtmlToObj } from "../util"
-import { getAccountConf } from "../../constant"
+import { PRODUCT_PATTERN_MAP } from "../../constant"
 import { getCurrentAccountLocalInfo } from "./getCurrentAccountLocalInfo"
 import { getContactOverlay } from "./getContactOverlay"
-import { getPhone400FromEnvironment } from "./getPhone400FromEnvironment"
+import { getAccountConfFromCtrip } from "./getAccountConfFromCtrip"
 
 export const saveProduct = async (productId: string) => {
   const productInfo = await getProductBaseInfo(productId)
@@ -91,11 +91,25 @@ function normalizeProductInfo(productInfo: any) {
   }
 }
 
+/** 从 productInfo 中解析 productPatternId，兼容 productPatternID/productPatternId */
+function getProductPatternId(productInfo: any): number | undefined {
+  const sc = productInfo?.saleControl ?? productInfo?.saleControlInfo ?? {}
+  const v = sc.productPatternID ?? sc.productPatternId
+  return v != null ? Number(v) : undefined
+}
+
 export const saveProductBaseInfo = async (productInfo: any) => {
   const normalized = normalizeProductInfo(productInfo)
   // 导入时使用当前登录账号的地接社名称（brandId/brandName/productBrandDto）
-  const { saleControlInfoDto, phone400: accountPhone400 } = await getAccountConf()
+  const { saleControlInfoDto, phone400: accountPhone400 } = await getAccountConfFromCtrip()
   const productId = productInfo?.productId ?? productInfo?.baseInfo?.productId
+
+  // 根据 productPatternId 设置产品名称后缀，导入时继承源产品团态
+  const productPatternId = getProductPatternId(productInfo)
+  const patternName =
+    productPatternId != null && PRODUCT_PATTERN_MAP[productPatternId]
+      ? PRODUCT_PATTERN_MAP[productPatternId]
+      : "私家团"
 
   // 地接社 localInfo 需使用当前账号数据，单独查询并覆盖
   let localInfoOverlay: { localInfoID?: number; localInfoIds?: number[] } = {}
@@ -104,16 +118,12 @@ export const saveProductBaseInfo = async (productInfo: any) => {
   }
 
   const pid = productId != null ? (typeof productId === 'number' ? productId : parseInt(String(productId), 10)) : undefined
-  // 从当前环境获取 phone400、extNumberId：优先 getResourceInfoList+baseInfoMerge+getExtNumberList，否则用 AccountConfMap
-  const envResult = await getPhone400FromEnvironment(productInfo)
-  const phone400Overlay = envResult.phone400 ?? accountPhone400 ?? ''
 
   const rawBaseInfo = {
     ...normalized.baseInfo,
     ...(pid != null && !isNaN(pid) && { productId: pid }),
     brandId: saleControlInfoDto.brandId,
-    phone400: phone400Overlay,
-    ...(envResult.extNumberId != null && { extNumberId: envResult.extNumberId }),
+    phone400: accountPhone400 ?? '',
   }
   const baseInfo = pickBaseInfo(rawBaseInfo as Record<string, unknown>)
 
@@ -183,7 +193,7 @@ export const saveProductBaseInfo = async (productInfo: any) => {
         days: '%1$s日',
         night: '%1$s晚',
         nights: '%1$s晚',
-        pattern: '私家团',
+        pattern: patternName,
         destinationJoiner: '+',
         diamonds: '(%1$s钻)',
         mainName: '%1$s%2$s%3$s%4$s',
