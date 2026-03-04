@@ -7,6 +7,20 @@ import { getBatchOperateSchedule, getCurrentYearMonth, getNextMonth } from '../.
 import { getProductImageText } from '../../scripts/savedescriptioninfo';
 import type { ProductData } from '../types';
 
+/** 校验 API 返回的 ResponseStatus，若为 Failure 则抛出错误（导出时停止并跳过） */
+function checkResponseStatus(data: any, context: string): void {
+  const status = data?.ResponseStatus;
+  const ack = status?.Ack;
+  const errors = status?.Errors;
+  if (ack === 'Failure' || (Array.isArray(errors) && errors.length > 0)) {
+    const msg =
+      (Array.isArray(errors) && errors.length > 0
+        ? errors.map((e: any) => e.Message ?? e.ErrorCode).join(', ')
+        : null) ?? `${context} 失败`;
+    throw new Error(msg);
+  }
+}
+
 /** 从 getProductDetail 完整响应中提取 saleControl */
 export async function extractSaleControl(productId: string): Promise<any> {
   const res = await getProductDetail(productId);
@@ -63,18 +77,15 @@ export async function extractTripDesc(productId: string): Promise<any> {
 }
 
 export async function extractPackages(productId: string): Promise<any> {
-  try {
-    const packages = await getPackageList(productId);
-    return packages;
-  } catch (e) {
-    console.error('extractPackages error:', e);
-    return {};
-  }
+  const packages = await getPackageList(productId);
+  checkResponseStatus(packages, '获取套餐列表');
+  return packages;
 }
 
 export async function extractPriceInventory(productId: string): Promise<any> {
   try {
     const packages = await getPackageList(productId);
+    checkResponseStatus(packages, '获取套餐列表');
     if (!packages.itemList?.[0]) {
       return { dates: [] };
     }
@@ -108,6 +119,13 @@ export async function extractPriceInventory(productId: string): Promise<any> {
 
     return { dates: dateArr, resourceIds: { optionalResourceId, singleResourceId } };
   } catch (e) {
+    // 权限/API 失败时向上抛出，导出时停止并跳过
+    if (
+      e instanceof Error &&
+      (e.message.includes('获取套餐列表') || e.message.includes('权限'))
+    ) {
+      throw e;
+    }
     console.error('extractPriceInventory error:', e);
     return { dates: [] };
   }
@@ -157,6 +175,7 @@ export async function extractFullProduct(
 ): Promise<ProductData> {
   onProgress?.('获取产品详情...');
   const detailRes = await getProductDetail(productId);
+  checkResponseStatus(detailRes, '获取产品详情');
 
   onProgress?.('提取销售控制...');
   const saleControl = detailRes.saleControlInfo || detailRes.productBaseInfo?.saleControlInfo || {};

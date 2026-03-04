@@ -17,10 +17,11 @@ const ExportTab: React.FC<ExportTabProps> = () => {
   const accountIdRef = useRef<string>('');
 
   const parseProductIds = (input: string): string[] => {
-    return input
+    const ids = input
       .split(/[,\n\s]+/)
       .map((id) => id.trim())
       .filter((id) => id && /^\d+$/.test(id));
+    return [...new Set(ids)];
   };
 
   const handleStartExport = async () => {
