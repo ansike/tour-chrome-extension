@@ -55,7 +55,11 @@ const DumpProduct = (props: DumpProductProps) => {
         if (res.code === 200) {
           setProductTypeList(res.data.productType);
           setRegionList(res.data.region);
+        } else if (res.code === 401) {
+          message.error("登录已过期，请重新登录");
         }
+      }).catch(() => {
+        message.error("获取配置失败，请检查登录状态");
       });
     }
   }, [selectedRegionType]);

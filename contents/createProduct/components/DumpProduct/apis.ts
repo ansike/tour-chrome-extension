@@ -57,9 +57,4 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp, productType
   return res.json();
 };
 
-export const getProductDumpConfig = async (regionType: string) => {
-  const res = await fetch(
-    `https://www.askfuture.online/api/product/dump/config?regionType=${regionType}`,
-  );
-  return res.json();
-};
+export { getProductDumpConfig } from "../../../../lib/api";
