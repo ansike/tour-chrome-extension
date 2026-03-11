@@ -1,4 +1,4 @@
-import { getAccountConfFromCtrip } from "~contents/createProduct/components/scripts/getAccountConfFromCtrip";
+import { getAccountConfFromCtrip } from "~src/components/scripts/getAccountConfFromCtrip";
 
 import { searchProviderContactCardList } from "../../CreateCarResource/utils/searchProviderContactCardList";
 import { getCurrentUserInfo } from "../../scripts/getCurrentUserInfo";

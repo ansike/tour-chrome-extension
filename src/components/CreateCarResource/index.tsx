@@ -11,7 +11,7 @@ import {
 import { useForm } from "antd/es/form/Form";
 import React, { useEffect, useState } from "react";
 
-import { carType, PRICE_STEP } from "~contents/createProduct/constant";
+import { carType, PRICE_STEP } from "~src/constant";
 
 import { getAllCarResource } from "./utils/getAllCarResource";
 import { searchProviderContactCardList } from "./utils/searchProviderContactCardList";

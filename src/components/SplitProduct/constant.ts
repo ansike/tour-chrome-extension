@@ -1,5 +1,5 @@
 import type { StepProps } from "antd"
-import { flight, train } from "~contents/createProduct/constant"
+import { flight, train } from "~src/constant"
 
 // 创建步骤配置常量
 export const CreateStepConstant = {

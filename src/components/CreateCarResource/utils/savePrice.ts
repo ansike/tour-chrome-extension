@@ -1,4 +1,4 @@
-import { PRICE_RATE } from "~contents/createProduct/constant";
+import { PRICE_RATE } from "~src/constant";
 
 import { getVendorId } from "../../scripts/getVendorId";
 

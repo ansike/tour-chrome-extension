@@ -4,14 +4,14 @@ import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
 import { useState, useEffect } from "react";
 
-import CombinationProduct from "./components/CombinationProduct";
-import CreateCarResource from "./components/CreateCarResource";
-import CreateSubProduct from "./components/CreateSubProduct";
-import DuplicateProduct from "./components/DuplicateProduct";
-import SplitProduct from "./components/SplitProduct";
-import DumpProduct from "./components/DumpProduct";
-import ProductTransfer from "./components/ProductTransfer";
-import { isLoggedIn } from "../../lib/auth";
+import CombinationProduct from "~src/components/CombinationProduct";
+import CreateCarResource from "~src/components/CreateCarResource";
+import CreateSubProduct from "~src/components/CreateSubProduct";
+import DuplicateProduct from "~src/components/DuplicateProduct";
+import SplitProduct from "~src/components/SplitProduct";
+import DumpProduct from "~src/components/DumpProduct";
+import ProductTransfer from "~src/components/ProductTransfer";
+import { isLoggedIn } from "~src/lib/auth";
 
 const HOST_ID = "tour-helper-shadow-host";
 

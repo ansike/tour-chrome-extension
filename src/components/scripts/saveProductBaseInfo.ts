@@ -1,7 +1,7 @@
 // 无须过多的参数，可以固定
 
 import { parseHtmlToObj } from "../util"
-import { PRODUCT_PATTERN_MAP } from "../../constant"
+import { PRODUCT_PATTERN_MAP } from "~src/constant"
 import { getCurrentAccountLocalInfo } from "./getCurrentAccountLocalInfo"
 import { getContactOverlay } from "./getContactOverlay"
 import { getAccountConfFromCtrip } from "./getAccountConfFromCtrip"

@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import {
   getTourDaily,
   type TourDailyDescription,
-} from "~contents/createProduct/components/scripts/getProductBaseInfo";
-import { getProductDetail } from "~contents/createProduct/components/scripts/getProductDetail";
+} from "~src/components/scripts/getProductBaseInfo";
+import { getProductDetail } from "~src/components/scripts/getProductDetail";
 
 import { useAirportSelect } from "../useAirportSelect";
 import { downloadXslx, permuteWithDeletions } from "../util";

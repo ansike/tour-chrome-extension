@@ -1,4 +1,4 @@
-import { TRANSTORT_TYPE } from "~contents/createProduct/constant";
+import { TRANSTORT_TYPE } from "~src/constant";
 
 import { getTourDaily } from "../../scripts/getProductBaseInfo";
 import {

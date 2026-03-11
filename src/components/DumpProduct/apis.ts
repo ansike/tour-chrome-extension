@@ -57,4 +57,4 @@ export const getTourMarketQuotationsRanking = async ({ region, isUp, productType
   return res.json();
 };
 
-export { getProductDumpConfig } from "../../../../lib/api";
+export { getProductDumpConfig } from "~src/lib/api";

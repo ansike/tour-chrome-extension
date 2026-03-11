@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx'
-import { PRICE_STEP } from '~contents/createProduct/constant'
+import { PRICE_STEP } from '~src/constant'
 import { saveResource } from './saveResource'
 import { savePrice } from './savePrice'
 import { sleep } from '../../util'

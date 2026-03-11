@@ -4,7 +4,7 @@ import {
   flight,
   train,
   TRANSTORT_TYPE,
-} from "~contents/createProduct/constant";
+} from "~src/constant";
 
 import { getPackageList } from "../../scripts/savePackageItem";
 import { searchResourceGroup } from "../../scripts/searchResourceGroup";

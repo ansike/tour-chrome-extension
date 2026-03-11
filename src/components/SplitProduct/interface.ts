@@ -1,4 +1,4 @@
-import type { TourDailyDescription } from "~contents/createProduct/components/scripts/getProductBaseInfo";
+import type { TourDailyDescription } from "~src/components/scripts/getProductBaseInfo";
 
 export interface TourDay {
     id: string;

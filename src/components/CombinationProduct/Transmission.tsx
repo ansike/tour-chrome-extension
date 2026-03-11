@@ -1,6 +1,6 @@
 import { Form, Input, InputNumber, Select } from "antd";
 
-import { TRANSTORT_TYPE } from "~contents/createProduct/constant";
+import { TRANSTORT_TYPE } from "~src/constant";
 
 const options = [
   {

@@ -1,18 +1,18 @@
 import { Flex, Steps, message, type StepProps } from 'antd'
 import React, { useEffect, useState } from 'react';
 
-import { productDuplicate } from '~contents/createProduct/components/scripts/productDuplicate';
-import { StepsConfMap, CreateStepConstant } from '~/contents/createProduct/CreateModal/constant';
-import { saveSaleControlInfo } from '~contents/createProduct/components/scripts/saveSaleControlInfo';
-import { saveProduct } from '~contents/createProduct/components/scripts/saveProductBaseInfo';
-import { saveProductRichText } from '~contents/createProduct/components/scripts/savedescriptioninfo';
-import { savePackage } from '~contents/createProduct/components/scripts/savePackageItem';
-import { saveProductResource } from '~/contents/createProduct/scripts/saveProductMaintainType';
+import { productDuplicate } from '~src/components/scripts/productDuplicate';
+import { StepsConfMap, CreateStepConstant } from './constant';
+import { saveSaleControlInfo } from '~src/components/scripts/saveSaleControlInfo';
+import { saveProduct } from '~src/components/scripts/saveProductBaseInfo';
+import { saveProductRichText } from '~src/components/scripts/savedescriptioninfo';
+import { savePackage } from '~src/components/scripts/savePackageItem';
+import { saveProductResource } from '../scripts/saveProductResource';
 import type { TourDay } from "./interface";
-import { savePriceInventory } from '~contents/createProduct/components/scripts/savePriceInventory';
+import { savePriceInventory } from '~src/components/scripts/savePriceInventory';
 // import { saveLineInfo } from '../scripts/saveLineInfo';
 import { updateResourceActive } from '../scripts/updateResourceActive';
-import { saveClauses } from '~contents/createProduct/components/scripts/saveClauses';
+import { saveClauses } from '~src/components/scripts/saveClauses';
 
 import { saveTourDailyDetail } from '../scripts/saveTourDailyDetail';
 import { formatData } from '../util';

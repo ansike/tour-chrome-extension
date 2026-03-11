@@ -2,7 +2,7 @@ import { CheckCircleTwoTone } from "@ant-design/icons";
 import { Button, Progress } from "antd";
 import { useEffect, useState } from "react";
 
-import { productDuplicate } from "~contents/createProduct/components/scripts/productDuplicate";
+import { productDuplicate } from "~src/components/scripts/productDuplicate";
 
 import { saveClauses } from "../scripts/saveClauses";
 import { saveProductRichText } from "../scripts/savedescriptioninfo";

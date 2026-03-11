@@ -1,6 +1,6 @@
 import { Modal, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { DEBUG_IMPORT_FILE_URL, isImportDebugMode } from '../../constant';
+import { DEBUG_IMPORT_FILE_URL, isImportDebugMode } from '~src/constant';
 import ExportTab from './ExportTab';
 import ImportTab from './ImportTab';
 

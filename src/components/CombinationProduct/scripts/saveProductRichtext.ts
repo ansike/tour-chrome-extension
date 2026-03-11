@@ -1,4 +1,4 @@
-import { pmRcmdItems } from "~contents/createProduct/constant";
+import { pmRcmdItems } from "~src/constant";
 
 import { bindProductImage } from "../../scripts/bindProductImage";
 import {
