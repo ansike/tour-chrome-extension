@@ -1,5 +1,4 @@
-import { Dropdown, type MenuProps, message, Tooltip } from "antd";
-import { LockOutlined } from "@ant-design/icons";
+import { Dropdown, type MenuProps } from "antd";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -19,39 +18,6 @@ export const getStyle = () => {
   const style = document.createElement("style");
   style.textContent = cssText;
   return style;
-};
-
-const ProtectedMenuItem = ({ 
-  label,
-  children, 
-  isAuthenticated 
-}: { 
-  label: string;
-  children: React.ReactNode; 
-  isAuthenticated: boolean;
-}) => {
-  if (isAuthenticated) {
-    return <>{children}</>;
-  }
-  
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    message.warning("此功能需要登录，请点击扩展图标登录");
-  };
-  
-  return (
-    <Tooltip title="需要登录">
-      <span 
-        onClick={handleClick} 
-        onMouseDown={(e) => e.stopPropagation()}
-        style={{ color: "#999", cursor: "not-allowed", display: "flex", alignItems: "center", gap: 4 }}
-      >
-        <LockOutlined />
-        {label}
-      </span>
-    </Tooltip>
-  );
 };
 
 const CreateProduct = () => {
@@ -141,31 +107,23 @@ const CreateProduct = () => {
       key: "DUPLICATE_PRODUCT",
       label: <DuplicateProduct />,
     },
-    {
-      key: "DUMP_PRODUCT",
-      label: (
-        <ProtectedMenuItem label="导出产品数据" isAuthenticated={isAuthenticated}>
-          <DumpProduct />
-        </ProtectedMenuItem>
-      ),
-    },
-    {
-      key: "PRODUCT_TRANSFER",
-      label: (
-        <ProtectedMenuItem label="跨账号复制" isAuthenticated={isAuthenticated}>
-          <ProductTransfer />
-        </ProtectedMenuItem>
-      ),
-    },
-    ...(isAdmin === "1"
+    ...(isAuthenticated
+      ? [
+          {
+            key: "DUMP_PRODUCT",
+            label: <DumpProduct />,
+          },
+          {
+            key: "PRODUCT_TRANSFER",
+            label: <ProductTransfer />,
+          },
+        ]
+      : []),
+    ...(isAdmin === "1" && isAuthenticated
       ? [
           {
             key: "CREATE_CAR_RESOURCE",
-            label: (
-              <ProtectedMenuItem label="创建用车资源" isAuthenticated={isAuthenticated}>
-                <CreateCarResource />
-              </ProtectedMenuItem>
-            ),
+            label: <CreateCarResource />,
           },
         ]
       : []),
