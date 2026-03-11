@@ -2,7 +2,7 @@ import { Dropdown, type MenuProps, message, Tooltip } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import cssText from "data-text:./style.css";
 import { type PlasmoCSConfig } from "plasmo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import CombinationProduct from "~src/components/CombinationProduct";
 import CreateCarResource from "~src/components/CreateCarResource";
@@ -56,6 +56,54 @@ const ProtectedMenuItem = ({
 
 const CreateProduct = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [position, setPosition] = useState({ x: window.innerWidth - 60, y: window.innerHeight / 2 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
+  const hasDragged = useRef(false);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    hasDragged.current = false;
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startPosX: position.x,
+      startPosY: position.y,
+    };
+  }, [position]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !dragRef.current) return;
+    
+    const deltaX = e.clientX - dragRef.current.startX;
+    const deltaY = e.clientY - dragRef.current.startY;
+    
+    if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+      hasDragged.current = true;
+    }
+    
+    const newX = Math.max(0, Math.min(window.innerWidth - 40, dragRef.current.startPosX + deltaX));
+    const newY = Math.max(0, Math.min(window.innerHeight - 40, dragRef.current.startPosY + deltaY));
+    
+    setPosition({ x: newX, y: newY });
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    dragRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
   
   useEffect(() => {
     const checkAuth = async () => {
@@ -124,23 +172,37 @@ const CreateProduct = () => {
   ];
 
   return (
-    <div id="tour-helper-container">
-      <Dropdown menu={{ items }} placement="topRight">
+    <div 
+      id="tour-helper-container"
+      style={{
+        position: "fixed",
+        left: position.x,
+        top: position.y,
+        zIndex: 2147483647,
+      }}
+    >
+      <Dropdown 
+        menu={{ items }} 
+        placement="topRight"
+        trigger={hasDragged.current ? [] : ["click"]}
+      >
         <div
-          className="p-8"
+          onMouseDown={handleMouseDown}
           style={{
             background: "#1677ff",
             color: "white",
             fontSize: 12,
-            cursor: "pointer",
+            cursor: isDragging ? "grabbing" : "grab",
             borderRadius: "100%",
-            width: "40px",
-            height: "40px",
+            width: "60px",
+            height: "60px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             textAlign: "center",
             pointerEvents: "auto",
+            userSelect: "none",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}>
           <span>Tour helper</span>
         </div>
