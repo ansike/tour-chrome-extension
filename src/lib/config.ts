@@ -1,12 +1,12 @@
 function getApiBaseUrl(): string {
   // 开发环境使用本地服务
-  if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
-    const manifest = chrome.runtime.getManifest();
-    const isDev = !manifest.update_url;
-    if (isDev) {
-      return 'http://localhost:8000';
-    }
-  }
+  // if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
+  //   const manifest = chrome.runtime.getManifest();
+  //   const isDev = !manifest.update_url;
+  //   if (isDev) {
+  //     return 'http://localhost:8000';
+  //   }
+  // }
   return 'https://www.askfuture.online';
 }
 

@@ -5,6 +5,7 @@ import {
   savePriceInventoryFetch,
 } from "../../scripts/savePriceInventory";
 import { saveProductBaseInfo } from "../../scripts/saveProductBaseInfo";
+import { getAuthData } from "../../../lib/auth";
 import {
   createProductDraft,
   getSegments,
@@ -144,13 +145,17 @@ export async function createProductFromData(
     onProgress?.("保存产品信息...");
     if (data.baseInfo) {
       const base = data.baseInfo as any;
+      const authData = await getAuthData();
+      const providerProductName = authData?.user?.name ? `TOUR-${authData.user.name}` : "";
+      base.baseInfo.providerProductName = providerProductName;
+      base.baseInfo.providerProductId = newProductId;
       const productInfo = {
         ...base,
         saleControl:
           data.saleControl ?? base.saleControlInfo ?? base.saleControl,
         bookingControl: base.bookingControls,
         productId: newProductId,
-        baseInfo: { ...base.baseInfo, productId: newProductId },
+        baseInfo: base.baseInfo,
       };
       await saveProductBaseInfo(productInfo);
     }
