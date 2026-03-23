@@ -1,5 +1,6 @@
 import { Button, Table, Tag, Upload, message, Tooltip } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { CopyOutlined, UploadOutlined } from '@ant-design/icons';
+import copy from 'copy-to-clipboard';
 import React, { useEffect, useState } from 'react';
 import type { ImportItem, ProductData } from './types';
 import {
@@ -146,6 +147,20 @@ const ImportTab: React.FC<ImportTabProps> = ({
     message.success('导入完成');
   };
 
+  const handleCopyNewProductIds = () => {
+    const ids = importItems
+      .map((it) => it.newProductId?.trim())
+      .filter((id): id is string => Boolean(id));
+    if (ids.length === 0) {
+      message.warning('暂无新产品 ID 可复制');
+      return;
+    }
+    copy(ids.join(','));
+    message.success(
+      ids.length === 1 ? '已复制新产品 ID' : `已复制 ${ids.length} 个新产品 ID`
+    );
+  };
+
   const handleDownloadResult = () => {
     const results = importItems.map((it) => ({
       sourceProductId: it.sourceProductId,
@@ -179,16 +194,32 @@ const ImportTab: React.FC<ImportTabProps> = ({
       title: '新产品 ID',
       dataIndex: 'newProductId',
       key: 'newProductId',
-      width: 120,
+      width: 150,
       render: (id: string) =>
         id ? (
-          <a
-            href={`https://vbooking.ctrip.com/ivbk/vendor/baseInfoMerge?productId=${id}&from=vbk`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {id}
-          </a>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <a
+              href={`https://vbooking.ctrip.com/ivbk/vendor/baseInfoMerge?productId=${id}&from=vbk`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {id}
+            </a>
+            <Tooltip title="复制 ID">
+              <Button
+                type="text"
+                size="small"
+                icon={<CopyOutlined />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  copy(id);
+                  message.success('已复制新产品 ID');
+                }}
+                aria-label="复制新产品 ID"
+              />
+            </Tooltip>
+          </span>
         ) : (
           '--'
         ),
@@ -229,6 +260,7 @@ const ImportTab: React.FC<ImportTabProps> = ({
   const canDownload = importItems.some(
     (it) => it.status === 'success' || it.status === 'partial' || it.status === 'failed'
   );
+  const canCopyNewIds = importItems.some((it) => Boolean(it.newProductId?.trim()));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -255,6 +287,14 @@ const ImportTab: React.FC<ImportTabProps> = ({
 
         <Button onClick={handleDownloadResult} disabled={!canDownload || importing}>
           下载结果 CSV
+        </Button>
+
+        <Button
+          icon={<CopyOutlined />}
+          onClick={handleCopyNewProductIds}
+          disabled={!canCopyNewIds}
+        >
+          复制新产品 ID
         </Button>
       </div>
 
