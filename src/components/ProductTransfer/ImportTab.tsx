@@ -11,6 +11,10 @@ import {
 } from './utils/csvImport';
 import { createProductFromData } from './apis/createProduct';
 import { exportResultsToCsv } from './utils/csvExport';
+import { getVendorId } from '../scripts/getVendorId';
+import { submitProductTransferImportLog } from '~src/lib/api';
+import { saveLastProductTransferImport } from '~src/lib/productTransferAuditStorage';
+import { extractVbkAccount } from './utils/vbkAccount';
 
 interface ImportTabProps {
   /** 调试时使用内置示例 CSV，不依赖网络 */
@@ -101,50 +105,71 @@ const ImportTab: React.FC<ImportTabProps> = ({
       return;
     }
 
+    let rows: ImportItem[] = importItems.map((x) => ({ ...x }));
     setImporting(true);
 
     for (let i = 0; i < parsedProducts.length; i++) {
       const product = parsedProducts[i];
 
-      setImportItems((prev) =>
-        prev.map((it, idx) =>
-          idx === i ? { ...it, status: 'importing' as const, stage: '开始' } : it
-        )
+      rows = rows.map((it, idx) =>
+        idx === i ? { ...it, status: 'importing' as const, stage: '开始' } : it
       );
+      setImportItems([...rows]);
 
-      console.log('product', product);
       const result = await createProductFromData(product, (stage) => {
-        setImportItems((prev) =>
-          prev.map((it, idx) => (idx === i ? { ...it, stage } : it))
-        );
+        rows = rows.map((it, idx) => (idx === i ? { ...it, stage } : it));
+        setImportItems([...rows]);
       });
 
       if (!result.success && result.errorMessage) {
         message.error(`产品 ${product.productName} 导入失败: ${result.errorMessage}`);
       }
-      setImportItems((prev) =>
-        prev.map((it, idx) =>
-          idx === i
-            ? {
-                ...it,
-                newProductId: result.newProductId,
-                status: result.success
-                  ? ('success' as const)
-                  : result.newProductId
-                  ? ('partial' as const)
-                  : ('failed' as const),
-                stage: result.stage,
-                errorMessage: result.errorMessage,
-              }
-            : it
-        )
+      rows = rows.map((it, idx) =>
+        idx === i
+          ? {
+              ...it,
+              newProductId: result.newProductId,
+              status: result.success
+                ? ('success' as const)
+                : result.newProductId
+                ? ('partial' as const)
+                : ('failed' as const),
+              stage: result.stage,
+              errorMessage: result.errorMessage,
+            }
+          : it
       );
+      setImportItems([...rows]);
 
       await new Promise((r) => setTimeout(r, 500 + Math.random() * 500));
     }
 
     setImporting(false);
     message.success('导入完成');
+
+    void (async () => {
+      const [vbkAccount, vendorId] = await Promise.all([
+        extractVbkAccount(),
+        getVendorId().catch(() => 'unknown'),
+      ]);
+      const items = rows.map((it) => ({
+        sourceProductId: it.sourceProductId,
+        productName: it.productName,
+        newProductId: it.newProductId ?? '',
+        status: it.status,
+        stage: it.stage ?? '',
+        errorMessage: it.errorMessage ?? '',
+        retryCount: it.retryCount ?? 0,
+      }));
+      const logId = await submitProductTransferImportLog({
+        vendorId: vendorId || 'unknown',
+        vbkAccount: vbkAccount || 'unknown',
+        items,
+      });
+      if (logId != null) {
+        await saveLastProductTransferImport(logId, rows);
+      }
+    })();
   };
 
   const handleCopyNewProductIds = () => {
@@ -194,7 +219,7 @@ const ImportTab: React.FC<ImportTabProps> = ({
       title: '新产品 ID',
       dataIndex: 'newProductId',
       key: 'newProductId',
-      width: 150,
+      width: 180,
       render: (id: string) =>
         id ? (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -210,6 +235,7 @@ const ImportTab: React.FC<ImportTabProps> = ({
                 type="text"
                 size="small"
                 icon={<CopyOutlined />}
+                style={{ flexShrink: 0, paddingInline: 4 }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

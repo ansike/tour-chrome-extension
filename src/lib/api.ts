@@ -100,3 +100,58 @@ export async function logout(): Promise<ApiResponse<any>> {
 export async function getProductDumpConfig(regionType: string): Promise<ApiResponse<any>> {
   return request(`${API_ENDPOINTS.PRODUCT_DUMP_CONFIG}?regionType=${regionType}`, {}, true);
 }
+
+export async function submitProductTransferImportLog(payload: {
+  vendorId: string;
+  vbkAccount: string;
+  items: Record<string, unknown>[];
+}): Promise<number | null> {
+  const token = await getToken();
+  if (!token) return null;
+  try {
+    const res = await request<{ id: number }>(
+      API_ENDPOINTS.PRODUCT_TRANSFER_IMPORT_LOG,
+      { method: 'POST', body: JSON.stringify(payload) },
+      true,
+    );
+    if (res.code === 200 && res.data != null && typeof (res.data as { id?: number }).id === 'number') {
+      return (res.data as { id: number }).id;
+    }
+    console.warn('[Tour Helper] product transfer import log:', res.message);
+  } catch (e) {
+    console.warn('[Tour Helper] product transfer import log failed', e);
+  }
+  return null;
+}
+
+export async function submitProductTransferExportLog(payload: {
+  vendorId: string;
+  vbkAccount: string;
+  items: Record<string, unknown>[];
+  relatedImportLogId?: number | null;
+}): Promise<number | null> {
+  const token = await getToken();
+  if (!token) return null;
+  try {
+    const body: Record<string, unknown> = {
+      vendorId: payload.vendorId,
+      vbkAccount: payload.vbkAccount,
+      items: payload.items,
+    };
+    if (payload.relatedImportLogId != null) {
+      body.relatedImportLogId = payload.relatedImportLogId;
+    }
+    const res = await request<{ id: number }>(
+      API_ENDPOINTS.PRODUCT_TRANSFER_EXPORT_LOG,
+      { method: 'POST', body: JSON.stringify(body) },
+      true,
+    );
+    if (res.code === 200 && res.data != null && typeof (res.data as { id?: number }).id === 'number') {
+      return (res.data as { id: number }).id;
+    }
+    console.warn('[Tour Helper] product transfer export log:', res.message);
+  } catch (e) {
+    console.warn('[Tour Helper] product transfer export log failed', e);
+  }
+  return null;
+}

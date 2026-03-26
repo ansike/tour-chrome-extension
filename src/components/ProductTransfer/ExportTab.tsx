@@ -1,9 +1,12 @@
-import { Button, Input, Table, Tag, message } from 'antd';
+import { Button, Checkbox, Input, Table, Tag, message } from 'antd';
 import React, { useState, useRef } from 'react';
 import type { ExportItem, ProductData } from './types';
 import { extractFullProduct } from './apis/extractProduct';
 import { exportProductsToCsv } from './utils/csvExport';
 import { getVendorId } from '../scripts/getVendorId';
+import { submitProductTransferExportLog } from '~src/lib/api';
+import { loadLastProductTransferImport } from '~src/lib/productTransferAuditStorage';
+import { extractVbkAccount } from './utils/vbkAccount';
 
 const { TextArea } = Input;
 
@@ -14,6 +17,7 @@ const ExportTab: React.FC<ExportTabProps> = () => {
   const [exportItems, setExportItems] = useState<ExportItem[]>([]);
   const [exporting, setExporting] = useState(false);
   const [exportedData, setExportedData] = useState<ProductData[]>([]);
+  const [linkLastImport, setLinkLastImport] = useState(true);
   const accountIdRef = useRef<string>('');
 
   const parseProductIds = (input: string): string[] => {
@@ -49,44 +53,42 @@ const ExportTab: React.FC<ExportTabProps> = () => {
     }
 
     const results: ProductData[] = [];
+    let rows: ExportItem[] = items.map((x) => ({ ...x }));
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    for (let i = 0; i < rows.length; i++) {
+      const item = rows[i];
 
-      setExportItems((prev) =>
-        prev.map((it, idx) =>
-          idx === i ? { ...it, status: 'extracting' as const } : it
-        )
+      rows = rows.map((it, idx) =>
+        idx === i ? { ...it, status: 'extracting' as const } : it
       );
+      setExportItems([...rows]);
 
       try {
         const data = await extractFullProduct(item.productId);
         results.push(data);
 
-        setExportItems((prev) =>
-          prev.map((it, idx) =>
-            idx === i
-              ? {
-                  ...it,
-                  status: 'success' as const,
-                  productName: data.productName,
-                  data,
-                }
-              : it
-          )
+        rows = rows.map((it, idx) =>
+          idx === i
+            ? {
+                ...it,
+                status: 'success' as const,
+                productName: data.productName,
+                data,
+              }
+            : it
         );
+        setExportItems([...rows]);
       } catch (error) {
-        setExportItems((prev) =>
-          prev.map((it, idx) =>
-            idx === i
-              ? {
-                  ...it,
-                  status: 'failed' as const,
-                  errorMessage: (error as Error).message,
-                }
-              : it
-          )
+        rows = rows.map((it, idx) =>
+          idx === i
+            ? {
+                ...it,
+                status: 'failed' as const,
+                errorMessage: (error as Error).message,
+              }
+            : it
         );
+        setExportItems([...rows]);
       }
 
       await new Promise((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -98,6 +100,31 @@ const ExportTab: React.FC<ExportTabProps> = () => {
     if (results.length > 0) {
       message.success(`成功提取 ${results.length} 个产品数据`);
     }
+
+    void (async () => {
+      const snap = linkLastImport ? await loadLastProductTransferImport() : null;
+      const vbkAccount = await extractVbkAccount();
+      const vendorId = accountIdRef.current || 'unknown';
+      const payloadItems: Record<string, unknown>[] = rows.map((it) => {
+        const row: Record<string, unknown> = {
+          productId: it.productId,
+          productName: it.productName,
+          status: it.status,
+          errorMessage: it.errorMessage ?? '',
+        };
+        if (snap && snap.newToSource[it.productId] != null) {
+          row.importNewProductId = it.productId;
+          row.importSourceProductId = snap.newToSource[it.productId];
+        }
+        return row;
+      });
+      await submitProductTransferExportLog({
+        vendorId,
+        vbkAccount: vbkAccount || 'unknown',
+        items: payloadItems,
+        relatedImportLogId: snap?.logId ?? null,
+      });
+    })();
   };
 
   const handleDownloadCsv = async () => {
@@ -165,13 +192,20 @@ const ExportTab: React.FC<ExportTabProps> = () => {
         />
       </div>
 
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <Button type="primary" onClick={handleStartExport} loading={exporting}>
           开始导出
         </Button>
         <Button onClick={handleDownloadCsv} disabled={!canDownload}>
           下载 CSV
         </Button>
+        <Checkbox
+          checked={linkLastImport}
+          onChange={(e) => setLinkLastImport(e.target.checked)}
+          disabled={exporting}
+        >
+          关联最近一次导入记录（上报服务端）
+        </Checkbox>
       </div>
 
       {exportItems.length > 0 && (
