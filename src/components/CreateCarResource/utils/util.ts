@@ -2,7 +2,8 @@ import * as XLSX from 'xlsx'
 import { PRICE_STEP } from '~src/constant'
 import { saveResource } from './saveResource'
 import { savePrice } from './savePrice'
-import { sleep } from '../../util'
+import { getVendorId } from '../../scripts/getVendorId'
+import { buildExistingResourceKey } from './history'
 
 // 辅助函数：将字符串转换为 ArrayBuffer
 function s2ab(s) {
@@ -14,115 +15,228 @@ function s2ab(s) {
     return buf
 }
 
-/**
- * 
- * @param data json 格式
- * 
-    // const newData = [
-    //     {
-    //         "5座ID": "1",
-    //         "5座价格": "1"
-    //     },
-    //     {
-    //         "5座ID": "2",
-    //         "5座价格": "2"
-    //     },
-    // ]
- */
+export function downloadCarResourceWorkbook(resourceRows = [], groupRows = []) {
+    const workbook = XLSX.utils.book_new()
+    appendDomesticCarResourceSheet(workbook, resourceRows)
+    appendDomesticCarResourceGroupSheet(workbook, groupRows)
 
-export function downloadXslx(data) {
-    console.log({ data })
-    const newData = []
-    data.forEach((d) => {
-        d.items?.forEach((i, idx) => {
-            const curObj = newData[idx];
-            if (curObj) {
-                curObj[d.label + "ID"] = i
-                curObj[d.label + "价格"] = d.start + idx * PRICE_STEP
-            } else {
-                newData[idx] = {
-                    [d.label + "ID"]: i,
-                    [d.label + "价格"]: d.start + idx * PRICE_STEP
+    const excelData = XLSX.write(workbook, { type: 'binary' })
+    const blobData = new Blob([s2ab(excelData)], {
+        type: 'application/octet-stream'
+    })
+    const downloadLink = document.createElement('a')
+    downloadLink.href = URL.createObjectURL(blobData)
+    downloadLink.download = `用车资源-${formatNowForFileName()}.xlsx`
+    downloadLink.click()
+}
+
+const domesticCarColumns = [
+    {
+        key: '经济5座',
+        labels: ['经济5座', '5座经济'],
+        resourceName: '5座经济型车(1-3)',
+        headers: ['资源名称1-3人', '资源描述', 'ID号'],
+    },
+    {
+        key: '舒适5座',
+        labels: ['舒适5座', '5座舒适'],
+        resourceName: '5座舒适型车(1-4)',
+        headers: ['资源名称1-4人', '资源描述', 'ID号'],
+    },
+    {
+        key: '商务7座',
+        labels: ['商务7座', '7座'],
+        resourceName: '7座商务车(1-5)',
+        headers: ['资源名称 1-5人', '资源描述', 'ID号'],
+    },
+    {
+        key: '9座小巴',
+        labels: ['9座小巴', '商务9座', '9座'],
+        resourceName: '9座商务车(1-7)',
+        headers: ['资源名称 1-7人', '资源描述', 'ID号'],
+    },
+    {
+        key: '12座中巴',
+        labels: ['12座中巴', '12座'],
+        resourceName: '12座车(1-10)',
+        headers: ['资源名称 1-10人', '资源描述', 'ID号'],
+    },
+    {
+        key: '14座中巴',
+        labels: ['14座中巴', '14座'],
+        resourceName: '14座用车',
+        headers: ['资源名称 1-12人', '资源描述', 'ID号'],
+    },
+    {
+        key: '19座中巴',
+        labels: ['19座中巴', '19座'],
+        resourceName: '19座用车',
+        headers: ['资源名称1-15人', '资源描述', 'ID号'],
+    },
+]
+
+function appendDomesticCarResourceSheet(workbook, resourceRows) {
+    const validRows = resourceRows.filter((row) => row.resourceId && row.createStatus === 'success')
+    const groupedRows = domesticCarColumns.map((column) => {
+        return validRows
+            .filter((row) => getDomesticCarKey(row.label || row.carName || '') === column.key)
+            .sort((a, b) => Number(a.price) - Number(b.price))
+    })
+    const maxRows = Math.max(0, ...groupedRows.map((rows) => rows.length))
+    const trailingBlankColumns = ['', '', '']
+    const domesticColumnCount = domesticCarColumns.length * 3 + trailingBlankColumns.length
+    const rows = [
+        new Array(domesticColumnCount).fill(''),
+        ['提前预订：1天12点 是否必选：是 是否默认：是 单位：辆 份数算法：每单', ...new Array(domesticColumnCount - 1).fill('')],
+        [...domesticCarColumns.flatMap((column) => column.headers), ...trailingBlankColumns],
+    ]
+
+    for (let index = 0; index < maxRows; index++) {
+        rows.push([
+            ...domesticCarColumns.flatMap((column, columnIndex) => {
+                const row = groupedRows[columnIndex][index]
+                if (!row) {
+                    return ['', '', '']
                 }
-            }
-        })
-    })
+                return [column.resourceName, Number(row.price), row.resourceId]
+            }),
+            ...trailingBlankColumns,
+        ])
+    }
 
-    const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils.json_to_sheet(newData)
-
-    const headerRowCells = XLSX.utils.sheet_to_json(worksheet, { range: 1 })
-    const colWidths = headerRowCells.map(cell => ({
-        width: 20, // 设置宽度为 20 个字符
-        alignment: { horizontal: 'left' } // 设置对齐方式为左对齐
-    }))
-    worksheet['!cols'] = colWidths
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-    const excelData = XLSX.write(workbook, { type: 'binary' })
-    const blobData = new Blob([s2ab(excelData)], {
-        type: 'application/octet-stream'
-    })
-
-    const downloadLink = document.createElement('a')
-    downloadLink.href = URL.createObjectURL(blobData)
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDay()
-    const hour = date.getHours()
-    const min = date.getMinutes()
-    downloadLink.download = `用车资源-${year}年${month}月${day}日${hour}时${min}分.xlsx`
-    downloadLink.click()
+    const worksheet = XLSX.utils.aoa_to_sheet(rows)
+    worksheet['!cols'] = [
+        ...domesticCarColumns.flatMap(() => [
+            { width: 22 },
+            { width: 12 },
+            { width: 14 },
+        ]),
+        { width: 12 },
+        { width: 12 },
+        { width: 12 },
+    ]
+    worksheet['!merges'] = [{ s: { r: 1, c: 0 }, e: { r: 1, c: domesticColumnCount - 1 } }]
+    XLSX.utils.book_append_sheet(workbook, worksheet, '国内车辆资源')
 }
 
-export function downloadCarResources(data) {
-    console.log({ data })
-
-    const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils.json_to_sheet(data)
-
-    const headerRowCells = XLSX.utils.sheet_to_json(worksheet, { range: 1 })
-    const colWidths = headerRowCells.map(cell => ({
-        width: 20, // 设置宽度为 20 个字符
-        alignment: { horizontal: 'left' } // 设置对齐方式为左对齐
-    }))
-    worksheet['!cols'] = colWidths
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-    const excelData = XLSX.write(workbook, { type: 'binary' })
-    const blobData = new Blob([s2ab(excelData)], {
-        type: 'application/octet-stream'
-    })
-
-    const downloadLink = document.createElement('a')
-    downloadLink.href = URL.createObjectURL(blobData)
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDay()
-    const hour = date.getHours()
-    const min = date.getMinutes()
-    downloadLink.download = `用车资源-${year}年${month}月${day}日${hour}时${min}分.xlsx`
-    downloadLink.click()
+function appendDomesticCarResourceGroupSheet(workbook, groupRows) {
+    const rows = [
+        ['资源组ID', '资源组名称', '', '', ''],
+        ...groupRows
+            .filter((row) => row.resourceGroupId && row.status === 'success')
+            .map((row) => [row.resourceGroupId, row.resourceGroupName || '', '', '', '']),
+    ]
+    const worksheet = XLSX.utils.aoa_to_sheet(rows)
+    worksheet['!cols'] = [{ width: 14 }, { width: 90 }, { width: 12 }, { width: 12 }, { width: 12 }]
+    XLSX.utils.book_append_sheet(workbook, worksheet, '国内用车资源组')
 }
 
-export const createCarResource = async (car, user, callback) => {
-    const { start, end } = car
-    for (let i = start; i <= end; i += PRICE_STEP) {
+function getDomesticCarKey(text) {
+    const source = String(text || '').split(/[:：]/)[0].trim()
+    const aliases = domesticCarColumns
+        .flatMap((column) => column.labels.map((label) => ({ key: column.key, label })))
+        .sort((prev, next) => next.label.length - prev.label.length)
+    const matched = aliases.find(({ label }) => source.includes(label) || String(text || '').includes(label))
+    return matched?.key || source
+}
+
+function formatNowForFileName() {
+    const date = new Date()
+    const pad = (value) => String(value).padStart(2, '0')
+    return `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日${pad(date.getHours())}时${pad(date.getMinutes())}分`
+}
+
+type CreateCarResourcePriceOptions = {
+    startDate?: string;
+    endDate?: string;
+    existingResourceMap?: Map<string, any>;
+}
+
+export function collectExistingCarResourceRows(car, existingResourceMap?: Map<string, any>) {
+    const rows = []
+    const missingPrices = []
+    for (let price = Number(car.start); price <= Number(car.end); price += PRICE_STEP) {
+        const row = buildCarResourceRow(car, price)
+        const existingResource = existingResourceMap?.get(
+            buildExistingResourceKey(car.label || car.carName, price)
+        )
+        if (existingResource?.resourceId) {
+            row.resourceId = existingResource.resourceId
+            row.createStatus = 'success'
+            row.priceStatus = 'history'
+            row.createdAt = existingResource.createTime || existingResource.createdAt || new Date().toISOString()
+            rows.push(row)
+            continue
+        }
+        missingPrices.push(price)
+    }
+    return { rows, missingPrices }
+}
+
+export const createCarResource = async (
+    car,
+    user,
+    callback,
+    vendorId?: string | number,
+    priceOptions: CreateCarResourcePriceOptions = {}
+) => {
+    const currentVendorId = vendorId ?? await getVendorId()
+    const { rows, missingPrices } = collectExistingCarResourceRows(car, priceOptions.existingResourceMap)
+    for (const row of rows) {
+        callback(row)
+    }
+    const createdRows = await createCarResourcesByPrices(
+        car,
+        user,
+        missingPrices,
+        callback,
+        currentVendorId,
+        priceOptions
+    )
+    return [...rows, ...createdRows]
+}
+
+export async function createCarResourcesByPrices(
+    car,
+    user,
+    prices: number[],
+    callback,
+    vendorId?: string | number,
+    priceOptions: CreateCarResourcePriceOptions = {}
+) {
+    const currentVendorId = vendorId ?? await getVendorId()
+    const results = []
+    for (const i of prices) {
+        const row = buildCarResourceRow(car, i)
         try {
             const resource = await saveResource({
                 ...car,
                 price: i
-            }, user)
-            await savePrice(resource.resourceId, i);
-            callback({
-                ...car,
-                resourceId: resource.resourceId
-            })
+            }, user, currentVendorId)
+            row.resourceId = resource.resourceId
+            row.createStatus = 'success'
+            await savePrice(resource.resourceId, i, currentVendorId, priceOptions);
+            row.priceStatus = 'success'
         } catch (error) {
             console.error(i, car, error)
-            throw error
+            row.createStatus = row.resourceId ? 'success' : 'failed'
+            row.priceStatus = row.resourceId ? 'failed' : 'skipped'
+            row.error = error instanceof Error ? error.message : String(error)
         }
+        results.push(row)
+        callback(row)
+    }
+    return results
+}
+
+function buildCarResourceRow(car, price: number) {
+    return {
+        ...car,
+        price,
+        resourceId: '',
+        createStatus: 'pending',
+        priceStatus: 'pending',
+        error: '',
+        createdAt: new Date().toISOString()
     }
 }

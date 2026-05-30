@@ -1,11 +1,23 @@
-import { PRICE_RATE } from "~src/constant";
-
 import { getVendorId } from "../../scripts/getVendorId";
+import { buildFullDateResourcePrices } from "./editDatePrice";
 
-export async function savePrice(resourceId, cost) {
-  const vendorId = await getVendorId();
-  let dateArr = getDatesBetween(new Date("2024/02/26"), new Date("2030/03/31"));
-  const marketPrice = Math.ceil(cost * PRICE_RATE);
+type SavePriceOptions = {
+  startDate?: string;
+  endDate?: string;
+};
+
+export async function savePrice(
+  resourceId,
+  cost,
+  vendorId?: string | number,
+  options: SavePriceOptions = {},
+) {
+  const currentVendorId = vendorId ?? (await getVendorId());
+  const resourcePrices = buildFullDateResourcePrices(
+    cost,
+    options.startDate || getTodayText(),
+    options.endDate || "2030-07-12",
+  );
   const body = {
     contentType: "json",
     head: {
@@ -22,18 +34,11 @@ export async function savePrice(resourceId, cost) {
     costPriceCurrency: "CNY",
     inventoryMode: "U",
     saveType: "N",
-    resourcePrices: dateArr.map((date) => {
-      return {
-        date: date,
-        active: true,
-        marketPrice,
-        cost,
-      };
-    }),
+    resourcePrices,
     resourceChildPrices: [],
     resourceStorages: [],
     relatedSingleRoomPrices: [],
-    vendorId: vendorId,
+    vendorId: currentVendorId,
   };
   const res = await fetch(
     "https://online.ctrip.com/restapi/soa2/15638/SaveResourceStoragePriceInfo.json?_fxpcqlniredt=09031111115146167449&_fxpcqlniredt=09031111115146167449",
@@ -61,16 +66,17 @@ export async function savePrice(resourceId, cost) {
       credentials: "include",
     },
   );
-  return res.json();
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`savePrice HTTP ${res.status}: ${text.slice(0, 500)}`);
+  }
+  return res.json().catch(() => ({}));
 }
 
-function getDatesBetween(start, end) {
-  for (
-    var arr = [], dt = new Date(start);
-    dt <= end;
-    dt.setDate(dt.getDate() + 1)
-  ) {
-    arr.push(dt.toISOString().slice(0, 10));
-  }
-  return arr;
+function getTodayText() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }

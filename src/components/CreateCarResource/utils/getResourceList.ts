@@ -1,10 +1,47 @@
-export async function getResourceList(user, pageNo = 1, pageSize = 10) {
+export async function getResourceList(user, pageNo = 1, pageSize = 10, options: {
+    resourceName?: string;
+    bookingContactId?: number | null | false;
+} = {}) {
     // dr 506368
     // tl 621237
     // ask 642097
-    const bookingContactId = user.contactCardId;
+    const bookingContactId =
+        options.bookingContactId === undefined ? user.contactCardId : options.bookingContactId;
+    const cid = getVbkCid();
+    const requestBody: any = {
+        contentType: "json",
+        head: {
+            cid,
+            ctok: "",
+            cver: "1.0",
+            lang: "01",
+            sid: "8888",
+            syscode: "09",
+            auth: "",
+            extension: []
+        },
+        resourceIds: [],
+        resourceName: options.resourceName || "",
+        categoryList: [{ categoryId: "2", piCategoryId: "1132" }],
+        departureCityId: null,
+        destinationCityId: null,
+        productRegion: null,
+        active: "T",
+        vendorId: null,
+        pmEid: "",
+        paEid: "",
+        createTimeStart: null,
+        createTimeEnd: null,
+        pageNo,
+        pageSize,
+        businessOwner: "VBK"
+    };
+    if (options.bookingContactId !== false) {
+        requestBody.bookingContactId = bookingContactId;
+    }
+
     const res = await fetch(
-        "https://online.ctrip.com/restapi/soa2/15638/searchResourceList.json?_fxpcqlniredt=09031119411217359276&_fxpcqlniredt=09031119411217359276",
+        `https://online.ctrip.com/restapi/soa2/15638/searchResourceList.json?_fxpcqlniredt=${cid}&_fxpcqlniredt=${cid}`,
         {
             headers: {
                 accept: "*/*",
@@ -21,13 +58,25 @@ export async function getResourceList(user, pageNo = 1, pageSize = 10) {
                 "x-ctx-locale": "zh-CN",
             },
             referrerPolicy: "no-referrer-when-downgrade",
-            body: `{\"contentType\":\"json\",\"head\":{\"cid\":\"09031119411217359276\",\"ctok\":\"\",\"cver\":\"1.0\",\"lang\":\"01\",\"sid\":\"8888\",\"syscode\":\"09\",\"auth\":\"\",\"extension\":[]},\"resourceIds\":[],\"resourceName\":\"\",\"categoryList\":[{\"categoryId\":\"2\",\"piCategoryId\":\"1132\"}],\"departureCityId\":null,\"destinationCityId\":null,\"productRegion\":null,\"active\":\"\",\"vendorId\":null,\"pmEid\":\"\",\"paEid\":\"\",\"createTimeStart\":null,\"createTimeEnd\":null,\"bookingContactId\":${bookingContactId},\"pageNo\":${pageNo},\"pageSize\":${pageSize},\"businessOwner\":\"VBK\",\"active\":\"T\"}`,
+            body: JSON.stringify(requestBody),
             method: "POST",
             mode: "cors",
             credentials: "include",
         }
     );
     return await res.json();
+}
+
+function getVbkCid() {
+    const cookies = typeof document === "undefined" ? "" : document.cookie || "";
+    const cookieMap = cookies.split(";").reduce<Record<string, string>>((map, item) => {
+        const [key, ...value] = item.trim().split("=");
+        if (key) {
+            map[key] = value.join("=");
+        }
+        return map;
+    }, {});
+    return cookieMap.vbk_login_cid || cookieMap.GUID || "09031119411217359276";
 }
 
 

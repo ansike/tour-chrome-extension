@@ -87,9 +87,6 @@ const CreateProduct = () => {
     };
   }, []);
 
-  const queryParams = new URLSearchParams(window.location.search);
-  const isAdmin = queryParams.get("admin");
-  
   const items: MenuProps["items"] = [
     {
       key: "SPLIT_PRODUCT",
@@ -117,10 +114,6 @@ const CreateProduct = () => {
             key: "PRODUCT_TRANSFER",
             label: <ProductTransfer />,
           },
-        ]
-      : []),
-    ...(isAdmin === "1" && isAuthenticated
-      ? [
           {
             key: "CREATE_CAR_RESOURCE",
             label: <CreateCarResource />,

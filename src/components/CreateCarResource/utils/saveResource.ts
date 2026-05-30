@@ -1,7 +1,14 @@
-
-export const saveResource = async (car, user) => {
+export const saveResource = async (car, user, vendorId?: string | number) => {
     // TODO 资源信息改成接口获取不要写死
-    const { price, carName, maxPersonQuantity, carIds } = car;
+    const {
+        price,
+        carName,
+        maxPersonQuantity,
+        carIds,
+        productCategories = [9, 10],
+        productPatterns = [2, 4],
+        saleModes = ["P"],
+    } = car;
     const body = {
         "contentType": "json",
         "head": {
@@ -19,6 +26,7 @@ export const saveResource = async (car, user) => {
                 "piCategoryId": 1132,
                 // "resourceId": 52878471,
                 "name": carName,
+                "resourceId": null,
                 "categoryId": 2,
                 "categoryName": "用车",
                 "inputLocale": "zh-CN",
@@ -28,14 +36,16 @@ export const saveResource = async (car, user) => {
                 "visaPeopleGroupType": 0,
                 "destinationCity": {
                     "cityId": 41,
+                    "name": "拉萨",
                     "cityName": "拉萨",
                     "countryId": 1,
                     "countryName": "中国",
                     "provinceId": 30,
                     "provinceName": "西藏",
                     "eName": "Lhasa",
+                    "cityCode": "LXA",
                     "key": 41,
-                    "value": "拉萨"
+                    "value": "拉萨/西藏/中国"
                 },
                 "departureCities": [],
                 "saleCities": [],
@@ -74,7 +84,10 @@ export const saveResource = async (car, user) => {
                 "businessOwner": "VBK",
                 "transportation": 0,
                 "canCashBack": "F",
-                "isVisaAssignInAdvance": "F"
+                "isVisaAssignInAdvance": "F",
+                "forProductCategory": productCategories.map(Number),
+                "forProductPattern": productPatterns.map(Number),
+                "forSaleMode": saleModes
             },
             "bookingControllerInfo": {
                 "vendorBookingSeneschalContactId": 0,
@@ -150,7 +163,9 @@ export const saveResource = async (car, user) => {
                 "isSmsVBKNoticeType": 1,
                 "fillInNumberLimit": "A",
                 "piCustomerInfoTemplateId": 29312799,
-                "unBookingInfo": {},
+                "unBookingInfo": {
+                    "unBookingRule": 4
+                },
                 "vendorBookingEmail": user.email,
                 "fullVendorBookingPhone": user.mobileNoFull,
                 "vendorBookingEmergencyContact": "蒋茂林",
@@ -167,9 +182,7 @@ export const saveResource = async (car, user) => {
                 "exchangeMode": 1,
                 "isProviderDistribution": "F",
                 "operationNote": "",
-                // TODO 供应商ID
-                "vendorId": 1393638,
-                "vendorName": "安徽皖美畅行旅行社有限公司",
+                "vendorId": vendorId == null ? undefined : Number(vendorId),
                 "isNeedReceipt": "T",
                 "receiptDay": 2,
                 "receiptTime": "12:00",
@@ -185,6 +198,7 @@ export const saveResource = async (car, user) => {
                     "bestoneb2b",
                     "youtripshop",
                     "ctripshop",
+                    "online",
                     "ctrip",
                     "trip",
                     "tripsystem"

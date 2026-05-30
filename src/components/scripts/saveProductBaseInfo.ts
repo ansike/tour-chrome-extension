@@ -20,7 +20,7 @@ const BASE_INFO_WHITELIST = [
   'destinationCityID', 'destinationProvinceId', 'destinationCityName',
   'destinationCountryName', 'destinationCountryId',
   'brandId', 'vendorProductCode', 'providerProductName',
-  'phone400', 'phone400ToB', 'extNumberId', 'operationNote',
+  'phone400', 'extNumberId', 'operationNote',
   'userGroupId', 'vendorId', 'isSimpleTour', 'active', 'businessOwner',
   'serviceLanguages', 'defaultServiceLanguages', 'isServiceLanguageInput',
   'isCityManage', 'priceCurrency', 'isExtendToStay', 'price', 'priceDescription',

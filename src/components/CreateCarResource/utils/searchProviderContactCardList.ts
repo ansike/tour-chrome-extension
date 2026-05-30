@@ -3,13 +3,14 @@ import { getVendorId } from "../../scripts/getVendorId";
 /** contactType: 0=全部, 1=投诉, 2=预订, 3=紧急, 4=管家 */
 export async function searchProviderContactCardList(
   searchKeyWord: string = "",
-  contactType: number = 0
+  contactType: number = 0,
+  selectedContactCardIdList: number[] = [],
 ) {
   const vendorId = await getVendorId();
   const body = {
     providerId: vendorId,
     contactType,
-    selectedContactCardIdList: [],
+    selectedContactCardIdList,
     searchKeyWord,
     version: "v0.4",
     pageIndex: 1,
@@ -33,11 +34,13 @@ export async function searchProviderContactCardList(
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-site",
         "x-ctx-locale": "zh-CN",
-        "x-tour-auth-from": "vbk",
-      },
-      referrerPolicy: "no-referrer-when-downgrade",
-      body: JSON.stringify(body),
-      method: "POST",
+      "x-tour-auth-from": "vbk",
+    },
+    referrer:
+      "https://vbooking.ctrip.com/ivbk/vendor/serviceInfoMerge?from=vbk",
+    referrerPolicy: "no-referrer-when-downgrade",
+    body: JSON.stringify(body),
+    method: "POST",
       mode: "cors",
       credentials: "include",
     },
