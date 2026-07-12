@@ -32,3 +32,9 @@ dist/
 
 # typescript
 .tsbuildinfo
+
+# release artifacts (out-of-git)
+chrome-mv3-prod-*.zip
+
+# user-provided store screenshots
+docs/release/**/assets/*.png
