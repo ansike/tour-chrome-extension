@@ -1,0 +1,7 @@
+{
+  "name": "Tour Helper - 旅行助手",
+  "short_description": "为旅行社运营人员简化携程旅游产品的创建、跨账号复制与车资源批量配置。",
+  "description": "Tour Helper 是面向携程旅行社运营人员的浏览器助手，覆盖携程度假（vacations.ctrip.com）、后台下单（vbooking.ctrip.com）、online 子域上的旅游产品管理场景。\n\n主要功能：\n\n• 产品创建 —— 自动填充表单、失败自动重试、可拖拽悬浮球快捷入口，覆盖携程长流程产品创建。\n• 产品跨账号复制 —— 在不同旅行社账号之间复制既有旅游产品，并支持向运营方后端（atdtour.com）批量上报审计。\n• 车资源批量配置 —— 批量创建车资源及资源分组。\n• 跨账号小工具 —— 在供应商后台页面之间复制付款节点、酒店信息、行程标题。\n\n插件仅在你访问携程相关页面时读取其 DOM 用于实现功能；登录后 token 仅存储在本地 chrome.storage，不会出售、共享或传输给任何第三方。\n\n完整隐私政策请见 PRIVACY.md。",
+  "category": "Productivity",
+  "language": "zh-CN"
+}

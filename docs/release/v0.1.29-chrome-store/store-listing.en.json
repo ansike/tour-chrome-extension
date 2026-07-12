@@ -1,0 +1,7 @@
+{
+  "name": "Tour Helper",
+  "short_description": "Streamline Ctrip tour-product creation, transfer, and car-resource setup for travel-agency operators.",
+  "description": "Tour Helper is an in-browser assistant for travel-agency operators who manage tour products on Ctrip (vacations.ctrip.com, vbooking.ctrip.com, online.ctrip.com).\n\nKey features:\n\n• Product creation — automate the long-form Ctrip product-creation flow with auto-filled fields, retry on transient failures, and a draggable floating ball overlay for quick access.\n• Product transfer — copy an existing tour product to another operator account, with batch audit reporting to the operator backend (atdtour.com).\n• Car-resource batch setup — create car resources and resource groups in batch.\n• Cross-account utilities — copy payment spots, hotel info, and daily titles between vendor pages.\n\nThe extension reads DOM from the Ctrip pages you visit and stores an authentication token locally (chrome.storage) only when you log in via the popup. It does not sell, share, or transmit your data to any third party.\n\nSee PRIVACY.md for the full privacy policy.",
+  "category": "Productivity",
+  "language": "en"
+}
