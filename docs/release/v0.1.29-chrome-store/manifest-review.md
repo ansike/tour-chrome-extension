@@ -25,6 +25,12 @@ When filling the Dashboard's "Permissions" tab, copy the "Justification" column 
 | --- | --- |
 | `assets/products_export_20260224_0941.csv` | Pre-bundled CSV used by the ExportTab feature to actively download exported product data when the user clicks the export button. |
 
+## content_scripts (optional, if requested by reviewer)
+
+| Match pattern | Justification (English) |
+| --- | --- |
+| `<all_urls>` | A small utility helper injected by Plasmo on every page; it does not access page content and is used only to load the per-page feature scripts declared above. No data is read from `<all_urls>`-matched pages — actual feature scripts only run on the matched Ctrip / atdtour pages listed above. |
+
 ## Note on dev-only placeholders
 
 `$EXTENSION_DEV_HOST_LOCALHOST` and `$EXTENSION_DEV_HOST_LOOPBACK` are referenced in the source `package.json` but are NOT present in the production-built `manifest.json`. Plasmo strips them during `plasmo build` because no values are defined for them in the production environment. No disclosure is needed for them.
