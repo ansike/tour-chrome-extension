@@ -92,8 +92,6 @@ host_permissions:
   - https://vbooking.ctrip.com/*    # 携程后台下单/订单管理：注入订单辅助
   - https://online.ctrip.com/*      # 携程 online 子域：辅助登录态/账号信息获取
   - https://www.atdtour.com/*       # 我方后端：API 调用（认证/产品迁移审计上报）
-  - $EXTENSION_DEV_HOST_LOCALHOST   # 仅开发期占位，发布包中保留（用户决定）
-  - $EXTENSION_DEV_HOST_LOOPBACK    # 同上
 
 permissions:
   - storage                         # 本地缓存 token / 用户偏好
@@ -168,7 +166,8 @@ unzip -l chrome-mv3-prod-0.1.29.zip | head -50
 ## 11. 风险与注意
 
 - `web_accessible_resources` 引用了一个 CSV 文件名 `products_export_20260224_0941.csv`，按 Chrome MV3 规范文件名应相对 `extension root`；plasmo build 输出的 zip 里应当保留此结构。
-- `$EXTENSION_DEV_HOST_LOCALHOST` / `$EXTENSION_DEV_HOST_LOOPBACK` 这两条会出现在发布版 manifest 中（用户已知情）。提交时要在 `manifest-review.md` 里明确写"only used during local development, no effect on end users"。如果审核因此被打回，备选方案是删这两行重新 build。
+- **`$EXTENSION_DEV_HOST_*` 不出现在生产 manifest**：Plasmo 在 `plasmo build` 时若 env 变量未定义，对应占位会被省略（而不是保留为字面量或替换为空）。已通过现有 `build/chrome-mv3-prod/manifest.json` 确认 —— host_permissions 只包含 4 个真实域名，没有这两条 dev 占位、`content_scripts` 也没有 `<all_urls>`。`manifest-review.md` 不需要为它们写披露理由。
+- 当前 `build/chrome-mv3-prod/` 仍是旧 build（域名还停留在 `askfuture.online`、版本 `0.1.28`）。本次发布前必须按第 8 节重打 zip，否则商店拿到的还是旧版。
 - 如果 Privacy 标签拒绝接受 raw.githubusercontent.com 链接，需切换到 GitHub Pages 或自有域名（届时再决定）。
 
 ## 12. 验证（发布前最后一步）
