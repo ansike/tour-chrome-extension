@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.PLASMO_PUBLIC_API_URL ?? 'https://www.askfuture.online';
+  process.env.PLASMO_PUBLIC_API_URL ?? 'https://www.atdtour.com';
 
 export const API_ENDPOINTS = {
   CAPTCHA: '/api/extension/captcha',

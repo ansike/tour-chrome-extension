@@ -38,7 +38,7 @@
       "https://vacations.ctrip.com/*",
       "https://vbooking.ctrip.com/*",
       "https://online.ctrip.com/*",
-      "https://www.askfuture.online/*",
+      "https://www.atdtour.com/*",
       "$EXTENSION_DEV_HOST_LOCALHOST",
       "$EXTENSION_DEV_HOST_LOOPBACK"
     ],
