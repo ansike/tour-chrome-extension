@@ -4,7 +4,13 @@
 
 - 拥有 Google 账号并支付过一次性 $5 注册费
 - 在 [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/) 启用了 2FA
-- 在仓库根目录准备好 `chrome-mv3-prod-0.1.29.zip`（来自 Task 10）
+- 已重新打包 `chrome-mv3-prod-0.1.29.zip`。该 zip 被 `.gitignore` 忽略，新克隆或换机器后需要先执行：
+  ```bash
+  rm -rf build/chrome-mv3-prod
+  npm run build
+  cd build/chrome-mv3-prod && zip -r ../../chrome-mv3-prod-0.1.29.zip . && cd ../..
+  ```
+  打包后用 `unzip -p chrome-mv3-prod-0.1.29.zip manifest.json | grep version` 确认输出 `0.1.29`。
 - 把商店素材（图标 / 截图）放到 `docs/release/v0.1.29-chrome-store/assets/` 下（来自 Task 4）
 
 ## 1. 新建 Item

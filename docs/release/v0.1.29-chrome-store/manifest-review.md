@@ -25,11 +25,11 @@ When filling the Dashboard's "Permissions" tab, copy the "Justification" column 
 | --- | --- |
 | `assets/products_export_20260224_0941.csv` | Pre-bundled CSV used by the ExportTab feature to actively download exported product data when the user clicks the export button. |
 
-## content_scripts (optional, if requested by reviewer)
+## content_scripts
 
 | Match pattern | Justification (English) |
 | --- | --- |
-| `<all_urls>` | A small utility helper injected by Plasmo on every page; it does not access page content and is used only to load the per-page feature scripts declared above. No data is read from `<all_urls>`-matched pages — actual feature scripts only run on the matched Ctrip / atdtour pages listed above. |
+| `<all_urls>` | Plasmo auto-injects a small utility helper (`util.*.js`) on every page; this entry was confirmed present in the built `manifest.json` (verified during end-to-end check). The util script itself does not access page content or transmit data — it only loads the per-page feature scripts listed below. Actual data reading happens only inside the Ctrip / atdtour-matched scripts. |
 
 ## Note on dev-only placeholders
 
